@@ -1,0 +1,42 @@
+<!-- pages/admin-lessons/admin-lessons.wxml -->
+<view class="container">
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+
+  <view class="content" wx:else>
+    <!-- 页面标题 -->
+    <view class="page-header">
+      <view class="header-title">{{chapterTitle}}</view>
+      <view class="header-sub">{{courseName}}</view>
+    </view>
+
+    <!-- 知识点列表 -->
+    <view class="lesson-list">
+      <view
+        class="lesson-card"
+        wx:for="{{lessons}}"
+        wx:key="_id"
+        bindtap="goToExerciseEdit"
+        data-lessonid="{{item._id}}"
+        data-lessontitle="{{item.title}}"
+      >
+        <view class="lesson-icon">📝</view>
+        <view class="lesson-info">
+          <view class="lesson-title">
+            {{item.title}}
+            <text class="question-badge" wx:if="{{item.hasQuestions}}">有习题</text>
+          </view>
+          <view class="lesson-meta">序号：{{item.order}}</view>
+        </view>
+        <view class="lesson-arrow">›</view>
+      </view>
+
+      <view class="empty-state" wx:if="{{lessons.length === 0}}">
+        <view class="icon">📝</view>
+        <view class="text">暂无知识点</view>
+        <view class="text" style="font-size: 24rpx; margin-top: 10rpx;">请先在课程管理中添加知识点</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-space"></view>
+</view>

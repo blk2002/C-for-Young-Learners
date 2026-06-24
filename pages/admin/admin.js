@@ -4,12 +4,14 @@ const db = require('../../utils/db.js');
 
 Page({
   data: {
-    activeTab: 'users', // users / chapters
+    activeTab: 'users', // users / chapters / exercises
     pendingUsers: [],
     courses: [],
     chaptersMap: {},  // 按课程分组的章节
     selectedCourse: 'python',
     currentCourseName: 'Python',
+    exerciseCourse: 'python',
+    exerciseCourseName: 'Python',
     loading: true
   },
 
@@ -29,7 +31,10 @@ Page({
 
     this.setData({
       courses: app.globalData.courses,
-      currentCourseName: app.globalData.courses[0].name
+      selectedCourse: app.globalData.courses[0].id,
+      currentCourseName: app.globalData.courses[0].name,
+      exerciseCourse: app.globalData.courses[0].id,
+      exerciseCourseName: app.globalData.courses[0].name
     });
 
     this.loadData();
@@ -173,6 +178,23 @@ Page({
     const chapterTitle = e.currentTarget.dataset.title;
     wx.navigateTo({
       url: `/pages/admin-edit/admin-edit?type=lessonlist&chapterId=${chapterId}&chapterTitle=${encodeURIComponent(chapterTitle)}&courseId=${this.data.selectedCourse}`
+    });
+  },
+
+  // 习题管理：切换课程
+  switchExerciseCourse(e) {
+    const courseId = e.currentTarget.dataset.id;
+    const courseName = e.currentTarget.dataset.name;
+    this.setData({
+      exerciseCourse: courseId,
+      exerciseCourseName: courseName
+    });
+  },
+
+  // 习题管理：进入章节知识点习题
+  goToChapterExercises() {
+    wx.navigateTo({
+      url: `/pages/admin-exercises/admin-exercises?courseId=${this.data.exerciseCourse}&courseName=${encodeURIComponent(this.data.exerciseCourseName)}`
     });
   }
 });

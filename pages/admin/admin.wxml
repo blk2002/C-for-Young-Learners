@@ -22,6 +22,13 @@
     >
       📚 课程管理
     </view>
+    <view
+      class="tab {{activeTab === 'exercises' ? 'active' : ''}}"
+      data-tab="exercises"
+      bindtap="switchTab"
+    >
+      ✏️ 习题管理
+    </view>
   </view>
 
   <view class="loading" wx:if="{{loading}}">加载中...</view>
@@ -52,7 +59,7 @@
     <!-- 课程选择 -->
     <view class="course-selector">
       <view
-        class="course-tab {{selectedCourse === course.id ? 'active' : ''}}"
+        class="course-tab {{selectedCourse === item.id ? 'active' : ''}}"
         wx:for="{{courses}}"
         wx:key="id"
         data-id="{{item.id}}"
@@ -86,6 +93,46 @@
         <view class="text">暂无章节</view>
         <view class="text" style="font-size: 24rpx; margin-top: 10rpx;">点击上方"新增章节"添加</view>
       </view>
+    </view>
+  </view>
+
+  <!-- 习题管理 -->
+  <view class="content" wx:elif="{{activeTab === 'exercises'}}">
+    <!-- 课程选择 -->
+    <view class="course-selector">
+      <view
+        class="course-tab {{exerciseCourse === item.id ? 'active' : ''}}"
+        wx:for="{{courses}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        data-name="{{item.name}}"
+        bindtap="switchExerciseCourse"
+      >
+        {{item.icon}} {{item.name}}
+      </view>
+    </view>
+
+    <view class="section-header">
+      <view class="section-title">{{exerciseCourseName}} - 习题管理</view>
+    </view>
+
+    <!-- 入口卡片 -->
+    <view class="exercise-entry-card" bindtap="goToChapterExercises">
+      <view class="entry-icon">📚</view>
+      <view class="entry-content">
+        <view class="entry-title">章节知识点习题</view>
+        <view class="entry-desc">按章节和知识点组织独立练习题</view>
+      </view>
+      <view class="entry-arrow">›</view>
+    </view>
+
+    <view class="exercise-entry-card disabled">
+      <view class="entry-icon">🎓</view>
+      <view class="entry-content">
+        <view class="entry-title">等级考试习题</view>
+        <view class="entry-desc">考试真题题库（开发中）</view>
+      </view>
+      <view class="entry-arrow">›</view>
     </view>
   </view>
 

@@ -1,8 +1,51 @@
 <!-- pages/favorites/favorites.wxml -->
 <view class="container">
-  <view class="placeholder">
-    <view class="icon">❌</view>
-    <view class="title">错题</view>
-    <view class="desc">此页面开发中，敬请期待</view>
+  <!-- 顶部课程切换 -->
+  <view class="course-tabs">
+    <view 
+      class="tab-item {{currentCourse === 'cpp' ? 'active' : ''}}" 
+      bindtap="switchCourse"
+      data-course="cpp"
+    >
+      <text class="tab-icon">⚡</text>
+      <text class="tab-text">C++</text>
+    </view>
+    <view 
+      class="tab-item {{currentCourse === 'python' ? 'active' : ''}}" 
+      bindtap="switchCourse"
+      data-course="python"
+    >
+      <text class="tab-icon">🐍</text>
+      <text class="tab-text">Python</text>
+    </view>
+  </view>
+
+  <!-- 课程标题 -->
+  <view class="course-header">
+    <view class="course-title">{{courseInfo.name}} 错题本</view>
+    <view class="course-desc">回顾错题，查漏补缺</view>
+  </view>
+
+  <!-- 入口卡片 -->
+  <view class="entry-cards">
+    <!-- 章节知识点错题 -->
+    <view class="entry-card" bindtap="goToChapterWrong">
+      <view class="card-icon">📚</view>
+      <view class="card-content">
+        <view class="card-title">章节知识点错题</view>
+        <view class="card-desc">按章节分类，查看对应错题</view>
+      </view>
+      <view class="card-arrow">›</view>
+    </view>
+
+    <!-- 等级考试错题 -->
+    <view class="entry-card" bindtap="goToExamWrong">
+      <view class="card-icon">🎓</view>
+      <view class="card-content">
+        <view class="card-title">等级考试错题</view>
+        <view class="card-desc">考试真题中的错题汇总</view>
+      </view>
+      <view class="card-arrow">›</view>
+    </view>
   </view>
 </view>

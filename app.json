@@ -10,7 +10,14 @@
     "pages/favorites/favorites",
     "pages/progress/progress",
     "pages/study-progress/study-progress",
-    "pages/my-favorites/my-favorites"
+    "pages/my-favorites/my-favorites",
+    "pages/chapter-exercises/chapter-exercises",
+    "pages/exam-exercises/exam-exercises",
+    "pages/chapter-wrong/chapter-wrong",
+    "pages/exam-wrong/exam-wrong",
+    "pages/admin-exercises/admin-exercises",
+    "pages/admin-exercise-edit/admin-exercise-edit",
+    "pages/admin-lessons/admin-lessons"
   ],
   "window": {
     "backgroundTextStyle": "light",

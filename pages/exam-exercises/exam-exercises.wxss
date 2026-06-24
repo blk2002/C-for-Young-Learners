@@ -1,0 +1,36 @@
+/* pages/exam-exercises/exam-exercises.wxss */
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F5F7FA;
+}
+
+.placeholder {
+  text-align: center;
+  padding: 60rpx;
+}
+
+.placeholder .icon {
+  font-size: 120rpx;
+  margin-bottom: 30rpx;
+}
+
+.placeholder .title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.placeholder .course-name {
+  font-size: 28rpx;
+  color: #4A90E2;
+  margin-bottom: 20rpx;
+}
+
+.placeholder .desc {
+  font-size: 26rpx;
+  color: #999;
+}

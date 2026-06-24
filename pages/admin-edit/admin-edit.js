@@ -19,8 +19,18 @@ Page({
       title: '',
       content: '',
       codeExample: '',
-      order: 1,
-      questionsText: ''
+      order: 1
+    },
+    // 练习题
+    questions: [],
+    showQuestionModal: false,
+    editingIndex: -1,
+    editingQuestion: {
+      type: 'choice',
+      question: '',
+      options: { A: '', B: '', C: '', D: '' },
+      answer: '',
+      explanation: ''
     },
     // 知识点列表（用于lessonlist类型）
     lessons: [],
@@ -65,6 +75,13 @@ Page({
     }
   },
 
+  onShow() {
+    // 知识点列表页：每次显示都刷新数据（新增/编辑返回后）
+    if (this.data.type === 'lessonlist' && this.data.chapterId) {
+      this.loadLessons(this.data.chapterId);
+    }
+  },
+
   // 加载章节详情
   async loadChapter(id) {
     try {
@@ -103,17 +120,16 @@ Page({
       const result = await db.courses.getLesson(id);
       const lesson = result.data;
 
-      // 格式化题目数据
-      let questionsText = '';
+      let questions = [];
       if (lesson.questions) {
         try {
           if (typeof lesson.questions === 'string') {
-            questionsText = lesson.questions;
+            questions = JSON.parse(lesson.questions);
           } else {
-            questionsText = JSON.stringify(lesson.questions, null, 2);
+            questions = lesson.questions;
           }
         } catch (e) {
-          questionsText = '';
+          questions = [];
         }
       }
 
@@ -122,9 +138,9 @@ Page({
           title: lesson.title || '',
           content: lesson.content || '',
           codeExample: lesson.codeExample || '',
-          order: lesson.order || 1,
-          questionsText: questionsText
+          order: lesson.order || 1
         },
+        questions: questions,
         loading: false
       });
     } catch (err) {
@@ -144,7 +160,8 @@ Page({
   },
 
   onOrderInput(e) {
-    const val = parseInt(e.detail.value) || 1;
+    const rawVal = e.detail.value;
+    const val = rawVal === '' ? '' : (parseInt(rawVal) || 1);
     if (this.data.type === 'chapter') {
       this.setData({ 'chapterData.order': val });
     } else {
@@ -160,8 +177,199 @@ Page({
     this.setData({ 'lessonData.codeExample': e.detail.value });
   },
 
-  onQuestionsInput(e) {
-    this.setData({ 'lessonData.questionsText': e.detail.value });
+  // ========== 练习题管理 ==========
+
+  // 新增选择题
+  addChoiceQuestion() {
+    this.setData({
+      showQuestionModal: true,
+      editingIndex: -1,
+      editingQuestion: {
+        type: 'choice',
+        question: '',
+        options: { A: '', B: '', C: '', D: '' },
+        answer: '',
+        explanation: ''
+      }
+    });
+  },
+
+  // 新增填空题
+  addFillQuestion() {
+    this.setData({
+      showQuestionModal: true,
+      editingIndex: -1,
+      editingQuestion: {
+        type: 'fill',
+        question: '',
+        options: { A: '', B: '', C: '', D: '' },
+        answer: '',
+        explanation: ''
+      }
+    });
+  },
+
+  // 编辑题目
+  editQuestion(e) {
+    const index = e.currentTarget.dataset.index;
+    const q = this.data.questions[index];
+    const editingQuestion = {
+      type: q.type,
+      question: q.question || '',
+      options: q.options ? { ...q.options } : { A: '', B: '', C: '', D: '' },
+      answer: q.answer || '',
+      explanation: q.explanation || ''
+    };
+    this.setData({
+      showQuestionModal: true,
+      editingIndex: index,
+      editingQuestion: editingQuestion
+    });
+  },
+
+  // 删除题目
+  deleteQuestion(e) {
+    const index = e.currentTarget.dataset.index;
+    wx.showModal({
+      title: '确认删除',
+      content: '确定删除这道题目吗？',
+      success: (res) => {
+        if (res.confirm) {
+          const questions = [...this.data.questions];
+          questions.splice(index, 1);
+          this.setData({ questions });
+          wx.showToast({ title: '已删除', icon: 'success' });
+        }
+      }
+    });
+  },
+
+  // 上移
+  moveUp(e) {
+    const index = e.currentTarget.dataset.index;
+    if (index <= 0) return;
+    const questions = [...this.data.questions];
+    const temp = questions[index];
+    questions[index] = questions[index - 1];
+    questions[index - 1] = temp;
+    this.setData({ questions });
+  },
+
+  // 下移
+  moveDown(e) {
+    const index = e.currentTarget.dataset.index;
+    if (index >= this.data.questions.length - 1) return;
+    const questions = [...this.data.questions];
+    const temp = questions[index];
+    questions[index] = questions[index + 1];
+    questions[index + 1] = temp;
+    this.setData({ questions });
+  },
+
+  // 切换题目类型
+  selectQuestionType(e) {
+    const type = e.currentTarget.dataset.type;
+    this.setData({
+      'editingQuestion.type': type,
+      'editingQuestion.answer': ''
+    });
+  },
+
+  // 编辑题干/解析
+  onEditQuestionInput(e) {
+    const field = e.currentTarget.dataset.field;
+    this.setData({
+      [`editingQuestion.${field}`]: e.detail.value
+    });
+  },
+
+  // 编辑选项
+  onEditOptionInput(e) {
+    const option = e.currentTarget.dataset.option;
+    this.setData({
+      [`editingQuestion.options.${option}`]: e.detail.value
+    });
+  },
+
+  // 选择正确答案（选择题）
+  selectAnswer(e) {
+    const answer = e.currentTarget.dataset.answer;
+    this.setData({
+      'editingQuestion.answer': answer
+    });
+  },
+
+  // 编辑正确答案（填空题）
+  onEditAnswerInput(e) {
+    this.setData({
+      'editingQuestion.answer': e.detail.value
+    });
+  },
+
+  // 保存题目
+  saveQuestion() {
+    const q = this.data.editingQuestion;
+
+    if (!q.question.trim()) {
+      wx.showToast({ title: '请输入题干', icon: 'none' });
+      return;
+    }
+
+    if (q.type === 'choice') {
+      if (!q.options.A.trim() || !q.options.B.trim()) {
+        wx.showToast({ title: '请填写至少 A、B 两个选项', icon: 'none' });
+        return;
+      }
+      if (!q.answer) {
+        wx.showToast({ title: '请选择正确答案', icon: 'none' });
+        return;
+      }
+    } else {
+      if (!q.answer.trim()) {
+        wx.showToast({ title: '请输入正确答案', icon: 'none' });
+        return;
+      }
+    }
+
+    const questions = [...this.data.questions];
+    const newQuestion = {
+      type: q.type,
+      question: q.question.trim(),
+      answer: q.type === 'choice' ? q.answer : q.answer.trim(),
+      explanation: q.explanation.trim() || undefined
+    };
+
+    if (q.type === 'choice') {
+      const options = {};
+      if (q.options.A.trim()) options.A = q.options.A.trim();
+      if (q.options.B.trim()) options.B = q.options.B.trim();
+      if (q.options.C.trim()) options.C = q.options.C.trim();
+      if (q.options.D.trim()) options.D = q.options.D.trim();
+      newQuestion.options = options;
+    }
+
+    if (this.data.editingIndex >= 0) {
+      questions[this.data.editingIndex] = newQuestion;
+    } else {
+      questions.push(newQuestion);
+    }
+
+    this.setData({
+      questions: questions,
+      showQuestionModal: false
+    });
+
+    wx.showToast({ title: '已保存', icon: 'success' });
+  },
+
+  // 关闭弹窗
+  closeQuestionModal() {
+    this.setData({ showQuestionModal: false });
+  },
+
+  // 阻止冒泡（空函数，用于 catchtap）
+  preventBubble() {
+    // 空函数，仅用于阻止事件冒泡
   },
 
   // 保存章节
@@ -206,25 +414,12 @@ Page({
 
   // 保存知识点
   async saveLesson() {
-    const { title, content, codeExample, order, questionsText } = this.data.lessonData;
+    const { title, content, codeExample, order } = this.data.lessonData;
+    const questions = this.data.questions;
 
     if (!title.trim()) {
       wx.showToast({ title: '请输入知识点标题', icon: 'none' });
       return;
-    }
-
-    // 验证题目格式
-    let questions = [];
-    if (questionsText.trim()) {
-      try {
-        questions = JSON.parse(questionsText);
-        if (!Array.isArray(questions)) {
-          throw new Error('题目需为数组格式');
-        }
-      } catch (err) {
-        wx.showToast({ title: '题目格式错误', icon: 'none' });
-        return;
-      }
     }
 
     this.setData({ submitting: true });
@@ -302,16 +497,6 @@ Page({
           }
         }
       }
-    });
-  },
-
-  // 显示题目格式说明
-  showQuestionFormat() {
-    wx.showModal({
-      title: '题目格式说明',
-      content: '题目使用JSON数组格式。\n\n选择题示例：\n[{"type":"choice","question":"Python是什么类型语言？","options":{"A":"编译型","B":"解释型","C":"混合型","D":"机器语言"},"answer":"B","explanation":"Python是解释型语言。"}]\n\n填空题示例：\n[{"type":"fill","question":"Python使用____来定义代码块。","answer":"缩进","explanation":"Python使用缩进来定义代码块。"}]',
-      showCancel: false,
-      confirmText: '知道了'
     });
   }
 });

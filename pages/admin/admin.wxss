@@ -132,23 +132,29 @@
   display: flex;
   background: #fff;
   border-radius: 16rpx;
-  padding: 8rpx;
+  padding: 12rpx;
   margin-bottom: 30rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
 }
 
 .course-tab {
   flex: 1;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 20rpx 0;
+  margin: 0 8rpx;
   font-size: 28rpx;
   color: #666;
   border-radius: 12rpx;
-  transition: all 0.2s;
+  background: #F5F7FA;
+  transition: all 0.3s;
 }
 
 .course-tab.active {
-  background: #4A90E2;
+  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
   color: #fff;
+  font-weight: 500;
 }
 
 /* 章节列表 */
@@ -248,4 +254,54 @@
 .empty-state .text {
   font-size: 28rpx;
   color: #999;
+}
+
+/* 习题管理入口卡片 */
+.exercise-entry-card {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 40rpx 30rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.exercise-entry-card:active {
+  background: #F5F7FA;
+}
+
+.entry-icon {
+  font-size: 60rpx;
+  margin-right: 24rpx;
+  width: 80rpx;
+  text-align: center;
+}
+
+.entry-content {
+  flex: 1;
+}
+
+.entry-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.entry-desc {
+  font-size: 26rpx;
+  color: #999;
+}
+
+.entry-arrow {
+  font-size: 48rpx;
+  color: #CCC;
+}
+
+.exercise-entry-card.disabled {
+  opacity: 0.5;
+}
+
+.exercise-entry-card.disabled:active {
+  background: #fff;
 }

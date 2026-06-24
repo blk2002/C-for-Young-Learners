@@ -1,0 +1,9 @@
+<!-- pages/exam-exercises/exam-exercises.wxml -->
+<view class="container">
+  <view class="placeholder">
+    <view class="icon">🎓</view>
+    <view class="title">等级考试习题</view>
+    <view class="course-name">{{courseName}}</view>
+    <view class="desc">此页面开发中，敬请期待</view>
+  </view>
+</view>

@@ -1,0 +1,118 @@
+/* pages/admin-lessons/admin-lessons.wxss */
+.container {
+  min-height: 100vh;
+  background: #F5F7FA;
+}
+
+.loading {
+  text-align: center;
+  padding: 100rpx 0;
+  color: #999;
+}
+
+.content {
+  padding: 30rpx;
+}
+
+/* 页面标题 */
+.page-header {
+  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  color: #fff;
+}
+
+.header-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 8rpx;
+}
+
+.header-sub {
+  font-size: 24rpx;
+  opacity: 0.9;
+}
+
+/* 知识点列表 */
+.lesson-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+  padding-bottom: 40rpx;
+}
+
+.lesson-card {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx 30rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+  transition: all 0.2s;
+}
+
+.lesson-card:active {
+  background: #F0F4F8;
+  transform: scale(0.98);
+}
+
+.lesson-icon {
+  font-size: 44rpx;
+  margin-right: 24rpx;
+  width: 60rpx;
+  text-align: center;
+}
+
+.lesson-info {
+  flex: 1;
+}
+
+.lesson-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.question-badge {
+  display: inline-block;
+  margin-left: 12rpx;
+  padding: 4rpx 14rpx;
+  font-size: 22rpx;
+  background: #E8F4FD;
+  color: #4A90E2;
+  border-radius: 20rpx;
+  font-weight: 500;
+}
+
+.lesson-meta {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.lesson-arrow {
+  font-size: 40rpx;
+  color: #CCC;
+  font-weight: 300;
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 100rpx 30rpx;
+}
+
+.empty-state .icon {
+  font-size: 100rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-state .text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+.bottom-space {
+  height: 40rpx;
+}

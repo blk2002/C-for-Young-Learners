@@ -1,0 +1,85 @@
+/* pages/admin-exercises/admin-exercises.wxss */
+.container {
+  min-height: 100vh;
+  background: #F5F7FA;
+}
+
+.loading {
+  text-align: center;
+  padding: 100rpx 0;
+  color: #999;
+}
+
+.content {
+  padding: 30rpx;
+}
+
+.chapter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  padding-bottom: 40rpx;
+}
+
+.chapter-card {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 36rpx 30rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+  transition: all 0.2s;
+}
+
+.chapter-card:active {
+  background: #F0F4F8;
+  transform: scale(0.98);
+}
+
+.chapter-icon {
+  font-size: 48rpx;
+  margin-right: 24rpx;
+  width: 64rpx;
+  text-align: center;
+}
+
+.chapter-info {
+  flex: 1;
+}
+
+.chapter-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.chapter-meta {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.chapter-arrow {
+  font-size: 44rpx;
+  color: #CCC;
+  font-weight: 300;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 120rpx 30rpx;
+}
+
+.empty-state .icon {
+  font-size: 100rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-state .text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+.bottom-space {
+  height: 40rpx;
+}

@@ -154,11 +154,42 @@ const favorites = {
   }
 };
 
+// 章节知识点习题相关操作
+const chapterQuestions = {
+  // 获取题目
+  getQuestions(courseId, chapterId, lessonId) {
+    return wx.cloud.callFunction({
+      name: 'chapterQuestions',
+      data: {
+        action: 'getQuestions',
+        courseId,
+        chapterId,
+        lessonId
+      }
+    });
+  },
+
+  // 保存题目
+  saveQuestions(courseId, chapterId, lessonId, questions) {
+    return wx.cloud.callFunction({
+      name: 'chapterQuestions',
+      data: {
+        action: 'saveQuestions',
+        courseId,
+        chapterId,
+        lessonId,
+        questions
+      }
+    });
+  }
+};
+
 module.exports = {
   users,
   courses,
   progress,
   favorites,
+  chapterQuestions,
   collection,
   getDB
 };

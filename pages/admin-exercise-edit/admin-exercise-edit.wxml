@@ -1,0 +1,189 @@
+<!-- pages/admin-exercise-edit/admin-exercise-edit.wxml -->
+<view class="container">
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+
+  <view class="content" wx:else>
+    <!-- 页面标题 -->
+    <view class="page-header">
+      <view class="header-title">{{lessonTitle}}</view>
+      <view class="header-sub">{{chapterTitle}}</view>
+    </view>
+
+    <!-- 题目列表 -->
+    <view class="question-section">
+      <view class="label-row">
+        <view class="label">练习题</view>
+        <view class="question-count">共 {{questions.length}} 道</view>
+      </view>
+
+      <!-- 新增按钮 -->
+      <view class="question-add-row">
+        <view class="add-question-btn" bindtap="addChoiceQuestion">+ 新增选择题</view>
+        <view class="add-question-btn" bindtap="addFillQuestion">+ 新增填空题</view>
+      </view>
+
+      <!-- 题目列表 -->
+      <view class="question-list" wx:if="{{questions.length > 0}}">
+        <view class="question-item" wx:for="{{questions}}" wx:key="index" wx:for-item="q" wx:for-index="qIdx">
+          <view class="question-header">
+            <view class="question-index">第 {{qIdx + 1}} 题</view>
+            <view class="question-type-tag {{q.type === 'fill' ? 'fill' : ''}}">
+              {{q.type === 'choice' ? '选择题' : '填空题'}}
+            </view>
+          </view>
+          <view class="question-preview">{{q.question || '（暂无题干）'}}</view>
+          <view class="question-actions">
+            <view class="q-action-btn blue" data-index="{{qIdx}}" bindtap="editQuestion">编辑</view>
+            <view class="q-action-btn orange" data-index="{{qIdx}}" bindtap="moveUp" wx:if="{{qIdx > 0}}">上移</view>
+            <view class="q-action-btn orange" data-index="{{qIdx}}" bindtap="moveDown" wx:if="{{qIdx < questions.length - 1}}">下移</view>
+            <view class="q-action-btn red" data-index="{{qIdx}}" bindtap="deleteQuestion">删除</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="empty-questions" wx:else>
+        <view class="empty-text">暂无练习题</view>
+        <view class="empty-hint">点击上方按钮添加题目</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 编辑题目弹窗 -->
+  <view class="modal-mask" wx:if="{{showQuestionModal}}" bindtap="closeQuestionModal">
+    <view class="modal-content" catchtap="preventBubble">
+      <view class="modal-header">
+        <view class="modal-title">{{editingIndex >= 0 ? '编辑题目' : '新增题目'}}</view>
+        <view class="modal-close" bindtap="closeQuestionModal">✕</view>
+      </view>
+
+      <view class="modal-body">
+        <view class="form-item">
+          <view class="label">题目类型</view>
+          <view class="type-selector">
+            <view 
+              class="type-option {{editingQuestion.type === 'choice' ? 'active' : ''}}"
+              data-type="choice"
+              bindtap="selectQuestionType"
+            >选择题</view>
+            <view 
+              class="type-option {{editingQuestion.type === 'fill' ? 'active' : ''}}"
+              data-type="fill"
+              bindtap="selectQuestionType"
+            >填空题</view>
+          </view>
+        </view>
+
+        <view class="form-item">
+          <view class="label">题干 *</view>
+          <textarea
+            class="textarea"
+            placeholder="请输入题目内容..."
+            value="{{editingQuestion.question}}"
+            bindinput="onEditQuestionInput"
+            data-field="question"
+            maxlength="500"
+          />
+        </view>
+
+        <!-- 选择题选项 -->
+        <block wx:if="{{editingQuestion.type === 'choice'}}">
+          <view class="form-item">
+            <view class="label">选项 A *</view>
+            <input
+              class="input"
+              placeholder="选项 A 内容"
+              value="{{editingQuestion.options.A}}"
+              bindinput="onEditOptionInput"
+              data-option="A"
+            />
+          </view>
+          <view class="form-item">
+            <view class="label">选项 B *</view>
+            <input
+              class="input"
+              placeholder="选项 B 内容"
+              value="{{editingQuestion.options.B}}"
+              bindinput="onEditOptionInput"
+              data-option="B"
+            />
+          </view>
+          <view class="form-item">
+            <view class="label">选项 C</view>
+            <input
+              class="input"
+              placeholder="选项 C 内容（可选）"
+              value="{{editingQuestion.options.C}}"
+              bindinput="onEditOptionInput"
+              data-option="C"
+            />
+          </view>
+          <view class="form-item">
+            <view class="label">选项 D</view>
+            <input
+              class="input"
+              placeholder="选项 D 内容（可选）"
+              value="{{editingQuestion.options.D}}"
+              bindinput="onEditOptionInput"
+              data-option="D"
+            />
+          </view>
+        </block>
+
+        <view class="form-item">
+          <view class="label">正确答案 *</view>
+          <block wx:if="{{editingQuestion.type === 'choice'}}">
+            <view class="answer-selector">
+              <view 
+                class="answer-option {{editingQuestion.answer === 'A' ? 'active' : ''}}"
+                data-answer="A"
+                bindtap="selectAnswer"
+              >A</view>
+              <view 
+                class="answer-option {{editingQuestion.answer === 'B' ? 'active' : ''}}"
+                data-answer="B"
+                bindtap="selectAnswer"
+              >B</view>
+              <view 
+                class="answer-option {{editingQuestion.answer === 'C' ? 'active' : ''}}"
+                data-answer="C"
+                bindtap="selectAnswer"
+              >C</view>
+              <view 
+                class="answer-option {{editingQuestion.answer === 'D' ? 'active' : ''}}"
+                data-answer="D"
+                bindtap="selectAnswer"
+              >D</view>
+            </view>
+          </block>
+          <block wx:else>
+            <input
+              class="input"
+              placeholder="请输入正确答案"
+              value="{{editingQuestion.answer}}"
+              bindinput="onEditAnswerInput"
+            />
+          </block>
+        </view>
+
+        <view class="form-item">
+          <view class="label">答案解析</view>
+          <textarea
+            class="textarea"
+            placeholder="输入答案解析（可选）..."
+            value="{{editingQuestion.explanation}}"
+            bindinput="onEditQuestionInput"
+            data-field="explanation"
+            maxlength="500"
+          />
+        </view>
+      </view>
+
+      <view class="modal-footer">
+        <button class="btn-secondary" bindtap="closeQuestionModal">取消</button>
+        <button class="btn-primary" bindtap="saveQuestion">确定</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-space"></view>
+</view>
