@@ -1,9 +1,21 @@
-<!-- pages/exam-exercises/exam-exercises.wxml -->
 <view class="container">
-  <view class="placeholder">
-    <view class="icon">🎓</view>
-    <view class="title">等级考试习题</view>
-    <view class="course-name">{{courseName}}</view>
-    <view class="desc">此页面开发中，敬请期待</view>
+  <view class="page-title">{{courseName}} 等级考试</view>
+  <view class="page-subtitle">选择考试类型开始练习</view>
+
+  <view class="exam-list">
+    <view class="exam-card"
+          wx:for="{{examTypes}}"
+          wx:key="type"
+          data-type="{{item.type}}"
+          data-name="{{item.name}}"
+          bindtap="goToLevels"
+          style="background: linear-gradient(135deg, {{item.color}}, {{item.color}}dd);">
+      <view class="exam-icon">{{item.icon}}</view>
+      <view class="exam-info">
+        <view class="exam-name">{{item.name}}</view>
+        <view class="exam-desc">{{item.desc}}</view>
+      </view>
+      <view class="exam-arrow">›</view>
+    </view>
   </view>
 </view>

@@ -40,15 +40,17 @@ Page({
 
   // 进入章节知识点习题
   goToChapterExercises() {
+    const courseName = this.data.courseInfo ? this.data.courseInfo.name : '';
     wx.navigateTo({
-      url: `/pages/chapter-exercises/chapter-exercises?courseId=${this.data.currentCourse}`
+      url: `/pages/chapter-exercises/chapter-exercises?courseId=${this.data.currentCourse}&courseName=${courseName}`
     });
   },
 
   // 进入等级考试习题
   goToExamExercises() {
+    const courseName = this.data.courseInfo ? this.data.courseInfo.name : '';
     wx.navigateTo({
-      url: `/pages/exam-exercises/exam-exercises?courseId=${this.data.currentCourse}`
+      url: `/pages/exam-exercises/exam-exercises?courseId=${this.data.currentCourse}&courseName=${courseName}`
     });
   }
 });

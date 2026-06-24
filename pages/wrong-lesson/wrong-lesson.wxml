@@ -1,0 +1,33 @@
+<view class="container">
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+
+  <view class="content" wx:else>
+    <view class="lesson-list">
+      <view
+        class="lesson-card"
+        wx:for="{{lessons}}"
+        wx:key="_id"
+        bindtap="goToPractice"
+        data-lessonid="{{item._id}}"
+        data-lessontitle="{{item.title}}"
+      >
+        <view class="lesson-icon">❌</view>
+        <view class="lesson-info">
+          <view class="lesson-title">{{item.title}}</view>
+          <view class="lesson-meta">
+            <text>错题 {{item.wrongCount}} 道</text>
+          </view>
+        </view>
+        <view class="lesson-arrow">›</view>
+      </view>
+
+      <view class="empty-state" wx:if="{{lessons.length === 0}}">
+        <view class="icon">🎉</view>
+        <view class="text">暂无错题</view>
+        <view class="text" style="font-size: 24rpx; margin-top: 10rpx;">太棒了，继续保持！</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-space"></view>
+</view>

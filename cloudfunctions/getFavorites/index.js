@@ -10,7 +10,7 @@ exports.main = async (event, context) => {
   if (!userId) {
     return {
       success: false,
-      message: '用户ID不能为空'
+      message: '学生ID不能为空'
     };
   }
 

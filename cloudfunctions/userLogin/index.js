@@ -23,7 +23,7 @@ exports.main = async (event, context) => {
   if (!username || !password) {
     return {
       success: false,
-      message: '请输入用户名和密码'
+      message: '请输入学生姓名和密码'
     };
   }
 
@@ -36,7 +36,7 @@ exports.main = async (event, context) => {
     if (result.data.length === 0) {
       return {
         success: false,
-        message: '用户不存在'
+        message: '学生不存在'
       };
     }
 
@@ -54,7 +54,7 @@ exports.main = async (event, context) => {
     if (user.status === 'pending') {
       return {
         success: false,
-        message: '账号正在审核中，请等待管理员审核通过',
+        message: '账号正在审核中，请等待老师审核通过',
         needReview: true
       };
     }
@@ -62,7 +62,7 @@ exports.main = async (event, context) => {
     if (user.status === 'rejected') {
       return {
         success: false,
-        message: '账号已被拒绝，请联系管理员'
+        message: '账号已被拒绝，请联系老师'
       };
     }
 

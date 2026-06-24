@@ -27,7 +27,7 @@ exports.main = async (event, context) => {
     console.error('获取待审核用户失败', err);
     return {
       success: false,
-      message: '获取用户列表失败'
+      message: '获取学生列表失败'
     };
   }
 };

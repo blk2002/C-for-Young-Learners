@@ -2,7 +2,7 @@
 <view class="container">
   <view class="header">
     <view class="title">🛠️ 管理后台</view>
-    <view class="subtitle">用户审核与课程内容管理</view>
+    <view class="subtitle">学生审核与课程内容管理</view>
   </view>
 
   <!-- Tab切换 -->
@@ -12,7 +12,7 @@
       data-tab="users"
       bindtap="switchTab"
     >
-      👥 用户审核
+      👥 学生审核
       <text wx:if="{{pendingUsers.length > 0}}" class="badge">{{pendingUsers.length}}</text>
     </view>
     <view
@@ -50,7 +50,7 @@
     </block>
     <view class="empty-state" wx:else>
       <view class="icon">✅</view>
-      <view class="text">暂无待审核用户</view>
+      <view class="text">暂无待审核学生</view>
     </view>
   </view>
 
@@ -126,11 +126,11 @@
       <view class="entry-arrow">›</view>
     </view>
 
-    <view class="exercise-entry-card disabled">
+    <view class="exercise-entry-card" bindtap="goToExamExercises">
       <view class="entry-icon">🎓</view>
       <view class="entry-content">
         <view class="entry-title">等级考试习题</view>
-        <view class="entry-desc">考试真题题库（开发中）</view>
+        <view class="entry-desc">等级考试真题题库管理</view>
       </view>
       <view class="entry-arrow">›</view>
     </view>

@@ -15,7 +15,7 @@
   <view class="empty-state" wx:elif="{{chapters.length === 0}}">
     <view class="icon">📖</view>
     <view class="text">暂无课程章节</view>
-    <view class="text" style="font-size: 24rpx; margin-top: 10rpx;">请联系管理员添加课程内容</view>
+    <view class="text" style="font-size: 24rpx; margin-top: 10rpx;">请联系老师添加课程内容</view>
   </view>
 
   <!-- 章节列表 -->

@@ -25,14 +25,14 @@ exports.main = async (event, context) => {
   if (!username || !password) {
     return {
       success: false,
-      message: '用户名和密码不能为空'
+      message: '学生姓名和密码不能为空'
     };
   }
 
   if (username.length < 3) {
     return {
       success: false,
-      message: '用户名至少3个字符'
+      message: '学生姓名至少3个字符'
     };
   }
 
@@ -52,7 +52,7 @@ exports.main = async (event, context) => {
     if (existing.data.length > 0) {
       return {
         success: false,
-        message: '该用户名已被注册'
+        message: '该学生姓名已被注册'
       };
     }
 
@@ -69,7 +69,7 @@ exports.main = async (event, context) => {
 
     return {
       success: true,
-      message: '注册成功！请等待管理员审核通过',
+      message: '注册成功！请等待老师审核通过',
       data: {
         _id: result._id,
         username: username,

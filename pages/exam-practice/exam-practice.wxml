@@ -1,0 +1,100 @@
+<view class="container" wx:if="{{!loading}}">
+  <view class="progress-bar">
+    <view class="progress-text">第 {{currentIndex + 1}} / {{questions.length}} 题</view>
+    <view class="progress-track">
+      <view class="progress-fill" style="width: {{(currentIndex + 1) / questions.length * 100}}%"></view>
+    </view>
+  </view>
+
+  <block wx:for="{{questions}}" wx:key="id" wx:for-index="qIndex">
+    <view class="question-card" wx:if="{{qIndex === currentIndex}}">
+      <view class="question-header">
+        <view class="question-number">第 {{qIndex + 1}} 题</view>
+        <view class="question-type {{item.type === 'choice' ? 'type-choice' : 'type-fill'}}">
+          {{item.type === 'choice' ? '选择题' : '填空题'}}
+        </view>
+      </view>
+
+      <view class="question-content">{{item.question}}</view>
+
+      <block wx:if="{{item.type === 'choice'}}">
+        <view class="option-list">
+          <view class="option-item {{userAnswers[qIndex] === optKey ? 'selected' : ''}} {{submitted && item.answer === optKey ? 'correct' : ''}} {{submitted && userAnswers[qIndex] === optKey && userAnswers[qIndex] !== item.answer ? 'wrong' : ''}}"
+                wx:for="{{item.options}}"
+                wx:for-item="opt"
+                wx:for-index="optKey"
+                wx:key="optKey"
+                data-index="{{qIndex}}"
+                data-option="{{optKey}}"
+                bindtap="selectOption">
+            <view class="option-circle">{{optKey}}</view>
+            <view class="option-text">{{opt}}</view>
+            <view class="option-icon" wx:if="{{submitted && item.answer === optKey}}">✓</view>
+            <view class="option-icon wrong-icon" wx:if="{{submitted && userAnswers[qIndex] === optKey && userAnswers[qIndex] !== item.answer}}">✕</view>
+          </view>
+        </view>
+      </block>
+
+      <block wx:else>
+        <view class="fill-input-wrap">
+          <input class="fill-input"
+                 value="{{userAnswers[qIndex]}}"
+                 placeholder="请输入答案"
+                 data-index="{{qIndex}}"
+                 bindinput="onFillInput"
+                 disabled="{{submitted}}" />
+        </view>
+      </block>
+
+      <view class="answer-result" wx:if="{{submitted}}">
+        <view class="result-status {{answerResults[qIndex] ? 'correct' : 'wrong'}}">
+          {{answerResults[qIndex] ? '✓ 回答正确！' : '✕ 回答错误'}}
+        </view>
+
+        <view class="answer-detail">
+          <view class="detail-label">正确答案：</view>
+          <view class="detail-value" wx:if="{{item.type === 'choice'}}">
+            {{item.answer}}. {{item.options[item.answer]}}
+          </view>
+          <view class="detail-value" wx:else>{{item.answer}}</view>
+        </view>
+
+        <view class="explanation" wx:if="{{item.explanation}}">
+          <view class="exp-label">💡 解析：</view>
+          <view class="exp-text">{{item.explanation}}</view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <view class="nav-buttons">
+    <button class="nav-btn prev-btn"
+            bindtap="prevQuestion"
+            disabled="{{currentIndex === 0}}">
+      上一题
+    </button>
+    <button class="nav-btn next-btn"
+            bindtap="nextQuestion"
+            wx:if="{{currentIndex < questions.length - 1}}">
+      下一题
+    </button>
+    <button class="nav-btn submit-btn"
+            bindtap="submitAll"
+            wx:if="{{currentIndex === questions.length - 1 && !submitted}}">
+      提交
+    </button>
+  </view>
+
+  <view class="submit-score" wx:if="{{submitted}}">
+    <view class="score-text">
+      答对 {{questions.length - wrongCount}} / {{questions.length}} 题
+    </view>
+    <view class="score-rate">
+      正确率 {{correctRate}}%
+    </view>
+  </view>
+</view>
+
+<view class="loading" wx:if="{{loading}}">
+  <view class="loading-text">加载中...</view>
+</view>

@@ -35,6 +35,11 @@ Page({
     wx.navigateTo({ url: '/pages/admin/admin' });
   },
 
+  // 进入编辑资料页
+  goToEditProfile() {
+    wx.navigateTo({ url: '/pages/profile-edit/profile-edit' });
+  },
+
   // 退出登录
   logout() {
     wx.showModal({

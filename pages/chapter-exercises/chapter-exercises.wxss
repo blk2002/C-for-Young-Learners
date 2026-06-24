@@ -1,36 +1,105 @@
-/* pages/chapter-exercises/chapter-exercises.wxss */
 .container {
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background: #F5F7FA;
 }
 
-.placeholder {
+.loading {
   text-align: center;
-  padding: 60rpx;
+  padding: 100rpx 0;
+  color: #999;
 }
 
-.placeholder .icon {
-  font-size: 120rpx;
-  margin-bottom: 30rpx;
+.content {
+  padding: 30rpx;
 }
 
-.placeholder .title {
-  font-size: 36rpx;
-  font-weight: bold;
+.chapter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  padding-bottom: 40rpx;
+}
+
+.chapter-card {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 36rpx 30rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+  transition: all 0.2s;
+}
+
+.chapter-card:active {
+  background: #F0F4F8;
+  transform: scale(0.98);
+}
+
+.chapter-icon {
+  font-size: 48rpx;
+  margin-right: 24rpx;
+  width: 64rpx;
+  text-align: center;
+}
+
+.chapter-info {
+  flex: 1;
+}
+
+.chapter-title {
+  font-size: 30rpx;
+  font-weight: 600;
   color: #333;
-  margin-bottom: 16rpx;
+  margin-bottom: 12rpx;
 }
 
-.placeholder .course-name {
-  font-size: 28rpx;
+.chapter-meta {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 12rpx;
+}
+
+.progress-text {
+  margin-left: 20rpx;
   color: #4A90E2;
+}
+
+.progress-bar {
+  height: 8rpx;
+  background: #E8ECF0;
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4A90E2, #67B8F7);
+  border-radius: 4rpx;
+  transition: width 0.3s;
+}
+
+.chapter-arrow {
+  font-size: 44rpx;
+  color: #CCC;
+  font-weight: 300;
+  margin-left: 20rpx;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 120rpx 30rpx;
+}
+
+.empty-state .icon {
+  font-size: 100rpx;
   margin-bottom: 20rpx;
 }
 
-.placeholder .desc {
-  font-size: 26rpx;
+.empty-state .text {
+  font-size: 28rpx;
   color: #999;
+}
+
+.bottom-space {
+  height: 40rpx;
 }

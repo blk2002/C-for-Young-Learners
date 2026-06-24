@@ -41,6 +41,14 @@ const users = {
       name: 'reviewUser',
       data: { userId, approved }
     });
+  },
+
+  // 更新用户资料
+  updateProfile(userId, data) {
+    return wx.cloud.callFunction({
+      name: 'updateUserProfile',
+      data: { userId, ...data }
+    });
   }
 };
 
@@ -184,12 +192,205 @@ const chapterQuestions = {
   }
 };
 
+// 错题本相关操作
+const wrongQuestions = {
+  // 添加错题
+  addWrongQuestions(data) {
+    return wx.cloud.callFunction({
+      name: 'wrongQuestions',
+      data: {
+        action: 'addWrongQuestions',
+        ...data
+      }
+    });
+  },
+
+  // 获取错题列表
+  getWrongQuestions(userId, courseId, chapterId, lessonId, examType, level) {
+    return wx.cloud.callFunction({
+      name: 'wrongQuestions',
+      data: {
+        action: 'getWrongQuestions',
+        userId,
+        courseId,
+        chapterId,
+        lessonId,
+        examType,
+        level
+      }
+    });
+  },
+
+  // 获取有错题的章节列表
+  getWrongChapters(userId, courseId) {
+    return wx.cloud.callFunction({
+      name: 'wrongQuestions',
+      data: {
+        action: 'getWrongChapters',
+        userId,
+        courseId
+      }
+    });
+  },
+
+  // 获取有错题的知识点列表
+  getWrongLessons(userId, courseId, chapterId) {
+    return wx.cloud.callFunction({
+      name: 'wrongQuestions',
+      data: {
+        action: 'getWrongLessons',
+        userId,
+        courseId,
+        chapterId
+      }
+    });
+  },
+
+  // 标记单题为已掌握
+  markMastered(questionId) {
+    return wx.cloud.callFunction({
+      name: 'wrongQuestions',
+      data: {
+        action: 'markMastered',
+        questionId
+      }
+    });
+  },
+
+  // 标记知识点所有错题为已掌握
+  markLessonMastered(userId, courseId, chapterId, lessonId) {
+    return wx.cloud.callFunction({
+      name: 'wrongQuestions',
+      data: {
+        action: 'markLessonMastered',
+        userId,
+        courseId,
+        chapterId,
+        lessonId
+      }
+    });
+  },
+
+  // 获取有错题的考试类型列表
+  getWrongExamTypes(userId, courseId) {
+    return wx.cloud.callFunction({
+      name: 'wrongQuestions',
+      data: {
+        action: 'getWrongExamTypes',
+        userId,
+        courseId
+      }
+    });
+  },
+
+  // 获取某考试类型下有错题的等级列表
+  getWrongExamLevels(userId, courseId, examType) {
+    return wx.cloud.callFunction({
+      name: 'wrongQuestions',
+      data: {
+        action: 'getWrongExamLevels',
+        userId,
+        courseId,
+        examType
+      }
+    });
+  },
+
+  // 标记某考试类型某等级所有错题为已掌握
+  markExamMastered(userId, courseId, examType, level) {
+    return wx.cloud.callFunction({
+      name: 'wrongQuestions',
+      data: {
+        action: 'markExamMastered',
+        userId,
+        courseId,
+        examType,
+        level
+      }
+    });
+  },
+
+  // 保存练习进度
+  saveExerciseProgress(userId, courseId, chapterId, lessonId, totalQuestions, correctCount) {
+    return wx.cloud.callFunction({
+      name: 'wrongQuestions',
+      data: {
+        action: 'saveExerciseProgress',
+        userId,
+        courseId,
+        chapterId,
+        lessonId,
+        totalQuestions,
+        correctCount
+      }
+    });
+  },
+
+  // 获取练习进度
+  getExerciseProgress(userId, courseId, chapterId, lessonId) {
+    return wx.cloud.callFunction({
+      name: 'wrongQuestions',
+      data: {
+        action: 'getExerciseProgress',
+        userId,
+        courseId,
+        chapterId,
+        lessonId
+      }
+    });
+  }
+};
+
+// 等级考试习题相关操作
+const examQuestions = {
+  // 获取题目
+  getQuestions(courseId, examType, level) {
+    return wx.cloud.callFunction({
+      name: 'examQuestions',
+      data: {
+        action: 'getQuestions',
+        courseId,
+        examType,
+        level
+      }
+    });
+  },
+
+  // 保存题目
+  saveQuestions(courseId, examType, level, questions) {
+    return wx.cloud.callFunction({
+      name: 'examQuestions',
+      data: {
+        action: 'saveQuestions',
+        courseId,
+        examType,
+        level,
+        questions
+      }
+    });
+  },
+
+  // 获取有题目的等级列表
+  getLevelsWithQuestions(courseId, examType) {
+    return wx.cloud.callFunction({
+      name: 'examQuestions',
+      data: {
+        action: 'getLevelsWithQuestions',
+        courseId,
+        examType
+      }
+    });
+  }
+};
+
 module.exports = {
   users,
   courses,
   progress,
   favorites,
   chapterQuestions,
+  wrongQuestions,
+  examQuestions,
   collection,
   getDB
 };

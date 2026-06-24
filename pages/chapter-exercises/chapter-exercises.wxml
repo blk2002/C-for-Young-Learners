@@ -1,9 +1,39 @@
-<!-- pages/chapter-exercises/chapter-exercises.wxml -->
 <view class="container">
-  <view class="placeholder">
-    <view class="icon">📚</view>
-    <view class="title">章节知识点习题</view>
-    <view class="course-name">{{courseName}}</view>
-    <view class="desc">此页面开发中，敬请期待</view>
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+
+  <view class="content" wx:else>
+    <view class="chapter-list">
+      <view
+        class="chapter-card"
+        wx:for="{{chapters}}"
+        wx:key="_id"
+        bindtap="goToLessons"
+        data-chapterid="{{item._id}}"
+        data-chaptertitle="{{item.title}}"
+      >
+        <view class="chapter-icon">📖</view>
+        <view class="chapter-info">
+          <view class="chapter-title">{{item.title}}</view>
+          <view class="chapter-meta">
+            <text>共 {{item.totalQuestions}} 题</text>
+            <text wx:if="{{item.totalQuestions > 0}}" class="progress-text">
+              已完成 {{item.completedQuestions}} 题
+            </text>
+          </view>
+          <view class="progress-bar" wx:if="{{item.totalQuestions > 0}}">
+            <view class="progress-fill" style="width: {{item.progressPercent}}%;"></view>
+          </view>
+        </view>
+        <view class="chapter-arrow">›</view>
+      </view>
+
+      <view class="empty-state" wx:if="{{chapters.length === 0}}">
+        <view class="icon">📚</view>
+        <view class="text">暂无章节</view>
+        <view class="text" style="font-size: 24rpx; margin-top: 10rpx;">请等待老师添加章节</view>
+      </view>
+    </view>
   </view>
+
+  <view class="bottom-space"></view>
 </view>

@@ -1,0 +1,21 @@
+<view class="container">
+  <view class="page-title">{{examName}}</view>
+  <view class="page-subtitle">选择等级进行习题管理</view>
+
+  <view class="level-list">
+    <view class="level-card"
+          wx:for="{{levels}}"
+          wx:key="*this"
+          data-level="{{item}}"
+          bindtap="goToEdit">
+      <view class="level-index">{{index + 1}}</view>
+      <view class="level-info">
+        <view class="level-name">{{item}}</view>
+        <view class="level-count">
+          {{levelQuestionCounts[item] || 0}} 道题
+        </view>
+      </view>
+      <view class="level-arrow">›</view>
+    </view>
+  </view>
+</view>

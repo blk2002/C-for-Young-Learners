@@ -1,9 +1,33 @@
-<!-- pages/chapter-wrong/chapter-wrong.wxml -->
 <view class="container">
-  <view class="placeholder">
-    <view class="icon">📚</view>
-    <view class="title">章节知识点错题</view>
-    <view class="course-name">{{courseName}}</view>
-    <view class="desc">此页面开发中，敬请期待</view>
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+
+  <view class="content" wx:else>
+    <view class="chapter-list">
+      <view
+        class="chapter-card"
+        wx:for="{{chapters}}"
+        wx:key="_id"
+        bindtap="goToLessons"
+        data-chapterid="{{item._id}}"
+        data-chaptertitle="{{item.title}}"
+      >
+        <view class="chapter-icon">📖</view>
+        <view class="chapter-info">
+          <view class="chapter-title">{{item.title}}</view>
+          <view class="chapter-meta">
+            <text>错题 {{item.wrongCount}} 道</text>
+          </view>
+        </view>
+        <view class="chapter-arrow">›</view>
+      </view>
+
+      <view class="empty-state" wx:if="{{chapters.length === 0}}">
+        <view class="icon">🎉</view>
+        <view class="text">暂无错题</view>
+        <view class="text" style="font-size: 24rpx; margin-top: 10rpx;">太棒了，继续保持！</view>
+      </view>
+    </view>
   </view>
+
+  <view class="bottom-space"></view>
 </view>

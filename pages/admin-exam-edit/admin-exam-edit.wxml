@@ -1,0 +1,191 @@
+<view class="container">
+  <view class="header">
+    <view class="title">{{examName}} - {{level}}</view>
+    <view class="subtitle">共 {{questions.length}} 道题</view>
+  </view>
+
+  <view class="action-bar">
+    <button class="btn btn-primary" bindtap="addChoice">+ 新增选择题</button>
+    <button class="btn btn-success" bindtap="addFill">+ 新增填空题</button>
+  </view>
+
+  <view class="question-list" wx:if="{{questions.length > 0}}">
+    <view class="question-card" wx:for="{{questions}}" wx:key="id">
+      <view class="question-header">
+        <view class="question-index">第 {{index + 1}} 题</view>
+        <view class="question-type {{item.type === 'choice' ? 'type-choice' : 'type-fill'}}">
+          {{item.type === 'choice' ? '选择题' : '填空题'}}
+        </view>
+      </view>
+
+      <view class="question-content">{{item.question}}</view>
+
+      <block wx:if="{{item.type === 'choice'}}">
+        <view class="option-item" wx:for="{{item.options}}" wx:for-item="opt" wx:for-index="optKey" wx:key="optKey">
+          <text class="option-label">{{optKey}}.</text>
+          <text class="option-text">{{opt}}</text>
+          <text class="option-answer" wx:if="{{item.answer === optKey}}">✓ 正确答案</text>
+        </view>
+      </block>
+
+      <block wx:else>
+        <view class="fill-answer">
+          <text class="answer-label">答案：</text>
+          <text class="answer-text">{{item.answer}}</text>
+        </view>
+      </block>
+
+      <view class="explanation" wx:if="{{item.explanation}}">
+        <text class="exp-label">解析：</text>
+        <text class="exp-text">{{item.explanation}}</text>
+      </view>
+
+      <view class="question-actions">
+        <view class="action-btn" data-index="{{index}}" bindtap="moveUp" wx:if="{{index > 0}}">
+          ↑ 上移
+        </view>
+        <view class="action-btn" data-index="{{index}}" bindtap="moveDown" wx:if="{{index < questions.length - 1}}">
+          ↓ 下移
+        </view>
+        <view class="action-btn edit-btn" data-index="{{index}}" bindtap="{{item.type === 'choice' ? 'editChoice' : 'editFill'}}">
+          ✎ 编辑
+        </view>
+        <view class="action-btn delete-btn" data-index="{{index}}" bindtap="deleteQuestion">
+          ✕ 删除
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty" wx:else>
+    <view class="empty-icon">📝</view>
+    <view class="empty-text">暂无习题，点击上方按钮添加</view>
+  </view>
+
+  <view class="modal" wx:if="{{showChoiceModal}}">
+    <view class="modal-mask" bindtap="cancelChoice"></view>
+    <view class="modal-content">
+      <view class="modal-title">{{currentEditIndex >= 0 ? '编辑选择题' : '新增选择题'}}</view>
+
+      <view class="form-item">
+        <view class="form-label">题目内容</view>
+        <textarea class="form-textarea"
+                  value="{{choiceForm.question}}"
+                  data-field="question"
+                  bindinput="onChoiceInput"
+                  placeholder="请输入题目内容"
+                  auto-height></textarea>
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">选项 A</view>
+        <input class="form-input"
+               value="{{choiceForm.optionA}}"
+               data-field="optionA"
+               bindinput="onChoiceInput"
+               placeholder="请输入选项A" />
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">选项 B</view>
+        <input class="form-input"
+               value="{{choiceForm.optionB}}"
+               data-field="optionB"
+               bindinput="onChoiceInput"
+               placeholder="请输入选项B" />
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">选项 C</view>
+        <input class="form-input"
+               value="{{choiceForm.optionC}}"
+               data-field="optionC"
+               bindinput="onChoiceInput"
+               placeholder="请输入选项C" />
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">选项 D</view>
+        <input class="form-input"
+               value="{{choiceForm.optionD}}"
+               data-field="optionD"
+               bindinput="onChoiceInput"
+               placeholder="请输入选项D" />
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">正确答案</view>
+        <view class="answer-options">
+          <view class="answer-opt {{choiceForm.answer === 'A' ? 'active' : ''}}"
+                data-value="A"
+                bindtap="selectAnswer">A</view>
+          <view class="answer-opt {{choiceForm.answer === 'B' ? 'active' : ''}}"
+                data-value="B"
+                bindtap="selectAnswer">B</view>
+          <view class="answer-opt {{choiceForm.answer === 'C' ? 'active' : ''}}"
+                data-value="C"
+                bindtap="selectAnswer">C</view>
+          <view class="answer-opt {{choiceForm.answer === 'D' ? 'active' : ''}}"
+                data-value="D"
+                bindtap="selectAnswer">D</view>
+        </view>
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">答案解析（选填）</view>
+        <textarea class="form-textarea"
+                  value="{{choiceForm.explanation}}"
+                  data-field="explanation"
+                  bindinput="onChoiceInput"
+                  placeholder="请输入答案解析"
+                  auto-height></textarea>
+      </view>
+
+      <view class="modal-btns">
+        <button class="modal-btn cancel-btn" bindtap="cancelChoice">取消</button>
+        <button class="modal-btn confirm-btn" bindtap="saveChoice">保存</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="modal" wx:if="{{showFillModal}}">
+    <view class="modal-mask" bindtap="cancelFill"></view>
+    <view class="modal-content">
+      <view class="modal-title">{{currentEditIndex >= 0 ? '编辑填空题' : '新增填空题'}}</view>
+
+      <view class="form-item">
+        <view class="form-label">题目内容</view>
+        <textarea class="form-textarea"
+                  value="{{fillForm.question}}"
+                  data-field="question"
+                  bindinput="onFillInput"
+                  placeholder="请输入题目内容"
+                  auto-height></textarea>
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">答案</view>
+        <input class="form-input"
+               value="{{fillForm.answer}}"
+               data-field="answer"
+               bindinput="onFillInput"
+               placeholder="请输入答案" />
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">答案解析（选填）</view>
+        <textarea class="form-textarea"
+                  value="{{fillForm.explanation}}"
+                  data-field="explanation"
+                  bindinput="onFillInput"
+                  placeholder="请输入答案解析"
+                  auto-height></textarea>
+      </view>
+
+      <view class="modal-btns">
+        <button class="modal-btn cancel-btn" bindtap="cancelFill">取消</button>
+        <button class="modal-btn confirm-btn" bindtap="saveFill">保存</button>
+      </view>
+    </view>
+  </view>
+</view>

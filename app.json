@@ -17,7 +17,18 @@
     "pages/exam-wrong/exam-wrong",
     "pages/admin-exercises/admin-exercises",
     "pages/admin-exercise-edit/admin-exercise-edit",
-    "pages/admin-lessons/admin-lessons"
+    "pages/admin-lessons/admin-lessons",
+    "pages/lesson-exercises/lesson-exercises",
+    "pages/exercise-practice/exercise-practice",
+    "pages/wrong-lesson/wrong-lesson",
+    "pages/wrong-practice/wrong-practice",
+    "pages/admin-exam-type/admin-exam-type",
+    "pages/admin-exam-levels/admin-exam-levels",
+    "pages/admin-exam-edit/admin-exam-edit",
+    "pages/exam-levels/exam-levels",
+    "pages/exam-practice/exam-practice",
+    "pages/exam-wrong-levels/exam-wrong-levels",
+    "pages/profile-edit/profile-edit"
   ],
   "window": {
     "backgroundTextStyle": "light",

@@ -1,0 +1,148 @@
+/* pages/profile-edit/profile-edit.wxss */
+.container {
+  min-height: 100vh;
+  background: #F5F7FA;
+  padding-bottom: 40rpx;
+}
+
+/* 头像区域 */
+.avatar-section {
+  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+  padding: 60rpx 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.avatar-wrapper {
+  margin-bottom: 30rpx;
+}
+
+.avatar {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  border: 4rpx solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.avatar-default {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80rpx;
+}
+
+.avatar-buttons {
+  display: flex;
+  gap: 20rpx;
+}
+
+.avatar-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border: none;
+  border-radius: 30rpx;
+  padding: 12rpx 30rpx;
+  font-size: 24rpx;
+  line-height: 1.5;
+}
+
+.avatar-btn::after {
+  border: none;
+}
+
+.avatar-btn:active {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* 表单区域 */
+.form-section {
+  margin: 30rpx 40rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.form-item {
+  padding: 30rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+  position: relative;
+}
+
+.form-item:last-child {
+  border-bottom: none;
+}
+
+.form-item.readonly {
+  background: #FAFAFA;
+}
+
+.form-label {
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 16rpx;
+  font-weight: 500;
+}
+
+.form-input {
+  font-size: 30rpx;
+  color: #333;
+  padding: 10rpx 0;
+}
+
+.form-textarea {
+  font-size: 30rpx;
+  color: #333;
+  width: 100%;
+  min-height: 80rpx;
+  padding: 10rpx 0;
+}
+
+.char-count {
+  position: absolute;
+  right: 30rpx;
+  bottom: 20rpx;
+  font-size: 22rpx;
+  color: #999;
+}
+
+.form-readonly {
+  font-size: 30rpx;
+  color: #999;
+  padding: 10rpx 0;
+}
+
+.form-tip {
+  font-size: 22rpx;
+  color: #BBB;
+  margin-top: 6rpx;
+}
+
+/* 保存按钮 */
+.save-section {
+  padding: 40rpx 40rpx 0;
+}
+
+.save-btn {
+  background: #4A90E2;
+  color: #fff;
+  border-radius: 16rpx;
+  padding: 28rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  border: none;
+}
+
+.save-btn::after {
+  border: none;
+}
+
+.save-btn:active {
+  background: #357ABD;
+}
+
+.save-btn[disabled] {
+  background: #A0C4E8;
+  color: rgba(255, 255, 255, 0.7);
+}

@@ -9,7 +9,7 @@ exports.main = async (event, context) => {
   if (!userId) {
     return {
       success: false,
-      message: '用户ID不能为空'
+      message: '学生ID不能为空'
     };
   }
 
@@ -25,7 +25,7 @@ exports.main = async (event, context) => {
 
     return {
       success: true,
-      message: approved ? '已通过审核' : '已拒绝该用户'
+      message: approved ? '已通过审核' : '已拒绝该学生'
     };
   } catch (err) {
     console.error('审核失败', err);

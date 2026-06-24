@@ -42,7 +42,7 @@ Page({
 
     // 校验
     if (!username.trim()) {
-      wx.showToast({ title: '请输入用户名', icon: 'none' });
+      wx.showToast({ title: '请输入学生姓名', icon: 'none' });
       return;
     }
 
@@ -110,7 +110,7 @@ Page({
       if (result.result.success) {
         wx.showModal({
           title: '注册成功',
-          content: '请等待管理员审核通过后再登录',
+          content: '请等待老师审核通过后再登录',
           showCancel: false,
           confirmText: '好的',
           success: () => {

@@ -1,0 +1,63 @@
+<!-- pages/profile-edit/profile-edit.wxml -->
+<view class="container">
+  <!-- 头像区域 -->
+  <view class="avatar-section">
+    <view class="avatar-wrapper">
+      <image wx:if="{{avatarUrl}}" class="avatar" src="{{avatarUrl}}" mode="aspectFill" />
+      <view wx:else class="avatar avatar-default">
+        <text>{{isAdmin ? '🛡️' : '🎓'}}</text>
+      </view>
+    </view>
+    <view class="avatar-buttons">
+      <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+        使用微信头像
+      </button>
+      <button class="avatar-btn" bindtap="chooseFromAlbum">
+        从相册选择
+      </button>
+    </view>
+  </view>
+
+  <!-- 表单区域 -->
+  <view class="form-section">
+    <!-- 昵称 -->
+    <view class="form-item">
+      <view class="form-label">昵称</view>
+      <input
+        class="form-input"
+        placeholder="请输入昵称"
+        value="{{nickname}}"
+        bindinput="onNicknameInput"
+        maxlength="20"
+      />
+    </view>
+
+    <!-- 个性签名 -->
+    <view class="form-item">
+      <view class="form-label">个性签名</view>
+      <textarea
+        class="form-textarea"
+        placeholder="写下你的学习目标..."
+        value="{{signature}}"
+        bindinput="onSignatureInput"
+        maxlength="50"
+        auto-height
+      />
+      <view class="char-count">{{signature.length}}/50</view>
+    </view>
+
+    <!-- 学生姓名（只读） -->
+    <view class="form-item readonly">
+      <view class="form-label">学生姓名</view>
+      <view class="form-readonly">{{username}}</view>
+      <view class="form-tip">登录账号，不可修改</view>
+    </view>
+  </view>
+
+  <!-- 保存按钮 -->
+  <view class="save-section">
+    <button class="save-btn" bindtap="saveProfile" disabled="{{saving}}">
+      {{saving ? '保存中...' : '保 存'}}
+    </button>
+  </view>
+</view>

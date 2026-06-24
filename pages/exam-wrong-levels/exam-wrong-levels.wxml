@@ -1,0 +1,32 @@
+<!-- pages/exam-wrong-levels/exam-wrong-levels.wxml -->
+<view class="container">
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+
+  <view wx:else>
+    <view class="page-title">{{examName}}</view>
+    <view class="page-subtitle">选择等级查看错题</view>
+
+    <view class="level-list" wx:if="{{levels.length > 0}}">
+      <view
+        class="level-card"
+        wx:for="{{levels}}"
+        wx:key="level"
+        bindtap="goToPractice"
+        data-level="{{item.level}}"
+      >
+        <view class="level-index">{{item.levelIndex}}</view>
+        <view class="level-info">
+          <view class="level-name">{{item.levelName}}</view>
+          <view class="level-count">已做错 {{item.wrongCount}} 题</view>
+        </view>
+        <view class="level-arrow">›</view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{!loading && levels.length === 0}}">
+      <view class="empty-icon">🎉</view>
+      <view class="empty-text">该考试类型暂无错题</view>
+      <view class="empty-sub">继续保持！</view>
+    </view>
+  </view>
+</view>

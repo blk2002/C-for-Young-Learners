@@ -1,0 +1,44 @@
+<view class="container">
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+
+  <view class="content" wx:else>
+    <view class="lesson-list">
+      <view
+        class="lesson-card"
+        wx:for="{{lessons}}"
+        wx:key="_id"
+        bindtap="goToPractice"
+        data-lessonid="{{item._id}}"
+        data-lessontitle="{{item.title}}"
+      >
+        <view class="lesson-icon">📝</view>
+        <view class="lesson-info">
+          <view class="lesson-title">{{item.title}}</view>
+          <view class="lesson-meta">
+            <view class="meta-left">
+              <text class="count-text">共 {{item.questionCount}} 题</text>
+            </view>
+            <view wx:if="{{item.questionCount > 0}}" class="status-tag {{item.practiceStatus}}">
+              {{item.statusText}}
+            </view>
+          </view>
+          <view class="progress-wrap" wx:if="{{item.questionCount > 0 && item.completedCount > 0}}">
+            <view class="progress-bar">
+              <view class="progress-fill" style="width: {{item.progressPercent}}%;"></view>
+            </view>
+            <text class="progress-text">{{item.progressPercent}}%</text>
+          </view>
+        </view>
+        <view class="lesson-arrow">›</view>
+      </view>
+
+      <view class="empty-state" wx:if="{{lessons.length === 0}}">
+        <view class="icon">📚</view>
+        <view class="text">暂无知识点</view>
+        <view class="text" style="font-size: 24rpx; margin-top: 10rpx;">请等待老师添加知识点</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-space"></view>
+</view>

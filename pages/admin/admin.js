@@ -20,7 +20,7 @@ Page({
     if (!app.isAdmin()) {
       wx.showModal({
         title: '权限不足',
-        content: '只有管理员可以访问此页面',
+        content: '只有老师可以访问此页面',
         showCancel: false,
         success: () => {
           wx.navigateBack();
@@ -109,7 +109,7 @@ Page({
 
     wx.showModal({
       title: '确认',
-      content: `确定${actionText}该用户吗？`,
+      content: `确定${actionText}该学生吗？`,
       success: async (res) => {
         if (res.confirm) {
           try {
@@ -195,6 +195,12 @@ Page({
   goToChapterExercises() {
     wx.navigateTo({
       url: `/pages/admin-exercises/admin-exercises?courseId=${this.data.exerciseCourse}&courseName=${encodeURIComponent(this.data.exerciseCourseName)}`
+    });
+  },
+
+  goToExamExercises() {
+    wx.navigateTo({
+      url: `/pages/admin-exam-type/admin-exam-type?courseId=${this.data.exerciseCourse}&courseName=${encodeURIComponent(this.data.exerciseCourseName)}`
     });
   }
 });

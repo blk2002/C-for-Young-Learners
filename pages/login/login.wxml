@@ -21,10 +21,10 @@
     <view class="form-content">
       <!-- 用户名 -->
       <view class="input-group">
-        <view class="input-label">用户名</view>
+        <view class="input-label">学生姓名</view>
         <input
           class="input"
-          placeholder="请输入用户名"
+          placeholder="请输入学生姓名"
           value="{{username}}"
           bindinput="onUsernameInput"
           maxlength="20"
@@ -68,7 +68,7 @@
 
       <!-- 提示文字 -->
       <view class="hint-text" wx:if="{{mode === 'register'}}">
-        ⚠️ 注册后需要管理员审核通过才能登录
+        ⚠️ 注册后需要老师审核通过才能登录
       </view>
     </view>
   </view>
