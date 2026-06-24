@@ -22,12 +22,12 @@ Page({
 
   // 进入我的收藏
   goToFavorites() {
-    wx.navigateTo({ url: '/pages/favorites/favorites' });
+    wx.navigateTo({ url: '/pages/my-favorites/my-favorites' });
   },
 
   // 进入学习进度
   goToProgress() {
-    wx.navigateTo({ url: '/pages/progress/progress' });
+    wx.navigateTo({ url: '/pages/study-progress/study-progress' });
   },
 
   // 进入管理员页面

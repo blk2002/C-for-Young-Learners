@@ -149,8 +149,10 @@ W.push(table([
   ["pages/chapters/chapters", "章节列表页", "章节列表、当前学习标记、知识点展开", "已登录用户"],
   ["pages/lesson/lesson", "知识点详情页", "讲解文字、代码示例、练习题、答案解析、收藏按钮", "已登录用户"],
   ["pages/profile/profile", "个人中心", "用户信息卡、功能菜单（进度/收藏/管理/退出）", "已登录用户"],
-  ["pages/progress/progress", "学习进度页", "各课程当前学习位置", "已登录用户"],
-  ["pages/favorites/favorites", "我的收藏页", "已收藏知识点列表", "已登录用户"],
+  ["pages/progress/progress", "习题页", "习题练习（待开发）", "已登录用户"],
+  ["pages/favorites/favorites", "错题页", "错题本（待开发）", "已登录用户"],
+  ["pages/study-progress/study-progress", "学习进度页", "各课程当前学习位置", "已登录用户"],
+  ["pages/my-favorites/my-favorites", "我的收藏页", "已收藏知识点列表", "已登录用户"],
   ["pages/admin/admin", "管理后台", "用户审核 Tab / 课程管理 Tab", "仅管理员"],
   ["pages/admin-edit/admin-edit", "内容编辑页", "新增/编辑章节 / 新增/编辑知识点 / 知识点列表", "仅管理员"]
 ], [2400, 2400, 3000, 1560]));

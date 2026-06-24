@@ -1,90 +1,29 @@
 /* pages/favorites/favorites.wxss */
 .container {
-  padding: 0;
   min-height: 100vh;
-}
-
-.header {
-  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
-  padding: 50rpx 40rpx;
-  color: #fff;
-}
-
-.title {
-  font-size: 36rpx;
-  font-weight: bold;
-  margin-bottom: 10rpx;
-}
-
-.subtitle {
-  font-size: 26rpx;
-  opacity: 0.9;
-}
-
-.fav-list {
-  padding: 30rpx 40rpx;
-}
-
-.fav-card {
-  background: #fff;
-  border-radius: 16rpx;
-  padding: 30rpx;
-  margin-bottom: 20rpx;
   display: flex;
   align-items: center;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
-  transition: background 0.2s;
+  justify-content: center;
 }
 
-.fav-card:active {
-  background: #F5F7FA;
-}
-
-.fav-icon {
-  font-size: 48rpx;
-  margin-right: 20rpx;
-  width: 60rpx;
+.placeholder {
   text-align: center;
+  padding: 60rpx;
 }
 
-.fav-content {
-  flex: 1;
+.placeholder .icon {
+  font-size: 120rpx;
+  margin-bottom: 30rpx;
 }
 
-.lesson-title {
-  font-size: 30rpx;
-  font-weight: 500;
+.placeholder .title {
+  font-size: 36rpx;
+  font-weight: bold;
   color: #333;
-  margin-bottom: 8rpx;
+  margin-bottom: 16rpx;
 }
 
-.lesson-meta {
-  font-size: 24rpx;
-  color: #999;
-}
-
-.fav-arrow {
-  font-size: 40rpx;
-  color: #CCC;
-}
-
-.loading {
-  text-align: center;
-  padding: 100rpx 0;
-  color: #999;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 120rpx 30rpx;
-}
-
-.empty-state .icon {
-  font-size: 100rpx;
-  margin-bottom: 20rpx;
-}
-
-.empty-state .text {
+.placeholder .desc {
   font-size: 28rpx;
   color: #999;
 }

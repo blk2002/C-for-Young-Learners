@@ -8,7 +8,9 @@
     "pages/admin/admin",
     "pages/admin-edit/admin-edit",
     "pages/favorites/favorites",
-    "pages/progress/progress"
+    "pages/progress/progress",
+    "pages/study-progress/study-progress",
+    "pages/my-favorites/my-favorites"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -28,11 +30,11 @@
       },
       {
         "pagePath": "pages/progress/progress",
-        "text": "进度"
+        "text": "习题"
       },
       {
         "pagePath": "pages/favorites/favorites",
-        "text": "收藏"
+        "text": "错题"
       },
       {
         "pagePath": "pages/profile/profile",
