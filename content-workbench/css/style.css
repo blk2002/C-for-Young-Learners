@@ -52,3 +52,25 @@ body { margin:0; font:14px/20px "PingFang SC", system-ui, sans-serif; color:var(
 .wb-count.over { color:var(--wb-warn); }
 .wb-seg { width:100%; min-height:56px; padding:8px; border:1px solid var(--wb-border); border-radius:8px; font:13px/18px inherit; resize:vertical; }
 .wb-code { font-family:Consolas, monospace; }
+.wb-quiz-src-row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.wb-inline { display:inline-flex; align-items:center; gap:6px; }
+.wb-sel { border:1px solid var(--wb-border); border-radius:6px; padding:4px 6px; font-size:13px; background:#fff; }
+.wb-quiz-bar { display:flex; gap:8px; margin:4px 0 10px; }
+.wb-qcard { border:1px solid var(--wb-border); border-radius:10px; padding:10px; margin-bottom:10px; background:#fff; }
+.wb-qcard.err { border-color:var(--wb-err); background:rgba(229,72,77,.04); }
+.wb-qcard.skip { opacity:.55; }
+.wb-qcard.dup { border-color:var(--wb-warn); }
+.wb-qcard-head { display:flex; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap; }
+.wb-tag { font-size:12px; color:var(--wb-brand); background:var(--wb-brand-soft); border-radius:999px; padding:1px 10px; }
+.wb-qstatus { font-size:12px; color:var(--wb-muted); }
+.wb-qcard.err .wb-qstatus { color:var(--wb-err); }
+.wb-qcard-acts { margin-left:auto; display:flex; gap:6px; }
+.wb-qerr { color:var(--wb-err); font-size:12px; margin-bottom:6px; }
+.wb-qcard-body { display:flex; flex-direction:column; gap:6px; }
+.wb-qinput { width:100%; border:1px solid var(--wb-border); border-radius:6px; padding:6px 8px; font-size:13px; }
+.wb-qopts { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.wb-qopt { border:1px solid var(--wb-border); border-radius:6px; padding:6px 8px; font-size:13px; }
+.wb-qcard-bottom { display:flex; gap:6px; }
+.wb-qans { max-width:120px; } .wb-qexp { flex:1; }
+.wb-qcard-move { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+.wb-flabel { display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--wb-muted); }
