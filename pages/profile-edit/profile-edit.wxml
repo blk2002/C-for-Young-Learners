@@ -1,63 +1,82 @@
 <!-- pages/profile-edit/profile-edit.wxml -->
-<view class="container">
-  <!-- 头像区域 -->
-  <view class="avatar-section">
-    <view class="avatar-wrapper">
-      <image wx:if="{{avatarUrl}}" class="avatar" src="{{avatarUrl}}" mode="aspectFill" />
-      <view wx:else class="avatar avatar-default">
-        <text>{{isAdmin ? '🛡️' : '🎓'}}</text>
-      </view>
-    </view>
-    <view class="avatar-buttons">
-      <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
-        使用微信头像
-      </button>
-      <button class="avatar-btn" bindtap="chooseFromAlbum">
-        从相册选择
-      </button>
-    </view>
+<view class="edit-page">
+
+  <!-- 渐变头部 -->
+  <view class="hero">
+    <view class="hero-deco deco-a"></view>
+    <view class="hero-deco deco-b"></view>
   </view>
 
-  <!-- 表单区域 -->
-  <view class="form-section">
-    <!-- 昵称 -->
-    <view class="form-item">
-      <view class="form-label">昵称</view>
+  <!-- 基本信息卡（上浮，咬住渐变头部） -->
+  <view class="card basic-card">
+
+    <!-- 头像：骑在渐变与卡片的交界线上 -->
+    <view class="avatar-zone">
+      <view class="avatar-wrap">
+        <view class="avatar-circle">
+          <image wx:if="{{avatarUrl}}" class="avatar" src="{{avatarUrl}}" mode="aspectFill" />
+          <view wx:else class="avatar-text">{{initial}}</view>
+        </view>
+        <button class="avatar-trigger" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar"></button>
+        <view class="camera"><text class="icon i-edit-w"/></view>
+      </view>
+      <view class="avatar-hint">点击头像更换</view>
+    </view>
+
+    <!-- 姓名 -->
+    <view class="field">
+      <view class="field-label">姓名</view>
       <input
-        class="form-input"
-        placeholder="请输入昵称"
-        value="{{nickname}}"
-        bindinput="onNicknameInput"
+        class="field-input"
+        placeholder="请输入姓名"
+        placeholder-class="field-ph"
+        value="{{name}}"
+        bindinput="onNameInput"
         maxlength="20"
       />
     </view>
 
-    <!-- 个性签名 -->
-    <view class="form-item">
-      <view class="form-label">个性签名</view>
-      <textarea
-        class="form-textarea"
-        placeholder="写下你的学习目标..."
-        value="{{signature}}"
-        bindinput="onSignatureInput"
-        maxlength="50"
-        auto-height
-      />
-      <view class="char-count">{{signature.length}}/50</view>
-    </view>
-
-    <!-- 学生姓名（只读） -->
-    <view class="form-item readonly">
-      <view class="form-label">学生姓名</view>
-      <view class="form-readonly">{{username}}</view>
-      <view class="form-tip">登录账号，不可修改</view>
+    <!-- 登录账号（只读） -->
+    <view class="field">
+      <view class="field-label">登录账号</view>
+      <view class="field-value readonly">{{username}}</view>
+      <view class="field-chip">不可修改</view>
     </view>
   </view>
 
-  <!-- 保存按钮 -->
-  <view class="save-section">
+  <!-- 个性签名 -->
+  <view class="card sign-card">
+    <view class="sign-head">
+      <view class="sign-title">个性签名</view>
+      <view class="sign-count">{{signature.length}}/50</view>
+    </view>
+    <textarea
+      class="sign-input"
+      placeholder="写下你的学习目标..."
+      placeholder-class="field-ph"
+      value="{{signature}}"
+      bindinput="onSignatureInput"
+      maxlength="50"
+      auto-height
+    />
+  </view>
+
+  <!-- 修改密码 -->
+  <view class="card menu-card" bindtap="goToChangePassword">
+    <view class="menu-icon"><text class="icon i-shield"/></view>
+    <view class="menu-body">
+      <view class="menu-text">修改密码</view>
+      <view class="menu-sub">需要验证原密码</view>
+    </view>
+    <view class="menu-arrow"><text class="icon i-chevron"/></view>
+  </view>
+
+  <!-- 保存 -->
+  <view class="save-wrap">
     <button class="save-btn" bindtap="saveProfile" disabled="{{saving}}">
       {{saving ? '保存中...' : '保 存'}}
     </button>
   </view>
+
+  <view class="bottom-space"></view>
 </view>

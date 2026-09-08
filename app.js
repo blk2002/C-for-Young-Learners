@@ -42,12 +42,50 @@ App({
   isAdmin() {
     return this.globalData.userInfo && this.globalData.userInfo.role === 'admin';
   },
+
+  // 账号是否已过有效期
+  // 管理员永久有效；没有 validUntil 的老账号也视为永久有效
+  isExpired() {
+    const user = this.globalData.userInfo;
+    if (!user) return false;
+    if (user.role === 'admin') return false;
+    if (!user.validUntil) return false;
+
+    const expireTime = new Date(user.validUntil).getTime();
+    if (isNaN(expireTime)) return false;
+
+    return Date.now() > expireTime;
+  },
+
+  // 已过期就强制退出登录并回到登录页
+  // 在各页面的 onShow 里调用（小程序没有服务端推送，只能客户端检查）
+  enforceValidity() {
+    if (!this.checkLogin()) return false;
+    if (!this.isExpired()) return false;
+
+    this.logout();
+    wx.reLaunch({ url: '/pages/login/login' });
+    setTimeout(() => {
+      wx.showModal({
+        title: '账号已失效',
+        content: '账号已失效，请联系老师续期',
+        showCancel: false
+      });
+    }, 400);
+
+    return true;
+  },
+
+  onShow() {
+    // 从后台切回前台时检查一次有效期
+    this.enforceValidity();
+  },
   globalData: {
     userInfo: null,
     isLoggedIn: false,
     courses: [
-      { id: 'python', name: 'Python', icon: '🐍', color: '#3776AB' },
-      { id: 'cpp', name: 'C++', icon: '⚡', color: '#00599C' }
+      { id: 'python', name: 'Python', icon: 'i-code', color: '#45B0E0' },
+      { id: 'cpp', name: 'C++', icon: 'i-chip', color: '#4E6EF2' }
     ]
   }
 });

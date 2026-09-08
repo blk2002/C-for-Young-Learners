@@ -11,7 +11,7 @@
         data-lessonid="{{item._id}}"
         data-lessontitle="{{item.title}}"
       >
-        <view class="lesson-icon">📝</view>
+        <view class="lesson-icon"><text class="icon i-edit"/></view>
         <view class="lesson-info">
           <view class="lesson-title">{{item.title}}</view>
           <view class="lesson-meta">
@@ -29,11 +29,11 @@
             <text class="progress-text">{{item.progressPercent}}%</text>
           </view>
         </view>
-        <view class="lesson-arrow">›</view>
+        <view class="lesson-arrow"><text class="icon i-chevron"/></view>
       </view>
 
       <view class="empty-state" wx:if="{{lessons.length === 0}}">
-        <view class="icon">📚</view>
+        <view class="icon"><text class="icon i-book"/></view>
         <view class="text">暂无知识点</view>
         <view class="text" style="font-size: 24rpx; margin-top: 10rpx;">请等待老师添加知识点</view>
       </view>

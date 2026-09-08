@@ -1,13 +1,13 @@
 /* pages/admin-lessons/admin-lessons.wxss */
 .container {
   min-height: 100vh;
-  background: #F5F7FA;
+  background: var(--bg);
 }
 
 .loading {
   text-align: center;
   padding: 100rpx 0;
-  color: #999;
+  color: var(--t3);
 }
 
 .content {
@@ -16,7 +16,7 @@
 
 /* 页面标题 */
 .page-header {
-  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-deep) 100%);
   border-radius: 16rpx;
   padding: 30rpx;
   margin-bottom: 30rpx;
@@ -53,7 +53,7 @@
 }
 
 .lesson-card:active {
-  background: #F0F4F8;
+  background: var(--bg);
   transform: scale(0.98);
 }
 
@@ -71,7 +71,7 @@
 .lesson-title {
   font-size: 30rpx;
   font-weight: 600;
-  color: #333;
+  color: var(--t1);
   margin-bottom: 8rpx;
 }
 
@@ -80,20 +80,20 @@
   margin-left: 12rpx;
   padding: 4rpx 14rpx;
   font-size: 22rpx;
-  background: #E8F4FD;
-  color: #4A90E2;
+  background: var(--tint);
+  color: var(--primary);
   border-radius: 20rpx;
   font-weight: 500;
 }
 
 .lesson-meta {
   font-size: 24rpx;
-  color: #999;
+  color: var(--t3);
 }
 
 .lesson-arrow {
   font-size: 40rpx;
-  color: #CCC;
+  color: var(--t3);
   font-weight: 300;
 }
 
@@ -110,7 +110,7 @@
 
 .empty-state .text {
   font-size: 28rpx;
-  color: #999;
+  color: var(--t3);
 }
 
 .bottom-space {

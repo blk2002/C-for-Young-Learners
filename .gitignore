@@ -19,3 +19,8 @@ logs/
 # 绯荤粺鍨冨溇鏂囦欢
 .DS_Store
 Thumbs.db
+# 涓婚璁捐棰勮椤碉紙鏈湴鍙傝�冪敤锛屼笉杩涗粨搴擄級
+design-preview.html
+
+# 本地工具目录
+.workbuddy/

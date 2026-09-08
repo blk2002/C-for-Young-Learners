@@ -1,0 +1,86 @@
+<!-- pages/admin-student-edit/admin-student-edit.wxml -->
+<view class="container">
+  <!-- 基本信息 -->
+  <view class="form-section">
+    <view class="form-item">
+      <view class="form-label">学生姓名</view>
+      <input
+        class="form-input"
+        placeholder="请输入学生姓名"
+        placeholder-class="form-placeholder"
+        value="{{name}}"
+        bindinput="onNameInput"
+        maxlength="20"
+      />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">登录账号</view>
+      <input
+        class="form-input"
+        placeholder="字母、数字或下划线，至少3位"
+        placeholder-class="form-placeholder"
+        value="{{username}}"
+        bindinput="onUsernameInput"
+        maxlength="20"
+      />
+      <view class="form-tip">学生用这个账号登录，创建后不可修改</view>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">初始密码</view>
+      <input
+        class="form-input"
+        placeholder="默认 123456"
+        placeholder-class="form-placeholder"
+        value="{{password}}"
+        bindinput="onPasswordInput"
+        maxlength="20"
+      />
+      <view class="form-tip">留空则使用默认密码 123456，创建后请告知学生</view>
+    </view>
+  </view>
+
+  <!-- 有效期 -->
+  <view class="form-section">
+    <view class="section-title">课程有效期</view>
+
+    <view class="duration-row">
+      <view
+        class="duration-item {{durationDays === 30 ? 'on' : ''}}"
+        data-days="30"
+        bindtap="selectDuration"
+      >1个月</view>
+      <view
+        class="duration-item {{durationDays === 90 ? 'on' : ''}}"
+        data-days="90"
+        bindtap="selectDuration"
+      >3个月</view>
+      <view
+        class="duration-item {{durationDays === 180 ? 'on' : ''}}"
+        data-days="180"
+        bindtap="selectDuration"
+      >半年</view>
+      <view
+        class="duration-item {{durationDays === 365 ? 'on' : ''}}"
+        data-days="365"
+        bindtap="selectDuration"
+      >1年</view>
+    </view>
+
+    <view class="calc-box">
+      <text class="icon i-warn calc-icon"/> 有效期至 <text class="calc-date">{{validUntilText}}</text>（共 {{durationDays}} 天）
+    </view>
+
+    <view class="form-tip tip-block">
+      到期后学生将无法登录，但学习数据会保留；在「学生管理」里续期后即可继续使用。
+    </view>
+  </view>
+
+  <!-- 提交 -->
+  <view class="save-section">
+    <button class="save-btn" bindtap="onSubmit" disabled="{{saving}}">
+      {{saving ? '创建中...' : '创建账号'}}
+    </button>
+  </view>
+</view>

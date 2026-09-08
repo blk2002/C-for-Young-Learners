@@ -1,0 +1,134 @@
+/* pages/admin-student-edit/admin-student-edit.wxss */
+.container {
+  min-height: 100vh;
+  background: var(--bg);
+  padding-bottom: 60rpx;
+}
+
+.form-section {
+  margin: 30rpx 40rpx;
+  background: var(--panel);
+  border-radius: 20rpx;
+  padding: 10rpx 30rpx 30rpx;
+  box-shadow: var(--shadow-sm);
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--t1);
+  padding: 26rpx 0 6rpx;
+}
+
+.form-item {
+  padding: 26rpx 0 0;
+}
+
+.form-label {
+  font-size: 26rpx;
+  color: var(--t2);
+  font-weight: 500;
+  margin-bottom: 12rpx;
+}
+
+.form-input {
+  background: var(--panel-2);
+  border-radius: 16rpx;
+  padding: 22rpx 26rpx;
+  font-size: 29rpx;
+  color: var(--t1);
+  height: 48rpx;
+  min-height: 48rpx;
+  line-height: 48rpx;
+}
+
+.form-placeholder {
+  color: var(--t3);
+}
+
+.form-tip {
+  font-size: 22rpx;
+  color: var(--t3);
+  margin-top: 10rpx;
+  line-height: 1.6;
+}
+
+.tip-block {
+  margin-top: 20rpx;
+  background: var(--warning-tint);
+  border-radius: 14rpx;
+  padding: 18rpx 22rpx;
+  color: #B8700F;
+}
+
+/* 有效期时长选择 */
+.duration-row {
+  display: flex;
+  gap: 14rpx;
+  margin-top: 10rpx;
+}
+
+.duration-item {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx 0;
+  font-size: 25rpx;
+  border-radius: 16rpx;
+  background: var(--panel-2);
+  color: var(--t2);
+  border: 2rpx solid transparent;
+}
+
+.duration-item.on {
+  background: var(--tint);
+  color: var(--primary);
+  border-color: var(--primary);
+  font-weight: 600;
+}
+
+.calc-box {
+  margin-top: 24rpx;
+  background: var(--tint);
+  border-radius: 14rpx;
+  padding: 20rpx 24rpx;
+  font-size: 25rpx;
+  color: var(--t2);
+}
+
+.calc-icon {
+  font-size: 26rpx;
+  margin-right: 8rpx;
+}
+
+.calc-date {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* 提交按钮 */
+.save-section {
+  padding: 50rpx 40rpx 0;
+}
+
+.save-btn {
+  background: var(--grad-primary);
+  color: #fff;
+  border-radius: 20rpx;
+  padding: 26rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  border: none;
+  box-shadow: 0 8rpx 20rpx rgba(91, 103, 241, 0.25);
+}
+
+.save-btn::after {
+  border: none;
+}
+
+.save-btn:active {
+  opacity: 0.9;
+}
+
+.save-btn[disabled] {
+  opacity: 0.6;
+}

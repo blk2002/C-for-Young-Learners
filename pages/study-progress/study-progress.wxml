@@ -1,7 +1,7 @@
 <!-- pages/study-progress/study-progress.wxml -->
 <view class="container">
   <view class="header">
-    <view class="title">📊 我的学习进度</view>
+    <view class="title"><text class="icon i-chart-w"/> 我的学习进度</view>
     <view class="subtitle">查看你在各课程中的学习情况</view>
   </view>
 
@@ -18,7 +18,7 @@
       style="border-left: 8rpx solid {{item.color}};"
     >
       <view class="card-header">
-        <view class="course-icon">{{item.icon}}</view>
+        <view class="course-icon"><text class="icon {{item.icon}}"/></view>
         <view class="course-info">
           <view class="course-name">{{item.courseName}}</view>
           <view class="course-meta">共 {{item.totalLessons}} 个知识点</view>
@@ -32,7 +32,7 @@
     </view>
 
     <view class="empty-state" wx:if="{{progressData.length === 0}}">
-      <view class="icon">📖</view>
+      <view class="icon"><text class="icon i-book-open"/></view>
       <view class="text">暂无学习记录</view>
     </view>
   </view>

@@ -11,15 +11,8 @@ function collection(name) {
 }
 
 // 用户相关操作
+// 注意：账号由管理员在后台创建发放，学生不能自助注册
 const users = {
-  // 注册新用户
-  register(username, password) {
-    return wx.cloud.callFunction({
-      name: 'userRegister',
-      data: { username, password }
-    });
-  },
-
   // 用户登录
   login(username, password) {
     return wx.cloud.callFunction({
@@ -28,26 +21,61 @@ const users = {
     });
   },
 
-  // 获取待审核用户列表
-  getPendingUsers() {
+  // 修改密码（需验证原密码）
+  changePassword(userId, oldPassword, newPassword, confirmPassword) {
     return wx.cloud.callFunction({
-      name: 'getPendingUsers'
+      name: 'changePassword',
+      data: { userId, oldPassword, newPassword, confirmPassword }
     });
   },
 
-  // 审核用户
-  reviewUser(userId, approved) {
-    return wx.cloud.callFunction({
-      name: 'reviewUser',
-      data: { userId, approved }
-    });
-  },
-
-  // 更新用户资料
+  // 更新用户资料（name 为真实姓名）
   updateProfile(userId, data) {
     return wx.cloud.callFunction({
       name: 'updateUserProfile',
       data: { userId, ...data }
+    });
+  },
+
+  /* ========== 以下为管理员操作，均需传 operatorId（操作者 userId） ========== */
+
+  // 创建学生账号（durationDays 为有效期天数）
+  createUser(operatorId, name, username, password, durationDays) {
+    return wx.cloud.callFunction({
+      name: 'adminCreateUser',
+      data: { operatorId, name, username, password, durationDays }
+    });
+  },
+
+  // 获取学生列表
+  listUsers(operatorId) {
+    return wx.cloud.callFunction({
+      name: 'adminListUsers',
+      data: { operatorId }
+    });
+  },
+
+  // 删除学生账号（级联清理其全部学习数据）
+  deleteUser(operatorId, userId) {
+    return wx.cloud.callFunction({
+      name: 'adminDeleteUser',
+      data: { operatorId, userId }
+    });
+  },
+
+  // 一键重置学生密码为默认密码
+  resetPassword(operatorId, userId) {
+    return wx.cloud.callFunction({
+      name: 'adminResetPassword',
+      data: { operatorId, userId }
+    });
+  },
+
+  // 学生账号续期（durationDays 续期天数，或 validUntil 直接指定截止日期）
+  updateValidity(operatorId, userId, durationDays, validUntil) {
+    return wx.cloud.callFunction({
+      name: 'adminUpdateValidity',
+      data: { operatorId, userId, durationDays, validUntil }
     });
   }
 };

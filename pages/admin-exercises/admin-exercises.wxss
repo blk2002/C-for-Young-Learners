@@ -1,13 +1,13 @@
 /* pages/admin-exercises/admin-exercises.wxss */
 .container {
   min-height: 100vh;
-  background: #F5F7FA;
+  background: var(--bg);
 }
 
 .loading {
   text-align: center;
   padding: 100rpx 0;
-  color: #999;
+  color: var(--t3);
 }
 
 .content {
@@ -32,7 +32,7 @@
 }
 
 .chapter-card:active {
-  background: #F0F4F8;
+  background: var(--bg);
   transform: scale(0.98);
 }
 
@@ -50,18 +50,18 @@
 .chapter-title {
   font-size: 30rpx;
   font-weight: 600;
-  color: #333;
+  color: var(--t1);
   margin-bottom: 8rpx;
 }
 
 .chapter-meta {
   font-size: 24rpx;
-  color: #999;
+  color: var(--t3);
 }
 
 .chapter-arrow {
   font-size: 44rpx;
-  color: #CCC;
+  color: var(--t3);
   font-weight: 300;
 }
 
@@ -77,7 +77,7 @@
 
 .empty-state .text {
   font-size: 28rpx;
-  color: #999;
+  color: var(--t3);
 }
 
 .bottom-space {

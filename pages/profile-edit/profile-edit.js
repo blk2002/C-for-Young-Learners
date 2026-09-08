@@ -6,12 +6,15 @@ Page({
   data: {
     userInfo: null,
     username: '',
-    nickname: '',
+    name: '',
+    initial: '',
     signature: '',
     avatarUrl: '',
     tempAvatarPath: '',
     isAdmin: false,
-    saving: false
+    saving: false,
+    origin: '',   // 初始快照，用于判断是否有未保存的修改
+    dirty: false
   },
 
   onLoad() {
@@ -21,49 +24,75 @@ Page({
     }
 
     const userInfo = app.getUserInfo();
+    const name = userInfo.name || userInfo.nickname || userInfo.username || '';
+    const signature = userInfo.signature || '';
+    const avatar = userInfo.avatar || '';
+
     this.setData({
       userInfo,
       username: userInfo.username,
-      nickname: userInfo.nickname || '',
-      signature: userInfo.signature || '',
-      avatarUrl: userInfo.avatar || '',
-      isAdmin: app.isAdmin()
+      name,
+      initial: name.charAt(0).toUpperCase(),
+      signature,
+      avatarUrl: avatar,
+      isAdmin: app.isAdmin(),
+      origin: this.snapshot(name, signature, avatar)
     });
   },
 
+  onUnload() {
+    // 离开页面时务必关掉拦截，避免影响其他页面
+    this.syncLeaveGuard(false);
+  },
+
+  // 生成内容快照，用于比对是否被修改过
+  snapshot(name, signature, avatar) {
+    return [(name || '').trim(), (signature || '').trim(), avatar || ''].join('\u0001');
+  },
+
+  // 比对当前值与初始快照，同步「离开拦截」状态
+  checkDirty() {
+    const cur = this.snapshot(this.data.name, this.data.signature, this.data.avatarUrl);
+    const dirty = cur !== this.data.origin;
+    if (dirty === this.data.dirty) return;
+
+    this.setData({ dirty });
+    this.syncLeaveGuard(dirty);
+  },
+
+  // 有未保存修改时，拦截左上角返回 / 手势返回
+  syncLeaveGuard(dirty) {
+    try {
+      if (dirty && wx.enableAlertBeforeUnload) {
+        wx.enableAlertBeforeUnload({ message: '有修改还没保存，确定离开吗？' });
+      } else if (wx.disableAlertBeforeUnload) {
+        wx.disableAlertBeforeUnload();
+      }
+    } catch (err) {
+      // 低版本基础库不支持该能力，忽略即可
+      console.warn('离开拦截不可用', err);
+    }
+  },
+
+  // 点击头像（open-type="chooseAvatar"）→ 直接唤起微信头像选择
   onChooseAvatar(e) {
     const { avatarUrl } = e.detail;
     this.setData({
       avatarUrl,
       tempAvatarPath: avatarUrl
-    });
+    }, () => this.checkDirty());
   },
 
-  chooseFromAlbum() {
-    wx.chooseMedia({
-      count: 1,
-      mediaType: ['image'],
-      sourceType: ['album'],
-      sizeType: ['compressed'],
-      success: (res) => {
-        const tempFilePath = res.tempFiles[0].tempFilePath;
-        this.setData({
-          avatarUrl: tempFilePath,
-          tempAvatarPath: tempFilePath
-        });
-      },
-      fail: (err) => {
-        console.error('选择图片失败', err);
-      }
-    });
-  },
-
-  onNicknameInput(e) {
-    this.setData({ nickname: e.detail.value });
+  onNameInput(e) {
+    this.setData({ name: e.detail.value }, () => this.checkDirty());
   },
 
   onSignatureInput(e) {
-    this.setData({ signature: e.detail.value });
+    this.setData({ signature: e.detail.value }, () => this.checkDirty());
+  },
+
+  goToChangePassword() {
+    wx.navigateTo({ url: '/pages/change-password/change-password' });
   },
 
   async uploadAvatar() {
@@ -71,27 +100,26 @@ Page({
       return this.data.userInfo.avatar || '';
     }
 
-    try {
-      const userId = this.data.userInfo._id;
-      const cloudPath = `avatars/${userId}_${Date.now()}.jpg`;
+    const userId = this.data.userInfo._id;
+    const cloudPath = `avatars/${userId}_${Date.now()}.jpg`;
 
-      const uploadResult = await wx.cloud.uploadFile({
-        cloudPath,
-        filePath: this.data.tempAvatarPath
-      });
+    const uploadResult = await wx.cloud.uploadFile({
+      cloudPath,
+      filePath: this.data.tempAvatarPath
+    });
 
-      return uploadResult.fileID;
-    } catch (err) {
-      console.error('头像上传失败', err);
-      throw err;
-    }
+    return uploadResult.fileID;
   },
 
   async saveProfile() {
-    const { nickname, signature } = this.data;
+    const { name, signature } = this.data;
 
-    if (nickname && nickname.length < 2) {
-      wx.showToast({ title: '昵称至少2个字符', icon: 'none' });
+    if (!name || !name.trim()) {
+      wx.showToast({ title: '请输入姓名', icon: 'none' });
+      return;
+    }
+    if (name.trim().length < 2) {
+      wx.showToast({ title: '姓名至少2个字符', icon: 'none' });
       return;
     }
 
@@ -107,7 +135,8 @@ Page({
       }
 
       const result = await db.users.updateProfile(this.data.userInfo._id, {
-        nickname: nickname.trim(),
+        name: name.trim(),
+        nickname: name.trim(),
         signature: signature.trim(),
         avatar: avatarFileId
       });
@@ -115,8 +144,15 @@ Page({
       wx.hideLoading();
 
       if (result.result && result.result.success) {
-        const updatedUser = result.result.data;
-        app.setUserInfo(updatedUser);
+        app.setUserInfo(result.result.data);
+
+        // 存成功了就解除拦截，否则返回时会误弹「未保存」
+        this.syncLeaveGuard(false);
+        this.setData({
+          origin: this.snapshot(name, signature, avatarFileId),
+          dirty: false,
+          tempAvatarPath: ''
+        });
 
         wx.showToast({ title: '保存成功', icon: 'success' });
         setTimeout(() => {
@@ -124,7 +160,7 @@ Page({
         }, 1000);
       } else {
         wx.showToast({
-          title: result.result?.message || '保存失败',
+          title: (result.result && result.result.message) || '保存失败',
           icon: 'none'
         });
       }

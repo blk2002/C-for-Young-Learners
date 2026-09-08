@@ -25,15 +25,15 @@ Page({
           type: 'CIE',
           name: 'CIE 等级考试',
           desc: '中国电子学会 Python 编程等级考试',
-          icon: '📚',
-          color: '#4A90D9'
+          icon: "i-book",
+          color: '#5B67F1'
         },
         {
           type: 'GESP',
           name: 'GESP 等级考试',
           desc: 'CCF 编程能力等级认证',
-          icon: '🎯',
-          color: '#52C41A'
+          icon: "i-target",
+          color: '#22C08A'
         }
       ];
     } else {
@@ -42,22 +42,22 @@ Page({
           type: 'CIE',
           name: 'CIE 等级考试',
           desc: '中国电子学会 C++ 编程等级考试',
-          icon: '📚',
-          color: '#4A90D9'
+          icon: "i-book",
+          color: '#5B67F1'
         },
         {
           type: 'GESP',
           name: 'GESP 等级考试',
           desc: 'CCF 编程能力等级认证',
-          icon: '🎯',
-          color: '#52C41A'
+          icon: "i-target",
+          color: '#22C08A'
         },
         {
           type: 'CSP-JS',
           name: 'CSP-J/S 竞赛',
           desc: '信息学奥赛入门级/提高级',
-          icon: '🏆',
-          color: '#722ED1'
+          icon: "i-trophy",
+          color: '#8E5CF6'
         }
       ];
     }

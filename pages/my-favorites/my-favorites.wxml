@@ -1,7 +1,7 @@
 <!-- pages/my-favorites/my-favorites.wxml -->
 <view class="container">
   <view class="header">
-    <view class="title">❤️ 我的收藏</view>
+    <view class="title"><text class="icon i-heart-on-w"/> 我的收藏</view>
     <view class="subtitle">查看你收藏的知识点，方便复习</view>
   </view>
 
@@ -18,16 +18,16 @@
       data-title="{{item.lessonTitle}}"
       bindtap="goToLesson"
     >
-      <view class="fav-icon">📌</view>
+      <view class="fav-icon"><text class="icon i-bookmark"/></view>
       <view class="fav-content">
         <view class="lesson-title">{{item.lessonTitle}}</view>
         <view class="lesson-meta" wx:if="{{item.chapterTitle}}">{{item.chapterTitle}}</view>
       </view>
-      <view class="fav-arrow">›</view>
+      <view class="fav-arrow"><text class="icon i-chevron"/></view>
     </view>
 
     <view class="empty-state" wx:if="{{favorites.length === 0}}">
-      <view class="icon">🤍</view>
+      <view class="icon"><text class="icon i-heart-off"/></view>
       <view class="text">暂无收藏</view>
       <view class="text" style="font-size: 24rpx; margin-top: 10rpx;">
         进入知识点详情页，点击"收藏"按钮添加

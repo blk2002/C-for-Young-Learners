@@ -11,18 +11,18 @@
         data-chapterid="{{item._id}}"
         data-chaptertitle="{{item.title}}"
       >
-        <view class="chapter-icon">📖</view>
+        <view class="chapter-icon"><text class="icon i-book-open"/></view>
         <view class="chapter-info">
           <view class="chapter-title">{{item.title}}</view>
           <view class="chapter-meta">
             <text>错题 {{item.wrongCount}} 道</text>
           </view>
         </view>
-        <view class="chapter-arrow">›</view>
+        <view class="chapter-arrow"><text class="icon i-chevron"/></view>
       </view>
 
       <view class="empty-state" wx:if="{{chapters.length === 0}}">
-        <view class="icon">🎉</view>
+        <view class="icon"><text class="icon i-check"/></view>
         <view class="text">暂无错题</view>
         <view class="text" style="font-size: 24rpx; margin-top: 10rpx;">太棒了，继续保持！</view>
       </view>

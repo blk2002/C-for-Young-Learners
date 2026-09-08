@@ -4,7 +4,7 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 
 exports.main = async (event, context) => {
-  const { userId, nickname, signature, avatar } = event;
+  const { userId, name, nickname, signature, avatar } = event;
 
   if (!userId) {
     return {
@@ -18,6 +18,11 @@ exports.main = async (event, context) => {
       updatedAt: db.serverDate()
     };
 
+    // 真实姓名（编辑资料页的主要字段，同时同步到 nickname 保证旧逻辑兼容）
+    if (name !== undefined) {
+      updateData.name = name;
+      updateData.nickname = name;
+    }
     if (nickname !== undefined) {
       updateData.nickname = nickname;
     }
@@ -41,11 +46,13 @@ exports.main = async (event, context) => {
       data: {
         _id: user._id,
         username: user.username,
+        name: user.name || user.nickname || '',
         nickname: user.nickname || '',
         signature: user.signature || '',
         avatar: user.avatar || '',
         role: user.role,
-        status: user.status
+        status: user.status,
+        validUntil: user.validUntil || null
       }
     };
   } catch (err) {

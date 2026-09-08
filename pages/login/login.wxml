@@ -1,80 +1,64 @@
 <!-- pages/login/login.wxml -->
-<view class="login-container">
-  <!-- Logo区域 -->
-  <view class="logo-area">
-    <view class="logo-icon">📚</view>
-    <view class="logo-title">少儿编程课程</view>
-    <view class="logo-subtitle">开启你的编程之旅</view>
+<view class="login-page">
+  <!-- 品牌区 -->
+  <view class="brand">
+    <view class="brand-logo">
+      <text class="icon i-book-w brand-logo-ico"/>
+    </view>
+    <view class="brand-name">少儿编程课程</view>
+    <view class="brand-slogan">开启你的编程之旅</view>
   </view>
 
-  <!-- 表单区域 -->
-  <view class="form-card">
-    <view class="form-tabs">
-      <view class="tab {{mode === 'login' ? 'active' : ''}}" bindtap="switchMode" data-mode="login">
-        登录
-      </view>
-      <view class="tab {{mode === 'register' ? 'active' : ''}}" bindtap="switchMode" data-mode="register">
-        注册
-      </view>
-    </view>
-
-    <view class="form-content">
-      <!-- 用户名 -->
-      <view class="input-group">
-        <view class="input-label">学生姓名</view>
+  <!-- 表单卡片 -->
+  <view class="auth-card">
+    <!-- 账号 -->
+    <view class="field">
+      <view class="field-label">账号</view>
+      <view class="field-box {{focusField === 'username' ? 'focus' : ''}}">
+        <text class="icon i-user field-ico"/>
         <input
-          class="input"
-          placeholder="请输入学生姓名"
+          class="field-input"
+          placeholder="请输入账号"
+          placeholder-class="field-placeholder"
           value="{{username}}"
           bindinput="onUsernameInput"
+          bindfocus="onFocus"
+          bindblur="onBlur"
+          data-field="username"
           maxlength="20"
         />
-      </view>
-
-      <!-- 密码 -->
-      <view class="input-group">
-        <view class="input-label">密码</view>
-        <input
-          class="input"
-          placeholder="请输入密码"
-          value="{{password}}"
-          bindinput="onPasswordInput"
-          password="true"
-          maxlength="20"
-        />
-      </view>
-
-      <!-- 确认密码（仅注册时显示） -->
-      <view class="input-group" wx:if="{{mode === 'register'}}">
-        <view class="input-label">确认密码</view>
-        <input
-          class="input"
-          placeholder="请再次输入密码"
-          value="{{confirmPassword}}"
-          bindinput="onConfirmPasswordInput"
-          password="true"
-          maxlength="20"
-        />
-      </view>
-
-      <!-- 提交按钮 -->
-      <button
-        class="btn-primary submit-btn"
-        bindtap="onSubmit"
-        disabled="{{loading}}"
-      >
-        {{mode === 'login' ? '登 录' : '注 册'}}
-      </button>
-
-      <!-- 提示文字 -->
-      <view class="hint-text" wx:if="{{mode === 'register'}}">
-        ⚠️ 注册后需要老师审核通过才能登录
       </view>
     </view>
+
+    <!-- 密码 -->
+    <view class="field">
+      <view class="field-label">密码</view>
+      <view class="field-box {{focusField === 'password' ? 'focus' : ''}}">
+        <text class="icon i-shield field-ico"/>
+        <input
+          class="field-input"
+          placeholder="请输入密码"
+          placeholder-class="field-placeholder"
+          value="{{password}}"
+          bindinput="onPasswordInput"
+          bindfocus="onFocus"
+          bindblur="onBlur"
+          data-field="password"
+          password="true"
+          maxlength="20"
+        />
+      </view>
+    </view>
+
+    <!-- 提交按钮 -->
+    <button
+      class="btn-primary submit-btn"
+      bindtap="onSubmit"
+      disabled="{{loading}}"
+      loading="{{loading}}"
+    >登 录</button>
   </view>
 
-  <!-- 底部装饰 -->
-  <view class="footer">
-    <text>🎈 快乐学习，轻松编程 🎈</text>
-  </view>
+  <!-- 页脚 -->
+  <view class="page-foot">账号由老师发放，忘记密码请联系老师</view>
 </view>

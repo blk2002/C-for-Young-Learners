@@ -25,13 +25,54 @@
 - 📋 习题管理：章节知识点习题（新增/编辑/删除选择题和填空题）
 - 🏆 习题管理：等级考试习题（CIE / GESP / CSP-J/S，分级管理）
 
+## 🎨 主题与样式系统
+
+项目使用统一的**设计变量（Design Tokens）**管理视觉样式，主题为「星空靛蓝」。
+
+### 设计变量（定义在 `app.wxss`）
+
+| 变量 | 值 | 用途 |
+| ---- | ------ | ---- |
+| `--primary` | `#5B67F1` | 主色（按钮、链接、选中态） |
+| `--primary-deep` | `#8E5CF6` | 渐变端色（紫色） |
+| `--tint` | `#EDEFFF` | 主色淡背景（标签、选中底色） |
+| `--ok` / `--ok-tint` | `#22C08A` / `#E5F8F1` | 成功（答题正确） |
+| `--danger` / `--danger-tint` | `#FF5C72` / `#FFEDEF` | 危险（答题错误、删除） |
+| `--warning` / `--warning-tint` | `#FFA940` / `#FFF4E6` | 警告（提示） |
+| `--bg` / `--panel` / `--panel-2` | `#F6F7FB` / `#fff` / `#F1F2F8` | 页面背景 / 卡片 / 次级背景 |
+| `--t1` / `--t2` / `--t3` | `#252A3D` / `#5A6072` / `#9AA0B0` | 一/二/三级文字 |
+| `--line` | `#E7E9F2` | 分割线、描边 |
+| `--r-lg` / `--r-md` | `24rpx` / `20rpx` | 卡片 / 按钮圆角 |
+
+**换主题只需修改 `app.wxss` 中的变量定义**（以及 `app.json` 的导航栏、tabBar 颜色），页面样式全部引用变量。
+
+### 图标系统（`styles/icons.wxss`）
+
+- 全部图标为统一风格的**线性 SVG**（2px 圆角描边），以 base64 内嵌于 `styles/icons.wxss`
+- 用法：`<text class="icon i-book"/>`，大小跟随容器 `font-size`（图标为 1em 见方）
+- 彩色/渐变背景上使用白色变体：`<text class="icon i-book-w"/>`
+- 图标源码在 `tools/gen-icons.js`，**新增或修改图标后运行 `node tools/gen-icons.js` 重新生成**
+- tabBar 图标为 PNG（微信要求），位于 `assets/tabbar/`，同为线性风格
+- 课程卡片（Python / C++）与考试分类卡（CIE / GESP / CSP）保留品牌色渐变，图标用白色变体
+
+### 样式规范
+
+- 页面样式**不要硬编码颜色**，一律使用 `var(--xxx)` 变量
+- 新增语义色时先在 `app.wxss` 定义变量，再在页面引用
+
 ## 📁 项目结构
 
 ```
 c_young_learn/
 ├── app.js                    # 小程序入口
 ├── app.json                  # 小程序全局配置
-├── app.wxss                  # 全局样式
+├── app.wxss                  # 全局样式 + 设计变量定义
+├── styles/
+│   └── icons.wxss           # 图标库（由 tools/gen-icons.js 生成）
+├── assets/
+│   └── tabbar/              # tabBar 图标 PNG
+├── tools/
+│   └── gen-icons.js         # 图标库生成脚本
 ├── project.config.json       # 项目配置
 ├── sitemap.json              # 索引配置
 ├── utils/

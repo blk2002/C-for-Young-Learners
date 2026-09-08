@@ -7,7 +7,7 @@
       bindtap="switchCourse"
       data-course="cpp"
     >
-      <text class="tab-icon">⚡</text>
+      <text class="tab-icon"><text class="icon {{currentCourse === 'cpp' ? 'i-chip-w' : 'i-chip'}}"/></text>
       <text class="tab-text">C++</text>
     </view>
     <view 
@@ -15,7 +15,7 @@
       bindtap="switchCourse"
       data-course="python"
     >
-      <text class="tab-icon">🐍</text>
+      <text class="tab-icon"><text class="icon {{currentCourse === 'python' ? 'i-code-w' : 'i-code'}}"/></text>
       <text class="tab-text">Python</text>
     </view>
   </view>
@@ -30,22 +30,22 @@
   <view class="entry-cards">
     <!-- 章节知识点习题 -->
     <view class="entry-card" bindtap="goToChapterExercises">
-      <view class="card-icon">📚</view>
+      <view class="card-icon"><text class="icon i-book"/></view>
       <view class="card-content">
         <view class="card-title">章节知识点习题</view>
         <view class="card-desc">按章节顺序，逐个知识点练习</view>
       </view>
-      <view class="card-arrow">›</view>
+      <view class="card-arrow"><text class="icon i-chevron"/></view>
     </view>
 
     <!-- 等级考试习题 -->
     <view class="entry-card" bindtap="goToExamExercises">
-      <view class="card-icon">🎓</view>
+      <view class="card-icon"><text class="icon i-exam"/></view>
       <view class="card-content">
         <view class="card-title">等级考试习题</view>
         <view class="card-desc">模拟考试真题，考前冲刺练习</view>
       </view>
-      <view class="card-arrow">›</view>
+      <view class="card-arrow"><text class="icon i-chevron"/></view>
     </view>
   </view>
 </view>

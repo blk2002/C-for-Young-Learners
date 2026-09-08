@@ -1,137 +1,294 @@
 /* pages/profile-edit/profile-edit.wxss */
-.container {
+.edit-page {
   min-height: 100vh;
-  background: #F5F7FA;
+  background: var(--bg);
   padding-bottom: 40rpx;
 }
 
-/* 头像区域 */
-.avatar-section {
-  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
-  padding: 60rpx 40rpx;
+/* ============ 渐变头部 ============ */
+.hero {
+  position: relative;
+  height: 280rpx;
+  background: var(--grad-primary);
+  overflow: hidden;
+}
+
+.hero-deco {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.deco-a {
+  width: 300rpx;
+  height: 300rpx;
+  top: -120rpx;
+  right: -90rpx;
+}
+
+.deco-b {
+  width: 200rpx;
+  height: 200rpx;
+  bottom: -100rpx;
+  left: -50rpx;
+}
+
+/* ============ 卡片 ============ */
+.card {
+  margin: 0 32rpx;
+  background: var(--panel);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.basic-card {
+  margin-top: -136rpx;
+  position: relative;
+  z-index: 2;
+  padding-bottom: 8rpx;
+}
+
+/* ============ 头像 ============ */
+.avatar-zone {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.avatar-wrapper {
-  margin-bottom: 30rpx;
+/* 外层容器：控制整体尺寸、负 margin 和相机角标的定位基准 */
+.avatar-wrap {
+  position: relative;
+  width: 160rpx;
+  height: 160rpx;
+  margin-top: -80rpx;
+}
+
+/* 真正的圆形头像容器；用 view 而不是 button 控制圆角和形状，
+   避免微信小程序 button 默认样式把头像撑变形。 */
+.avatar-circle {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 6rpx solid #fff;
+  box-sizing: border-box;
+  background: var(--grad-primary);
 }
 
 .avatar {
-  width: 160rpx;
-  height: 160rpx;
-  border-radius: 50%;
-  border: 4rpx solid rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.2);
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
-.avatar-default {
+.avatar-text {
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 80rpx;
-}
-
-.avatar-buttons {
-  display: flex;
-  gap: 20rpx;
-}
-
-.avatar-btn {
-  background: rgba(255, 255, 255, 0.2);
   color: #fff;
-  border: none;
-  border-radius: 30rpx;
-  padding: 12rpx 30rpx;
-  font-size: 24rpx;
-  line-height: 1.5;
+  font-size: 58rpx;
+  font-weight: 700;
 }
 
-.avatar-btn::after {
-  border: none;
-}
-
-.avatar-btn:active {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-/* 表单区域 */
-.form-section {
-  margin: 30rpx 40rpx;
-  background: #fff;
-  border-radius: 16rpx;
-  overflow: hidden;
-}
-
-.form-item {
-  padding: 30rpx;
-  border-bottom: 1rpx solid #F0F0F0;
-  position: relative;
-}
-
-.form-item:last-child {
-  border-bottom: none;
-}
-
-.form-item.readonly {
-  background: #FAFAFA;
-}
-
-.form-label {
-  font-size: 28rpx;
-  color: #333;
-  margin-bottom: 16rpx;
-  font-weight: 500;
-}
-
-.form-input {
-  font-size: 30rpx;
-  color: #333;
-  padding: 10rpx 0;
-}
-
-.form-textarea {
-  font-size: 30rpx;
-  color: #333;
-  width: 100%;
-  min-height: 80rpx;
-  padding: 10rpx 0;
-}
-
-.char-count {
+/* 透明触发层：只负责承载 open-type="chooseAvatar" */
+.avatar-trigger {
   position: absolute;
-  right: 30rpx;
-  bottom: 20rpx;
-  font-size: 22rpx;
-  color: #999;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  opacity: 0;
+  z-index: 2;
 }
 
-.form-readonly {
+.avatar-trigger::after {
+  border: none;
+}
+
+/* 相机角标：absolute 相对于 .avatar-wrap */
+.camera {
+  position: absolute;
+  right: -10rpx;
+  bottom: -10rpx;
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 5rpx solid #fff;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 10rpx rgba(91, 103, 241, 0.2);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.camera .icon {
+  font-size: 22rpx;
+  line-height: 1;
+}
+
+.avatar-hint {
+  font-size: 22rpx;
+  color: var(--t3);
+  margin-top: 22rpx;
+}
+
+/* ============ 表单行 ============ */
+.field {
+  display: flex;
+  align-items: center;
+  min-height: 104rpx;
+  padding: 0 32rpx;
+  border-top: 1rpx solid var(--line);
+}
+
+.field-label {
+  width: 152rpx;
+  flex: none;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--t1);
+}
+
+.field-input {
+  flex: 1;
   font-size: 30rpx;
-  color: #999;
-  padding: 10rpx 0;
+  color: var(--t1);
 }
 
-.form-tip {
+.field-value {
+  flex: 1;
+  font-size: 30rpx;
+  color: var(--t1);
+}
+
+.field-value.readonly {
+  color: var(--t3);
+}
+
+.field-chip {
+  flex: none;
+  font-size: 20rpx;
+  color: var(--t3);
+  background: var(--panel-2);
+  padding: 6rpx 16rpx;
+  border-radius: 24rpx;
+}
+
+.field-ph {
+  color: var(--t3);
+}
+
+/* ============ 个性签名 ============ */
+.sign-card {
+  margin-top: 24rpx;
+  padding: 28rpx 32rpx;
+}
+
+.sign-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18rpx;
+}
+
+.sign-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--t1);
+}
+
+.sign-count {
   font-size: 22rpx;
-  color: #BBB;
-  margin-top: 6rpx;
+  color: var(--t3);
 }
 
-/* 保存按钮 */
-.save-section {
-  padding: 40rpx 40rpx 0;
+.sign-input {
+  width: 100%;
+  font-size: 28rpx;
+  color: var(--t1);
+  min-height: 80rpx;
+  line-height: 1.6;
+}
+
+/* ============ 修改密码 ============ */
+.menu-card {
+  margin-top: 24rpx;
+  display: flex;
+  align-items: center;
+  padding: 28rpx 32rpx;
+}
+
+.menu-card:active {
+  background: var(--panel-2);
+}
+
+.menu-icon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 20rpx;
+  background: var(--tint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.menu-icon .icon {
+  font-size: 30rpx;
+  line-height: 1;
+}
+
+.menu-body {
+  flex: 1;
+  margin-left: 20rpx;
+}
+
+.menu-text {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--t1);
+}
+
+.menu-sub {
+  font-size: 22rpx;
+  color: var(--t3);
+  margin-top: 4rpx;
+}
+
+.menu-arrow {
+  flex: none;
+}
+
+.menu-arrow .icon {
+  font-size: 26rpx;
+  line-height: 1;
+  color: var(--t3);
+}
+
+/* ============ 保存按钮 ============ */
+.save-wrap {
+  padding: 48rpx 32rpx 0;
 }
 
 .save-btn {
-  background: #4A90E2;
+  background: var(--grad-primary);
   color: #fff;
-  border-radius: 16rpx;
-  padding: 28rpx;
   font-size: 32rpx;
-  font-weight: 500;
+  font-weight: 600;
+  border-radius: 48rpx;
+  padding: 26rpx 0;
   border: none;
+  box-shadow: 0 12rpx 32rpx rgba(91, 103, 241, 0.3);
 }
 
 .save-btn::after {
@@ -139,10 +296,14 @@
 }
 
 .save-btn:active {
-  background: #357ABD;
+  opacity: 0.88;
 }
 
 .save-btn[disabled] {
-  background: #A0C4E8;
-  color: rgba(255, 255, 255, 0.7);
+  opacity: 0.6;
+  box-shadow: none;
+}
+
+.bottom-space {
+  height: 60rpx;
 }

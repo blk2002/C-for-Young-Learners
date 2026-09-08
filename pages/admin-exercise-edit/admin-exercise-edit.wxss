@@ -1,13 +1,13 @@
 /* pages/admin-exercise-edit/admin-exercise-edit.wxss */
 .container {
   min-height: 100vh;
-  background: #F5F7FA;
+  background: var(--bg);
 }
 
 .loading {
   text-align: center;
   padding: 100rpx 0;
-  color: #999;
+  color: var(--t3);
 }
 
 .content {
@@ -16,7 +16,7 @@
 
 /* 页面标题 */
 .page-header {
-  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-deep) 100%);
   border-radius: 16rpx;
   padding: 30rpx;
   margin-bottom: 30rpx;
@@ -52,12 +52,12 @@
 .label {
   font-size: 30rpx;
   font-weight: 600;
-  color: #333;
+  color: var(--t1);
 }
 
 .question-count {
   font-size: 26rpx;
-  color: #666;
+  color: var(--t2);
 }
 
 .question-add-row {
@@ -68,18 +68,18 @@
 
 .add-question-btn {
   flex: 1;
-  background: #E8F4FD;
-  color: #4A90E2;
+  background: var(--tint);
+  color: var(--primary);
   padding: 20rpx;
   border-radius: 12rpx;
   text-align: center;
   font-size: 26rpx;
   font-weight: 500;
-  border: 2rpx dashed #4A90E2;
+  border: 2rpx dashed var(--primary);
 }
 
 .add-question-btn:active {
-  background: #D0E8FA;
+  background: var(--tint);
 }
 
 .question-list {
@@ -87,11 +87,11 @@
 }
 
 .question-item {
-  background: #F8FAFC;
+  background: var(--bg);
   border-radius: 12rpx;
   padding: 24rpx;
   margin-bottom: 20rpx;
-  border-left: 6rpx solid #4A90E2;
+  border-left: 6rpx solid var(--primary);
 }
 
 .question-header {
@@ -103,7 +103,7 @@
 .question-index {
   font-size: 26rpx;
   font-weight: 600;
-  color: #333;
+  color: var(--t1);
   margin-right: 16rpx;
 }
 
@@ -111,18 +111,18 @@
   font-size: 22rpx;
   padding: 4rpx 12rpx;
   border-radius: 8rpx;
-  background: #E8F4FD;
-  color: #4A90E2;
+  background: var(--tint);
+  color: var(--primary);
 }
 
 .question-type-tag.fill {
-  background: #FFF3E0;
-  color: #FF9800;
+  background: var(--warning-tint);
+  color: var(--warning);
 }
 
 .question-preview {
   font-size: 28rpx;
-  color: #555;
+  color: var(--t2);
   line-height: 1.5;
   margin-bottom: 16rpx;
   overflow: hidden;
@@ -145,36 +145,36 @@
 }
 
 .q-action-btn.blue {
-  background: #D0E8FA;
-  color: #4A90E2;
+  background: var(--tint);
+  color: var(--primary);
 }
 
 .q-action-btn.orange {
-  background: #FFE8CC;
-  color: #FF9800;
+  background: var(--warning-tint);
+  color: var(--warning);
 }
 
 .q-action-btn.red {
-  background: #F8D7DA;
-  color: #DC3545;
+  background: var(--danger-tint);
+  color: var(--danger);
 }
 
 .empty-questions {
   text-align: center;
   padding: 60rpx 20rpx;
-  background: #F8FAFC;
+  background: var(--bg);
   border-radius: 12rpx;
 }
 
 .empty-questions .empty-text {
   font-size: 28rpx;
-  color: #999;
+  color: var(--t3);
   margin-bottom: 8rpx;
 }
 
 .empty-questions .empty-hint {
   font-size: 24rpx;
-  color: #BBB;
+  color: var(--t3);
 }
 
 /* 弹窗 */
@@ -206,18 +206,18 @@
   justify-content: space-between;
   align-items: center;
   padding: 30rpx;
-  border-bottom: 1rpx solid #F0F0F0;
+  border-bottom: 1rpx solid var(--line);
 }
 
 .modal-title {
   font-size: 32rpx;
   font-weight: 600;
-  color: #333;
+  color: var(--t1);
 }
 
 .modal-close {
   font-size: 36rpx;
-  color: #999;
+  color: var(--t3);
   width: 60rpx;
   height: 60rpx;
   display: flex;
@@ -240,7 +240,7 @@
 }
 
 .textarea {
-  background: #F5F7FA;
+  background: var(--bg);
   border-radius: 12rpx;
   padding: 24rpx 30rpx;
   font-size: 28rpx;
@@ -251,7 +251,7 @@
 }
 
 .input {
-  background: #F5F7FA;
+  background: var(--bg);
   border-radius: 12rpx;
   padding: 24rpx 30rpx;
   font-size: 28rpx;
@@ -261,7 +261,7 @@
   display: flex;
   gap: 20rpx;
   padding: 24rpx 30rpx;
-  border-top: 1rpx solid #F0F0F0;
+  border-top: 1rpx solid var(--line);
 }
 
 .modal-footer button {
@@ -270,13 +270,13 @@
 }
 
 .btn-secondary {
-  background: #F5F7FA;
-  color: #666;
+  background: var(--bg);
+  color: var(--t2);
   font-size: 28rpx;
 }
 
 .btn-primary {
-  background: #4A90E2;
+  background: var(--primary);
   color: #fff;
   font-size: 28rpx;
 }
@@ -290,17 +290,17 @@
   flex: 1;
   padding: 20rpx;
   text-align: center;
-  border: 2rpx solid #E0E0E0;
+  border: 2rpx solid var(--line);
   border-radius: 12rpx;
   font-size: 28rpx;
-  color: #666;
+  color: var(--t2);
   background: #fff;
 }
 
 .type-option.active {
-  border-color: #4A90E2;
-  background: #E8F4FD;
-  color: #4A90E2;
+  border-color: var(--primary);
+  background: var(--tint);
+  color: var(--primary);
   font-weight: 500;
 }
 
@@ -315,17 +315,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2rpx solid #E0E0E0;
+  border: 2rpx solid var(--line);
   border-radius: 50%;
   font-size: 28rpx;
   font-weight: 600;
-  color: #666;
+  color: var(--t2);
   background: #fff;
 }
 
 .answer-option.active {
-  border-color: #4A90E2;
-  background: #4A90E2;
+  border-color: var(--primary);
+  background: var(--primary);
   color: #fff;
 }
 

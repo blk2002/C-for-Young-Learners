@@ -4,24 +4,23 @@ const db = require('../../utils/db.js');
 
 Page({
   data: {
-    mode: 'login', // login / register
     username: '',
     password: '',
-    confirmPassword: '',
+    focusField: '', // 当前聚焦的输入框：username / password
     loading: false
   },
 
-  // 切换登录/注册模式
-  switchMode() {
-    this.setData({
-      mode: this.data.mode === 'login' ? 'register' : 'login',
-      username: '',
-      password: '',
-      confirmPassword: ''
-    });
+  // 输入框聚焦
+  onFocus(e) {
+    this.setData({ focusField: e.currentTarget.dataset.field });
   },
 
-  // 输入用户名
+  // 输入框失焦
+  onBlur() {
+    this.setData({ focusField: '' });
+  },
+
+  // 输入账号
   onUsernameInput(e) {
     this.setData({ username: e.detail.value });
   },
@@ -31,18 +30,12 @@ Page({
     this.setData({ password: e.detail.value });
   },
 
-  // 输入确认密码
-  onConfirmPasswordInput(e) {
-    this.setData({ confirmPassword: e.detail.value });
-  },
-
-  // 提交登录或注册
+  // 提交登录
   async onSubmit() {
-    const { mode, username, password, confirmPassword } = this.data;
+    const { username, password } = this.data;
 
-    // 校验
     if (!username.trim()) {
-      wx.showToast({ title: '请输入学生姓名', icon: 'none' });
+      wx.showToast({ title: '请输入账号', icon: 'none' });
       return;
     }
 
@@ -51,15 +44,7 @@ Page({
       return;
     }
 
-    if (mode === 'register') {
-      if (password !== confirmPassword) {
-        wx.showToast({ title: '两次密码不一致', icon: 'none' });
-        return;
-      }
-      await this.register();
-    } else {
-      await this.login();
-    }
+    await this.login();
   },
 
   // 登录
@@ -82,6 +67,7 @@ Page({
           wx.switchTab({ url: '/pages/index/index' });
         }, 1000);
       } else {
+        // 账号过期等失败原因都走这里，message 由云函数给出
         wx.showModal({
           title: '登录失败',
           content: result.result.message,
@@ -92,42 +78,6 @@ Page({
       wx.hideLoading();
       this.setData({ loading: false });
       console.error('登录错误', err);
-      wx.showToast({ title: '网络错误，请重试', icon: 'none' });
-    }
-  },
-
-  // 注册
-  async register() {
-    this.setData({ loading: true });
-    wx.showLoading({ title: '注册中...' });
-
-    try {
-      const result = await db.users.register(this.data.username, this.data.password);
-
-      wx.hideLoading();
-      this.setData({ loading: false });
-
-      if (result.result.success) {
-        wx.showModal({
-          title: '注册成功',
-          content: '请等待老师审核通过后再登录',
-          showCancel: false,
-          confirmText: '好的',
-          success: () => {
-            this.setData({ mode: 'login', password: '', confirmPassword: '' });
-          }
-        });
-      } else {
-        wx.showModal({
-          title: '注册失败',
-          content: result.result.message,
-          showCancel: false
-        });
-      }
-    } catch (err) {
-      wx.hideLoading();
-      this.setData({ loading: false });
-      console.error('注册错误', err);
       wx.showToast({ title: '网络错误，请重试', icon: 'none' });
     }
   },

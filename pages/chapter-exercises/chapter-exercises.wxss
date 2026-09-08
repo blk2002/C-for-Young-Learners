@@ -1,12 +1,12 @@
 .container {
   min-height: 100vh;
-  background: #F5F7FA;
+  background: var(--bg);
 }
 
 .loading {
   text-align: center;
   padding: 100rpx 0;
-  color: #999;
+  color: var(--t3);
 }
 
 .content {
@@ -31,7 +31,7 @@
 }
 
 .chapter-card:active {
-  background: #F0F4F8;
+  background: var(--bg);
   transform: scale(0.98);
 }
 
@@ -49,38 +49,38 @@
 .chapter-title {
   font-size: 30rpx;
   font-weight: 600;
-  color: #333;
+  color: var(--t1);
   margin-bottom: 12rpx;
 }
 
 .chapter-meta {
   font-size: 24rpx;
-  color: #999;
+  color: var(--t3);
   margin-bottom: 12rpx;
 }
 
 .progress-text {
   margin-left: 20rpx;
-  color: #4A90E2;
+  color: var(--primary);
 }
 
 .progress-bar {
   height: 8rpx;
-  background: #E8ECF0;
+  background: var(--line);
   border-radius: 4rpx;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #4A90E2, #67B8F7);
+  background: linear-gradient(90deg, var(--primary), var(--primary-deep));
   border-radius: 4rpx;
   transition: width 0.3s;
 }
 
 .chapter-arrow {
   font-size: 44rpx;
-  color: #CCC;
+  color: var(--t3);
   font-weight: 300;
   margin-left: 20rpx;
 }
@@ -97,7 +97,7 @@
 
 .empty-state .text {
   font-size: 28rpx;
-  color: #999;
+  color: var(--t3);
 }
 
 .bottom-space {

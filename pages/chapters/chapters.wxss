@@ -6,7 +6,7 @@
 
 /* 课程头部 */
 .course-header {
-  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-deep) 100%);
   padding: 50rpx 40rpx;
   color: #fff;
 }
@@ -42,7 +42,7 @@
 }
 
 .chapter-number {
-  background: #4A90E2;
+  background: var(--primary);
   color: #fff;
   padding: 10rpx 20rpx;
   border-radius: 10rpx;
@@ -58,13 +58,13 @@
 .chapter-title {
   font-size: 30rpx;
   font-weight: 600;
-  color: #333;
+  color: var(--t1);
   margin-bottom: 6rpx;
 }
 
 .chapter-meta {
   font-size: 24rpx;
-  color: #999;
+  color: var(--t3);
 }
 
 .chapter-badge {
@@ -73,7 +73,7 @@
 
 /* 知识点列表 */
 .lesson-list {
-  border-top: 1rpx solid #F0F0F0;
+  border-top: 1rpx solid var(--line);
   padding: 10rpx 0;
 }
 
@@ -81,7 +81,7 @@
   display: flex;
   align-items: center;
   padding: 24rpx 30rpx;
-  border-bottom: 1rpx solid #F8F8F8;
+  border-bottom: 1rpx solid var(--panel-2);
   transition: background 0.2s;
 }
 
@@ -90,11 +90,11 @@
 }
 
 .lesson-item:active {
-  background: #F5F7FA;
+  background: var(--bg);
 }
 
 .lesson-item.active {
-  background: #E8F4FD;
+  background: var(--tint);
 }
 
 .lesson-icon {
@@ -109,31 +109,31 @@
 
 .lesson-title {
   font-size: 28rpx;
-  color: #333;
+  color: var(--t1);
   margin-bottom: 6rpx;
 }
 
 .lesson-subtitle {
   font-size: 24rpx;
-  color: #999;
+  color: var(--t3);
   line-height: 1.4;
 }
 
 .lesson-arrow {
   font-size: 36rpx;
-  color: #CCC;
+  color: var(--t3);
   margin-left: 10rpx;
 }
 
 .empty-lesson {
   padding: 30rpx;
   text-align: center;
-  color: #999;
+  color: var(--t3);
   font-size: 24rpx;
 }
 
 .loading {
   text-align: center;
   padding: 100rpx 0;
-  color: #999;
+  color: var(--t3);
 }

@@ -15,7 +15,7 @@
           {{levelQuestionCounts[item] || 0}} 道题
         </view>
       </view>
-      <view class="level-arrow">›</view>
+      <view class="level-arrow"><text class="icon i-chevron"/></view>
     </view>
   </view>
 </view>

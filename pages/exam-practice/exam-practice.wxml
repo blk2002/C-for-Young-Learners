@@ -29,8 +29,8 @@
                 bindtap="selectOption">
             <view class="option-circle">{{optKey}}</view>
             <view class="option-text">{{opt}}</view>
-            <view class="option-icon" wx:if="{{submitted && item.answer === optKey}}">✓</view>
-            <view class="option-icon wrong-icon" wx:if="{{submitted && userAnswers[qIndex] === optKey && userAnswers[qIndex] !== item.answer}}">✕</view>
+            <view class="option-icon" wx:if="{{submitted && item.answer === optKey}}"><text class="icon i-check"/></view>
+            <view class="option-icon wrong-icon" wx:if="{{submitted && userAnswers[qIndex] === optKey && userAnswers[qIndex] !== item.answer}}"><text class="icon i-x"/></view>
           </view>
         </view>
       </block>
@@ -48,7 +48,7 @@
 
       <view class="answer-result" wx:if="{{submitted}}">
         <view class="result-status {{answerResults[qIndex] ? 'correct' : 'wrong'}}">
-          {{answerResults[qIndex] ? '✓ 回答正确！' : '✕ 回答错误'}}
+          <text class="icon {{answerResults[qIndex] ? 'i-check' : 'i-x'}}"/> {{answerResults[qIndex] ? '回答正确！' : '回答错误'}}
         </view>
 
         <view class="answer-detail">
@@ -60,7 +60,7 @@
         </view>
 
         <view class="explanation" wx:if="{{item.explanation}}">
-          <view class="exp-label">💡 解析：</view>
+          <view class="exp-label"><text class="icon i-bulb"/> 解析：</view>
           <view class="exp-text">{{item.explanation}}</view>
         </view>
       </view>

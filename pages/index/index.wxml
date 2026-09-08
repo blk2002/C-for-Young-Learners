@@ -2,8 +2,32 @@
 <view class="container">
   <!-- 欢迎区域 -->
   <view class="hero-section">
-    <view class="hello">👋 你好，{{userInfo.username || '同学'}}！</view>
-    <view class="subtitle">欢迎来到少儿编程课堂</view>
+    <view class="hero-deco deco-1"></view>
+    <view class="hero-deco deco-2"></view>
+
+    <view class="hero-top">
+      <view class="hero-text">
+        <view class="hello">你好，{{displayName || '同学'}}！</view>
+        <view class="subtitle">欢迎来到少儿编程课堂</view>
+      </view>
+      <view class="hero-avatar" bindtap="goToProfile">{{initial || '同'}}</view>
+    </view>
+
+    <!-- 学习进度（真实数据 · 章节维度） -->
+    <block wx:if="{{lastStudy}}">
+      <view class="progress-head">
+        <text class="progress-label">上次学到</text>
+        <text class="progress-course">{{lastStudy.courseName}} · {{lastStudy.chapterTitle}}</text>
+      </view>
+      <view class="progress-bar">
+        <view class="progress-fill" style="width: {{lastStudy.percent}}%"></view>
+      </view>
+      <view class="progress-meta">第 {{lastStudy.cur}} / {{lastStudy.total}} 章</view>
+    </block>
+    <view class="progress-empty" wx:else>
+      <view class="progress-label">还没开始学习</view>
+      <view class="empty-tip">去选一门课，开始你的编程之旅吧</view>
+    </view>
   </view>
 
   <!-- 课程入口 -->
@@ -19,17 +43,17 @@
       bindtap="goToCourse"
       style="background: linear-gradient(135deg, {{item.color}} 0%, {{item.color}}CC 100%);"
     >
-      <view class="course-icon">{{item.icon}}</view>
+      <view class="course-icon"><text class="icon {{item.icon}}-w"/></view>
       <view class="course-name">{{item.name}}</view>
       <view class="course-desc">点击开始学习</view>
-      <view class="course-arrow">→</view>
+      <view class="course-arrow"><text class="icon i-arrow-right-w"/></view>
     </view>
   </view>
 
   <!-- 提示文字 -->
   <view class="tip-section">
     <view class="tip-card">
-      <view class="tip-icon">💡</view>
+      <view class="tip-icon"><text class="icon i-bulb"/></view>
       <view class="tip-content">
         <view class="tip-title">学习小贴士</view>
         <view class="tip-text">循序渐进，每节课后记得练习，遇到问题可以收藏知识点，方便日后复习。</view>

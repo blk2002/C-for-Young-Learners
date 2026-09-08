@@ -53,7 +53,7 @@
     <view class="modal-content" catchtap="preventBubble">
       <view class="modal-header">
         <view class="modal-title">{{editingIndex >= 0 ? '编辑题目' : '新增题目'}}</view>
-        <view class="modal-close" bindtap="closeQuestionModal">✕</view>
+        <view class="modal-close" bindtap="closeQuestionModal"><text class="icon i-x"/></view>
       </view>
 
       <view class="modal-body">

@@ -1,0 +1,9 @@
+{
+  "name": "initQuestions",
+  "version": "1.0.0",
+  "description": "初始化三套练习题：学习页内嵌题、章节知识点习题、等级考试习题",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  }
+}

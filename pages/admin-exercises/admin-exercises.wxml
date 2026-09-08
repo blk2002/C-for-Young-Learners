@@ -12,16 +12,16 @@
         data-chapterid="{{item._id}}"
         data-chaptertitle="{{item.title}}"
       >
-        <view class="chapter-icon">📖</view>
+        <view class="chapter-icon"><text class="icon i-book-open"/></view>
         <view class="chapter-info">
           <view class="chapter-title">{{item.title}}</view>
           <view class="chapter-meta">序号：{{item.order}}</view>
         </view>
-        <view class="chapter-arrow">›</view>
+        <view class="chapter-arrow"><text class="icon i-chevron"/></view>
       </view>
 
       <view class="empty-state" wx:if="{{chapters.length === 0}}">
-        <view class="icon">📚</view>
+        <view class="icon"><text class="icon i-book"/></view>
         <view class="text">暂无章节</view>
         <view class="text" style="font-size: 24rpx; margin-top: 10rpx;">请先在课程管理中添加章节</view>
       </view>

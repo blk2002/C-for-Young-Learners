@@ -1,7 +1,7 @@
 /* pages/progress/progress.wxss */
 .container {
   min-height: 100vh;
-  background: #F5F7FA;
+  background: var(--bg);
 }
 
 /* 顶部课程切换 */
@@ -20,12 +20,12 @@
   padding: 24rpx 0;
   margin: 0 10rpx;
   border-radius: 12rpx;
-  background: #F5F7FA;
+  background: var(--bg);
   transition: all 0.3s;
 }
 
 .tab-item.active {
-  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-deep) 100%);
   color: #fff;
 }
 
@@ -47,13 +47,13 @@
 .course-title {
   font-size: 36rpx;
   font-weight: bold;
-  color: #333;
+  color: var(--t1);
   margin-bottom: 10rpx;
 }
 
 .course-desc {
   font-size: 26rpx;
-  color: #999;
+  color: var(--t3);
 }
 
 /* 入口卡片 */
@@ -73,7 +73,7 @@
 }
 
 .entry-card:active {
-  background: #F5F7FA;
+  background: var(--bg);
   transform: scale(0.98);
 }
 
@@ -91,16 +91,16 @@
 .card-title {
   font-size: 32rpx;
   font-weight: 600;
-  color: #333;
+  color: var(--t1);
   margin-bottom: 8rpx;
 }
 
 .card-desc {
   font-size: 26rpx;
-  color: #999;
+  color: var(--t3);
 }
 
 .card-arrow {
   font-size: 48rpx;
-  color: #CCC;
+  color: var(--t3);
 }

@@ -1,0 +1,9 @@
+{
+  "name": "initCourses",
+  "version": "1.0.0",
+  "description": "初始化 Python / C++ 两门课的章节与知识点（测试内容）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  }
+}

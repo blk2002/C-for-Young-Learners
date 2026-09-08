@@ -16,17 +16,17 @@
         data-type="{{item.examType}}"
         data-name="{{item.examName}}"
       >
-        <view class="exam-icon">{{item.icon}}</view>
+        <view class="exam-icon"><text class="icon {{item.icon}}-w"/></view>
         <view class="exam-info">
           <view class="exam-name">{{item.examName}}</view>
           <view class="exam-desc">已做错 {{item.wrongCount}} 题</view>
         </view>
-        <view class="exam-arrow">›</view>
+        <view class="exam-arrow"><text class="icon i-chevron-w"/></view>
       </view>
     </view>
 
     <view class="empty-state" wx:if="{{examTypes.length === 0}}">
-      <view class="empty-icon">🎉</view>
+      <view class="empty-icon"><text class="icon i-check"/></view>
       <view class="empty-text">暂无等级考试错题</view>
       <view class="empty-sub">太棒了，继续保持！</view>
     </view>

@@ -1,7 +1,7 @@
 {
-  "name": "userRegister",
+  "name": "adminCreateUser",
   "version": "1.0.0",
-  "description": "用户注册云函数",
+  "description": "",
   "main": "index.js",
   "dependencies": {
     "wx-server-sdk": "latest"

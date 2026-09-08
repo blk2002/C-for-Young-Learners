@@ -52,7 +52,7 @@
     </view>
 
     <view class="empty-state" wx:if="{{lessons.length === 0}}">
-      <view class="icon">📝</view>
+      <view class="icon"><text class="icon i-edit"/></view>
       <view class="text">暂无知识点</view>
       <view class="text" style="font-size: 24rpx; margin-top: 10rpx;">点击"新增"添加知识点</view>
     </view>
@@ -147,7 +147,7 @@
         <view class="modal-content" catchtap="preventBubble">
           <view class="modal-header">
             <view class="modal-title">{{editingIndex >= 0 ? '编辑题目' : '新增题目'}}</view>
-            <view class="modal-close" bindtap="closeQuestionModal">✕</view>
+            <view class="modal-close" bindtap="closeQuestionModal"><text class="icon i-x"/></view>
           </view>
 
           <view class="modal-body">

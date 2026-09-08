@@ -1,6 +1,6 @@
 .container {
   padding: 30rpx;
-  background: #f5f7fa;
+  background: var(--bg);
   min-height: 100vh;
   padding-bottom: 40rpx;
 }
@@ -12,13 +12,13 @@
 .title {
   font-size: 36rpx;
   font-weight: bold;
-  color: #333;
+  color: var(--t1);
   margin-bottom: 8rpx;
 }
 
 .subtitle {
   font-size: 26rpx;
-  color: #999;
+  color: var(--t3);
 }
 
 .action-bar {
@@ -36,12 +36,12 @@
 }
 
 .btn-primary {
-  background: #4A90D9;
+  background: var(--primary);
   color: #fff;
 }
 
 .btn-success {
-  background: #52C41A;
+  background: var(--ok);
   color: #fff;
 }
 
@@ -64,13 +64,13 @@
   align-items: center;
   margin-bottom: 16rpx;
   padding-bottom: 12rpx;
-  border-bottom: 1rpx solid #f0f0f0;
+  border-bottom: 1rpx solid var(--line);
 }
 
 .question-index {
   font-size: 28rpx;
   font-weight: bold;
-  color: #333;
+  color: var(--t1);
 }
 
 .question-type {
@@ -81,16 +81,16 @@
 }
 
 .type-choice {
-  background: #4A90D9;
+  background: var(--primary);
 }
 
 .type-fill {
-  background: #52C41A;
+  background: var(--ok);
 }
 
 .question-content {
   font-size: 28rpx;
-  color: #333;
+  color: var(--t1);
   line-height: 1.6;
   margin-bottom: 16rpx;
   word-break: break-all;
@@ -101,14 +101,14 @@
   align-items: flex-start;
   padding: 12rpx 0;
   font-size: 26rpx;
-  color: #555;
+  color: var(--t2);
   line-height: 1.5;
 }
 
 .option-label {
   font-weight: bold;
   margin-right: 10rpx;
-  color: #666;
+  color: var(--t2);
   flex-shrink: 0;
 }
 
@@ -118,15 +118,15 @@
 }
 
 .option-answer {
-  color: #52C41A;
+  color: var(--ok);
   font-size: 22rpx;
   margin-left: 10rpx;
   flex-shrink: 0;
 }
 
 .fill-answer {
-  background: #f6ffed;
-  border: 1rpx solid #b7eb8f;
+  background: var(--ok-tint);
+  border: 1rpx solid var(--ok-tint);
   border-radius: 8rpx;
   padding: 16rpx;
   margin-bottom: 12rpx;
@@ -134,27 +134,27 @@
 }
 
 .answer-label {
-  color: #52C41A;
+  color: var(--ok);
   font-weight: bold;
 }
 
 .answer-text {
-  color: #333;
+  color: var(--t1);
 }
 
 .explanation {
-  background: #fffbe6;
-  border: 1rpx solid #ffe58f;
+  background: var(--warning-tint);
+  border: 1rpx solid var(--warning-tint);
   border-radius: 8rpx;
   padding: 16rpx;
   margin-top: 12rpx;
   font-size: 24rpx;
-  color: #666;
+  color: var(--t2);
   line-height: 1.5;
 }
 
 .exp-label {
-  color: #d48806;
+  color: var(--warning);
   font-weight: bold;
 }
 
@@ -163,7 +163,7 @@
   gap: 16rpx;
   margin-top: 20rpx;
   padding-top: 16rpx;
-  border-top: 1rpx solid #f0f0f0;
+  border-top: 1rpx solid var(--line);
   flex-wrap: wrap;
 }
 
@@ -171,18 +171,18 @@
   font-size: 24rpx;
   padding: 10rpx 20rpx;
   border-radius: 8rpx;
-  background: #f5f7fa;
-  color: #666;
+  background: var(--bg);
+  color: var(--t2);
 }
 
 .edit-btn {
-  background: #e6f7ff;
-  color: #1890ff;
+  background: var(--tint);
+  color: var(--primary);
 }
 
 .delete-btn {
-  background: #fff1f0;
-  color: #f5222d;
+  background: var(--danger-tint);
+  color: var(--danger);
 }
 
 .empty {
@@ -197,7 +197,7 @@
 
 .empty-text {
   font-size: 28rpx;
-  color: #999;
+  color: var(--t3);
 }
 
 .modal {
@@ -234,7 +234,7 @@
 .modal-title {
   font-size: 32rpx;
   font-weight: bold;
-  color: #333;
+  color: var(--t1);
   text-align: center;
   margin-bottom: 30rpx;
 }
@@ -245,7 +245,7 @@
 
 .form-label {
   font-size: 26rpx;
-  color: #333;
+  color: var(--t1);
   margin-bottom: 10rpx;
   font-weight: 500;
 }
@@ -254,7 +254,7 @@
   width: 100%;
   height: 80rpx;
   padding: 0 20rpx;
-  border: 1rpx solid #d9d9d9;
+  border: 1rpx solid var(--line);
   border-radius: 8rpx;
   font-size: 26rpx;
   box-sizing: border-box;
@@ -264,7 +264,7 @@
   width: 100%;
   min-height: 120rpx;
   padding: 20rpx;
-  border: 1rpx solid #d9d9d9;
+  border: 1rpx solid var(--line);
   border-radius: 8rpx;
   font-size: 26rpx;
   box-sizing: border-box;
@@ -282,17 +282,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2rpx solid #d9d9d9;
+  border: 2rpx solid var(--line);
   border-radius: 12rpx;
   font-size: 28rpx;
-  color: #666;
+  color: var(--t2);
   background: #fff;
 }
 
 .answer-opt.active {
-  border-color: #1890ff;
-  background: #e6f7ff;
-  color: #1890ff;
+  border-color: var(--primary);
+  background: var(--tint);
+  color: var(--primary);
   font-weight: bold;
 }
 
@@ -311,11 +311,11 @@
 }
 
 .cancel-btn {
-  background: #f5f7fa;
-  color: #666;
+  background: var(--bg);
+  color: var(--t2);
 }
 
 .confirm-btn {
-  background: #1890ff;
+  background: var(--primary);
   color: #fff;
 }

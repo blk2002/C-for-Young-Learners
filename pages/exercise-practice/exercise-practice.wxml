@@ -2,7 +2,7 @@
   <view class="loading" wx:if="{{loading}}">加载中...</view>
 
   <view wx:elif="{{questions.length === 0}}" class="empty-state">
-    <view class="icon">📝</view>
+    <view class="icon"><text class="icon i-edit"/></view>
     <view class="text">暂无习题</view>
     <view class="text" style="font-size: 24rpx; margin-top: 10rpx;">该知识点还没有习题</view>
   </view>
@@ -51,12 +51,12 @@
       </view>
 
       <view class="result-section" wx:if="{{submitted}}">
-        <view class="result-correct" wx:if="{{isCorrect[currentIndex]}}">✅ 回答正确！</view>
-        <view class="result-wrong" wx:if="{{!isCorrect[currentIndex]}}">❌ 回答错误，正确答案是：{{currentQuestion.answer}}</view>
+        <view class="result-correct" wx:if="{{isCorrect[currentIndex]}}"><text class="icon i-check"/> 回答正确！</view>
+        <view class="result-wrong" wx:if="{{!isCorrect[currentIndex]}}"><text class="icon i-wrong"/> 回答错误，正确答案是：{{currentQuestion.answer}}</view>
       </view>
 
       <view class="answer-section" wx:if="{{submitted}}">
-        <view class="answer-label">✅ 答案：</view>
+        <view class="answer-label"><text class="icon i-check"/> 答案：</view>
         <view class="answer-text" wx:if="{{currentQuestion.type === 'choice'}}">
           选项 {{currentQuestion.answer}}
           <text wx:if="{{currentQuestion.answer === 'A'}}">. {{currentQuestion.options.A}}</text>
@@ -66,7 +66,7 @@
         </view>
         <view class="answer-text" wx:if="{{currentQuestion.type === 'fill'}}">{{currentQuestion.answer}}</view>
 
-        <view class="explanation-label" wx:if="{{currentQuestion.explanation}}">💡 解析：</view>
+        <view class="explanation-label" wx:if="{{currentQuestion.explanation}}"><text class="icon i-bulb"/> 解析：</view>
         <view class="explanation-text" wx:if="{{currentQuestion.explanation}}">{{currentQuestion.explanation}}</view>
       </view>
     </view>

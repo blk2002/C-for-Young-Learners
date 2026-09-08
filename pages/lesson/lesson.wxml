@@ -13,7 +13,7 @@
         class="action-btn {{isFavorite ? 'active' : ''}}"
         bindtap="toggleFavorite"
       >
-        {{isFavorite ? '❤️ 已收藏' : '🤍 收藏'}}
+        <text class="icon {{isFavorite ? 'i-heart-on' : 'i-heart-off'}}"/> {{isFavorite ? '已收藏' : '收藏'}}
       </view>
     </view>
 
@@ -22,14 +22,14 @@
 
     <!-- 知识点讲解 -->
     <view class="section" wx:if="{{lessonData.content}}">
-      <view class="section-title">📖 知识点讲解</view>
+      <view class="section-title"><text class="icon i-book-open"/> 知识点讲解</view>
       <view class="content-text">{{lessonData.content}}</view>
     </view>
 
     <!-- 代码示例 -->
     <view class="section" wx:if="{{lessonData.codeExample}}">
       <view class="code-header">
-        <view class="section-title" style="margin-bottom: 0;">💻 代码示例</view>
+        <view class="section-title" style="margin-bottom: 0;"><text class="icon i-code"/> 代码示例</view>
         <view class="copy-btn" bindtap="copyCode">复制</view>
       </view>
       <view class="code-block">{{lessonData.codeExample}}</view>
@@ -37,7 +37,7 @@
 
     <!-- 练习题 -->
     <view class="section" wx:if="{{questions.length > 0}}">
-      <view class="section-title">✏️ 练习题</view>
+      <view class="section-title"><text class="icon i-edit"/> 练习题</view>
       <!--<view class="hint-text">做完题目后点击"查看答案"，自行核对</view>-->
 
       <view class="question-card" wx:for="{{questions}}" wx:key="*this" wx:for-item="question" wx:for-index="qIdx">
@@ -77,20 +77,20 @@
         
         <!-- 对错结果 -->
         <view class="result-section" wx:if="{{submitted[qIdx]}}">
-        <view class="result-correct" wx:if="{{isCorrect[qIdx]}}">✅ 回答正确！</view>
-        <view class="result-wrong" wx:if="{{!isCorrect[qIdx]}}">❌ 回答错误，正确答案是：{{question.answer}}</view>
+        <view class="result-correct" wx:if="{{isCorrect[qIdx]}}"><text class="icon i-check"/> 回答正确！</view>
+        <view class="result-wrong" wx:if="{{!isCorrect[qIdx]}}"><text class="icon i-wrong"/> 回答错误，正确答案是：{{question.answer}}</view>
         </view>
       
         <!-- 提交并查看答案按钮 -->
         <view class="answer-toggle" wx:if="{{!submitted[qIdx]}}" data-qindex="{{qIdx}}" bindtap="submitAndShowAnswer">
-          ✅ 提交并查看答案
+          <text class="icon i-check"/> 提交并查看答案
         </view>
         <view class="answer-toggle submitted" wx:else>
-          ✓ 已提交
+          <text class="icon i-check"/> 已提交
         </view>
         <!-- 答案解析 -->
         <view class="answer-section" wx:if="{{submitted[qIdx]}}">
-          <view class="answer-label">✅ 答案：</view>
+          <view class="answer-label"><text class="icon i-check"/> 答案：</view>
           <view class="answer-text" wx:if="{{question.type === 'choice'}}">
             选项 {{question.answer}}
             <text wx:if="{{question.answer === 'A'}}">. {{question.options.A}}</text>
@@ -100,7 +100,7 @@
           </view>
           <view class="answer-text" wx:if="{{question.type === 'fill'}}">{{question.answer}}</view>
 
-          <view class="explanation-label" wx:if="{{question.explanation}}">💡 解析：</view>
+          <view class="explanation-label" wx:if="{{question.explanation}}"><text class="icon i-bulb"/> 解析：</view>
           <view class="explanation-text" wx:if="{{question.explanation}}">{{question.explanation}}</view>
         </view>
       </view>
@@ -108,7 +108,7 @@
 
     <!-- 无练习题 -->
     <view class="section" wx:if="{{questions.length === 0}}">
-      <view class="section-title">✏️ 练习题</view>
+      <view class="section-title"><text class="icon i-edit"/> 练习题</view>
       <view class="empty-text">暂无练习题</view>
     </view>
 

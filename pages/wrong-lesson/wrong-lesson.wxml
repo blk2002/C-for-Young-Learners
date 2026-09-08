@@ -11,18 +11,18 @@
         data-lessonid="{{item._id}}"
         data-lessontitle="{{item.title}}"
       >
-        <view class="lesson-icon">❌</view>
+        <view class="lesson-icon"><text class="icon i-wrong"/></view>
         <view class="lesson-info">
           <view class="lesson-title">{{item.title}}</view>
           <view class="lesson-meta">
             <text>错题 {{item.wrongCount}} 道</text>
           </view>
         </view>
-        <view class="lesson-arrow">›</view>
+        <view class="lesson-arrow"><text class="icon i-chevron"/></view>
       </view>
 
       <view class="empty-state" wx:if="{{lessons.length === 0}}">
-        <view class="icon">🎉</view>
+        <view class="icon"><text class="icon i-check"/></view>
         <view class="text">暂无错题</view>
         <view class="text" style="font-size: 24rpx; margin-top: 10rpx;">太棒了，继续保持！</view>
       </view>

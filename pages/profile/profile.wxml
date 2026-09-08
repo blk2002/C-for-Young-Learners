@@ -1,55 +1,85 @@
 <!-- pages/profile/profile.wxml -->
-<view class="container">
-  <!-- 用户信息 -->
-  <view class="user-section" bindtap="goToEditProfile">
-    <view class="user-info-wrapper">
-      <view class="avatar-wrapper">
+<view class="profile-page">
+  <!-- 用户信息头部 -->
+  <view class="user-hero">
+    <view class="hero-deco"></view>
+    <view class="user-row">
+      <view class="avatar-wrap">
         <image wx:if="{{userInfo.avatar}}" class="avatar" src="{{userInfo.avatar}}" mode="aspectFill" />
-        <view wx:else class="avatar avatar-default">
-          <text>{{isAdmin ? '🛡️' : '🎓'}}</text>
-        </view>
+        <view wx:else class="avatar avatar-text">{{initial}}</view>
       </view>
-      <view class="user-info">
-        <view class="username">{{userInfo.nickname || userInfo.username}}</view>
-        <view class="signature" wx:if="{{userInfo.signature}}">{{userInfo.signature}}</view>
-        <view class="role-tag">
-          <text wx:if="{{isAdmin}}">🛡️ 老师</text>
-          <text wx:else>🎓 学生</text>
-        </view>
+      <view class="user-meta">
+        <view class="display-name">{{displayName}}</view>
+        <view class="account">{{subtitle}}</view>
       </view>
-      <view class="edit-arrow">›</view>
+      <view class="role-chip">
+        <text wx:if="{{isAdmin}}">老师</text>
+        <text wx:else>学生</text>
+      </view>
     </view>
   </view>
 
-  <!-- 功能列表 -->
+  <!-- 学习数据概览 -->
+  <view class="stat-card">
+    <view class="stat-item">
+      <view class="stat-num">{{courseCount}}</view>
+      <view class="stat-label">学习中的课程</view>
+    </view>
+    <view class="stat-item" bindtap="continueLearning">
+      <view class="stat-num stat-text">{{lastChapter || '未开始'}}</view>
+      <view class="stat-label">上次学到</view>
+    </view>
+    <view class="stat-item">
+      <view class="stat-num">{{wrongCount}}</view>
+      <view class="stat-label">错题</view>
+    </view>
+  </view>
+
+  <!-- 功能菜单 -->
   <view class="menu-list">
+    <view class="menu-item" bindtap="goToEditProfile">
+      <view class="menu-icon"><text class="icon i-user"/></view>
+      <view class="menu-body">
+        <view class="menu-text">编辑资料</view>
+        <view class="menu-sub">姓名、头像、个性签名</view>
+      </view>
+      <view class="menu-arrow"><text class="icon i-chevron"/></view>
+    </view>
+
+    <view class="menu-item" bindtap="goToChangePassword">
+      <view class="menu-icon"><text class="icon i-shield"/></view>
+      <view class="menu-body">
+        <view class="menu-text">修改密码</view>
+        <view class="menu-sub">需要验证原密码</view>
+      </view>
+      <view class="menu-arrow"><text class="icon i-chevron"/></view>
+    </view>
+
     <view class="menu-item" bindtap="goToProgress">
-      <view class="menu-icon">📊</view>
-      <view class="menu-text">学习进度</view>
-      <view class="menu-arrow">›</view>
+      <view class="menu-icon"><text class="icon i-chart"/></view>
+      <view class="menu-body"><view class="menu-text">学习进度</view></view>
+      <view class="menu-arrow"><text class="icon i-chevron"/></view>
     </view>
 
     <view class="menu-item" bindtap="goToFavorites">
-      <view class="menu-icon">❤️</view>
-      <view class="menu-text">我的收藏</view>
-      <view class="menu-arrow">›</view>
+      <view class="menu-icon"><text class="icon i-heart-on"/></view>
+      <view class="menu-body"><view class="menu-text">我的收藏</view></view>
+      <view class="menu-arrow"><text class="icon i-chevron"/></view>
     </view>
 
     <!-- 管理员功能 -->
     <view class="menu-item admin-item" bindtap="goToAdmin" wx:if="{{isAdmin}}">
-      <view class="menu-icon">🛠️</view>
-      <view class="menu-text">
-        <text>内容管理</text>
-        <view class="menu-sub">审核学生、管理课程</view>
+      <view class="menu-icon"><text class="icon i-tool"/></view>
+      <view class="menu-body">
+        <view class="menu-text">内容管理</view>
+        <view class="menu-sub">管理学生账号、课程内容</view>
       </view>
-      <view class="menu-arrow">›</view>
+      <view class="menu-arrow"><text class="icon i-chevron"/></view>
     </view>
   </view>
 
-  <!-- 退出按钮 -->
-  <view class="logout-section">
-    <button class="logout-btn" bindtap="logout">退出登录</button>
-  </view>
+  <!-- 退出登录 -->
+  <view class="logout-btn" bindtap="logout">退出登录</view>
 
   <view class="bottom-space"></view>
 </view>

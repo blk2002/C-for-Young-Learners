@@ -2,9 +2,9 @@ const app = getApp();
 const db = require('../../utils/db.js');
 
 const EXAM_TYPE_CONFIG = {
-  CIE: { examType: 'CIE', examName: 'CIE', icon: '🏆', color: '#667eea', colorDark: '#764ba2' },
-  GESP: { examType: 'GESP', examName: 'GESP', icon: '🎯', color: '#f093fb', colorDark: '#f5576c' },
-  CSP: { examType: 'CSP-JS', examName: 'CSP-J/S', icon: '💻', color: '#4facfe', colorDark: '#00f2fe' }
+  CIE: { examType: 'CIE', examName: 'CIE', icon: "i-trophy", color: '#5B67F1', colorDark: '#8E5CF6' },
+  GESP: { examType: 'GESP', examName: 'GESP', icon: "i-target", color: '#FF9A62', colorDark: '#FF7A45' },
+  CSP: { examType: 'CSP-JS', examName: 'CSP-J/S', icon: "i-code", color: '#3EC8E0', colorDark: '#2AA8D6' }
 };
 
 Page({
@@ -61,8 +61,8 @@ Page({
         const config = EXAM_TYPE_CONFIG[item.examType] || {
           examType: item.examType,
           examName: item.examType,
-          icon: '📝',
-          color: '#999',
+          icon: "i-edit",
+          color: '#9AA0B0',
           colorDark: '#666'
         };
         return {

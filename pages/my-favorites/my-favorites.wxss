@@ -5,7 +5,7 @@
 }
 
 .header {
-  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-deep) 100%);
   padding: 50rpx 40rpx;
   color: #fff;
 }
@@ -37,7 +37,7 @@
 }
 
 .fav-card:active {
-  background: #F5F7FA;
+  background: var(--bg);
 }
 
 .fav-icon {
@@ -54,24 +54,24 @@
 .lesson-title {
   font-size: 30rpx;
   font-weight: 500;
-  color: #333;
+  color: var(--t1);
   margin-bottom: 8rpx;
 }
 
 .lesson-meta {
   font-size: 24rpx;
-  color: #999;
+  color: var(--t3);
 }
 
 .fav-arrow {
   font-size: 40rpx;
-  color: #CCC;
+  color: var(--t3);
 }
 
 .loading {
   text-align: center;
   padding: 100rpx 0;
-  color: #999;
+  color: var(--t3);
 }
 
 .empty-state {
@@ -86,5 +86,5 @@
 
 .empty-state .text {
   font-size: 28rpx;
-  color: #999;
+  color: var(--t3);
 }

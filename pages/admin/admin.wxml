@@ -1,8 +1,8 @@
 <!-- pages/admin/admin.wxml -->
 <view class="container">
   <view class="header">
-    <view class="title">🛠️ 管理后台</view>
-    <view class="subtitle">学生审核与课程内容管理</view>
+    <view class="title"><text class="icon i-tool-w"/> 管理后台</view>
+    <view class="subtitle">学生账号与课程内容管理</view>
   </view>
 
   <!-- Tab切换 -->
@@ -12,45 +12,84 @@
       data-tab="users"
       bindtap="switchTab"
     >
-      👥 学生审核
-      <text wx:if="{{pendingUsers.length > 0}}" class="badge">{{pendingUsers.length}}</text>
+      <text class="icon i-users"/> 学生管理
     </view>
     <view
       class="tab {{activeTab === 'chapters' ? 'active' : ''}}"
       data-tab="chapters"
       bindtap="switchTab"
     >
-      📚 课程管理
+      <text class="icon i-book"/> 课程管理
     </view>
     <view
       class="tab {{activeTab === 'exercises' ? 'active' : ''}}"
       data-tab="exercises"
       bindtap="switchTab"
     >
-      ✏️ 习题管理
+      <text class="icon i-edit"/> 习题管理
     </view>
   </view>
 
   <view class="loading" wx:if="{{loading}}">加载中...</view>
 
-  <!-- 用户审核 -->
+  <!-- 学生管理 -->
   <view class="content" wx:elif="{{activeTab === 'users'}}">
-    <block wx:if="{{pendingUsers.length > 0}}">
-      <view class="user-card" wx:for="{{pendingUsers}}" wx:key="_id">
-        <view class="user-avatar">👤</view>
-        <view class="user-info">
-          <view class="username">{{item.username}}</view>
-          <view class="user-meta">待审核</view>
+    <!-- 新建按钮 -->
+    <view class="add-btn" bindtap="goToCreateStudent">+ 新建学生账号</view>
+
+    <!-- 筛选 -->
+    <view class="filter-bar">
+      <view
+        class="filter-item {{studentFilter === 'all' ? 'on' : ''}}"
+        data-filter="all"
+        bindtap="switchStudentFilter"
+      >全部 {{filterCount.all}}</view>
+      <view
+        class="filter-item {{studentFilter === 'soon' ? 'on' : ''}}"
+        data-filter="soon"
+        bindtap="switchStudentFilter"
+      >即将到期 {{filterCount.soon}}</view>
+      <view
+        class="filter-item {{studentFilter === 'expired' ? 'on' : ''}}"
+        data-filter="expired"
+        bindtap="switchStudentFilter"
+      >已过期 {{filterCount.expired}}</view>
+    </view>
+
+    <!-- 学生列表 -->
+    <block wx:if="{{displayStudents.length > 0}}">
+      <view class="student-card" wx:for="{{displayStudents}}" wx:key="_id">
+        <view class="student-top">
+          <view class="student-avatar">
+            <image wx:if="{{item.avatar}}" class="avatar-img" src="{{item.avatar}}" mode="aspectFill" />
+            <text wx:else class="icon i-user"/>
+          </view>
+          <view class="student-info">
+            <view class="student-name">{{item.name}}</view>
+            <view class="student-account">{{item.username}}</view>
+          </view>
+          <view class="expire-tag {{item.expireState}}">
+            <block wx:if="{{item.expireState === 'permanent'}}">永久有效</block>
+            <block wx:elif="{{item.expireState === 'expired'}}">已过期</block>
+            <block wx:elif="{{item.expireState === 'soon'}}">{{item.remainDays}}天后到期</block>
+            <block wx:else>有效</block>
+          </view>
         </view>
-        <view class="user-actions">
-          <view class="btn-approve" data-id="{{item._id}}" data-approved="true" bindtap="reviewUser">通过</view>
-          <view class="btn-reject" data-id="{{item._id}}" data-approved="false" bindtap="reviewUser">拒绝</view>
+
+        <view class="student-validity">{{item.validityText}}</view>
+
+        <view class="student-actions">
+          <view class="action-btn blue" data-id="{{item._id}}" data-name="{{item.name}}" bindtap="resetPassword">重置密码</view>
+          <view class="action-btn" data-id="{{item._id}}" data-name="{{item.name}}" bindtap="renewStudent">续期</view>
+          <view class="action-btn red" data-id="{{item._id}}" data-name="{{item.name}}" bindtap="deleteStudent">删除</view>
         </view>
       </view>
     </block>
+
     <view class="empty-state" wx:else>
-      <view class="icon">✅</view>
-      <view class="text">暂无待审核学生</view>
+      <view class="icon"><text class="icon i-users"/></view>
+      <view class="text">{{studentList.length > 0 ? '该分类下没有学生' : '还没有学生账号'}}</view>
+      <view class="text" style="font-size: 24rpx; margin-top: 10rpx;">点击上方"新建学生账号"添加</view>
     </view>
   </view>
 
@@ -66,13 +105,21 @@
         data-name="{{item.name}}"
         bindtap="switchCourse"
       >
-        {{item.icon}} {{item.name}}
+        <text class="icon {{item.icon}}"/> {{item.name}}
       </view>
     </view>
 
-    <view class="section-header">
-      <view class="section-title">{{currentCourseName}} - 章节列表</view>
-      <view class="add-btn" bindtap="addChapter">+ 新增章节</view>
+    <view class="chapter-summary">
+      <view class="summary-left">
+        <view class="summary-icon"><text class="icon i-book-w"/></view>
+        <view class="summary-info">
+          <view class="summary-title">{{currentCourseName}} 章节</view>
+          <view class="summary-sub">当前 {{chaptersMap[selectedCourse] ? chaptersMap[selectedCourse].length : 0}} 个章节</view>
+        </view>
+      </view>
+      <view class="summary-btn" bindtap="addChapter">
+        <text class="summary-plus">+</text> 新增章节
+      </view>
     </view>
 
     <view class="chapter-list">
@@ -89,7 +136,7 @@
       </view>
 
       <view class="empty-state" wx:if="{{!chaptersMap[selectedCourse] || chaptersMap[selectedCourse].length === 0}}">
-        <view class="icon">📖</view>
+        <view class="icon"><text class="icon i-book-open"/></view>
         <view class="text">暂无章节</view>
         <view class="text" style="font-size: 24rpx; margin-top: 10rpx;">点击上方"新增章节"添加</view>
       </view>
@@ -108,7 +155,7 @@
         data-name="{{item.name}}"
         bindtap="switchExerciseCourse"
       >
-        {{item.icon}} {{item.name}}
+        <text class="icon {{item.icon}}"/> {{item.name}}
       </view>
     </view>
 
@@ -118,21 +165,21 @@
 
     <!-- 入口卡片 -->
     <view class="exercise-entry-card" bindtap="goToChapterExercises">
-      <view class="entry-icon">📚</view>
+      <view class="entry-icon"><text class="icon i-book"/></view>
       <view class="entry-content">
         <view class="entry-title">章节知识点习题</view>
         <view class="entry-desc">按章节和知识点组织独立练习题</view>
       </view>
-      <view class="entry-arrow">›</view>
+      <view class="entry-arrow"><text class="icon i-chevron"/></view>
     </view>
 
     <view class="exercise-entry-card" bindtap="goToExamExercises">
-      <view class="entry-icon">🎓</view>
+      <view class="entry-icon"><text class="icon i-exam"/></view>
       <view class="entry-content">
         <view class="entry-title">等级考试习题</view>
         <view class="entry-desc">等级考试真题题库管理</view>
       </view>
-      <view class="entry-arrow">›</view>
+      <view class="entry-arrow"><text class="icon i-chevron"/></view>
     </view>
   </view>
 

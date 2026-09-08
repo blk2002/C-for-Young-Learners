@@ -28,35 +28,45 @@
     "pages/exam-levels/exam-levels",
     "pages/exam-practice/exam-practice",
     "pages/exam-wrong-levels/exam-wrong-levels",
-    "pages/profile-edit/profile-edit"
+    "pages/profile-edit/profile-edit",
+    "pages/change-password/change-password",
+    "pages/admin-student-edit/admin-student-edit"
   ],
   "window": {
     "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#4A90E2",
+    "navigationBarBackgroundColor": "#F6F7FB",
     "navigationBarTitleText": "少儿编程",
-    "navigationBarTextStyle": "white",
-    "backgroundColor": "#F5F7FA"
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#F6F7FB"
   },
   "tabBar": {
-    "color": "#999999",
-    "selectedColor": "#4A90E2",
+    "color": "#9AA0B0",
+    "selectedColor": "#5B67F1",
     "backgroundColor": "#ffffff",
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "课程"
+        "text": "课程",
+        "iconPath": "assets/tabbar/home.png",
+        "selectedIconPath": "assets/tabbar/home-active.png"
       },
       {
         "pagePath": "pages/progress/progress",
-        "text": "习题"
+        "text": "习题",
+        "iconPath": "assets/tabbar/edit.png",
+        "selectedIconPath": "assets/tabbar/edit-active.png"
       },
       {
         "pagePath": "pages/favorites/favorites",
-        "text": "错题"
+        "text": "错题",
+        "iconPath": "assets/tabbar/wrong.png",
+        "selectedIconPath": "assets/tabbar/wrong-active.png"
       },
       {
         "pagePath": "pages/profile/profile",
-        "text": "我的"
+        "text": "我的",
+        "iconPath": "assets/tabbar/user.png",
+        "selectedIconPath": "assets/tabbar/user-active.png"
       }
     ]
   },

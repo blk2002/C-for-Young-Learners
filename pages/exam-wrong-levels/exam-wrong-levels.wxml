@@ -19,12 +19,12 @@
           <view class="level-name">{{item.levelName}}</view>
           <view class="level-count">已做错 {{item.wrongCount}} 题</view>
         </view>
-        <view class="level-arrow">›</view>
+        <view class="level-arrow"><text class="icon i-chevron"/></view>
       </view>
     </view>
 
     <view class="empty-state" wx:if="{{!loading && levels.length === 0}}">
-      <view class="empty-icon">🎉</view>
+      <view class="empty-icon"><text class="icon i-check"/></view>
       <view class="empty-text">该考试类型暂无错题</view>
       <view class="empty-sub">继续保持！</view>
     </view>

@@ -24,7 +24,7 @@
         <view class="option-item" wx:for="{{item.options}}" wx:for-item="opt" wx:for-index="optKey" wx:key="optKey">
           <text class="option-label">{{optKey}}.</text>
           <text class="option-text">{{opt}}</text>
-          <text class="option-answer" wx:if="{{item.answer === optKey}}">✓ 正确答案</text>
+          <text class="option-answer" wx:if="{{item.answer === optKey}}"><text class="icon i-check"/> 正确答案</text>
         </view>
       </block>
 
@@ -42,23 +42,23 @@
 
       <view class="question-actions">
         <view class="action-btn" data-index="{{index}}" bindtap="moveUp" wx:if="{{index > 0}}">
-          ↑ 上移
+          <text class="icon i-arrow-up"/> 上移
         </view>
         <view class="action-btn" data-index="{{index}}" bindtap="moveDown" wx:if="{{index < questions.length - 1}}">
-          ↓ 下移
+          <text class="icon i-arrow-down"/> 下移
         </view>
         <view class="action-btn edit-btn" data-index="{{index}}" bindtap="{{item.type === 'choice' ? 'editChoice' : 'editFill'}}">
-          ✎ 编辑
+          <text class="icon i-edit"/> 编辑
         </view>
         <view class="action-btn delete-btn" data-index="{{index}}" bindtap="deleteQuestion">
-          ✕ 删除
+          <text class="icon i-x"/> 删除
         </view>
       </view>
     </view>
   </view>
 
   <view class="empty" wx:else>
-    <view class="empty-icon">📝</view>
+    <view class="empty-icon"><text class="icon i-edit"/></view>
     <view class="empty-text">暂无习题，点击上方按钮添加</view>
   </view>
 

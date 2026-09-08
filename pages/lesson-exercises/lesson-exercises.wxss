@@ -1,12 +1,12 @@
 .container {
   min-height: 100vh;
-  background: #F5F7FA;
+  background: var(--bg);
 }
 
 .loading {
   text-align: center;
   padding: 100rpx 0;
-  color: #999;
+  color: var(--t3);
 }
 
 .content {
@@ -31,7 +31,7 @@
 }
 
 .lesson-card:active {
-  background: #F0F4F8;
+  background: var(--bg);
   transform: scale(0.98);
 }
 
@@ -51,7 +51,7 @@
 .lesson-title {
   font-size: 30rpx;
   font-weight: 600;
-  color: #333;
+  color: var(--t1);
   margin-bottom: 16rpx;
   line-height: 1.4;
   word-break: break-all;
@@ -71,7 +71,7 @@
 
 .count-text {
   font-size: 26rpx;
-  color: #999;
+  color: var(--t3);
 }
 
 .status-tag {
@@ -84,23 +84,23 @@
 }
 
 .status-tag.not-started {
-  background: #F0F4F8;
-  color: #8C8C8C;
+  background: var(--bg);
+  color: var(--t3);
 }
 
 .status-tag.in-progress {
-  background: #E6F7FF;
-  color: #1890FF;
+  background: var(--tint);
+  color: var(--primary);
 }
 
 .status-tag.completed {
-  background: #F6FFED;
-  color: #52C41A;
+  background: var(--ok-tint);
+  color: var(--ok);
 }
 
 .status-tag.no-questions {
-  background: #FFF7E6;
-  color: #FA8C16;
+  background: var(--warning-tint);
+  color: var(--warning);
 }
 
 .progress-wrap {
@@ -112,21 +112,21 @@
 .progress-bar {
   flex: 1;
   height: 12rpx;
-  background: #F0F4F8;
+  background: var(--bg);
   border-radius: 6rpx;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #1890FF, #40A9FF);
+  background: linear-gradient(90deg, var(--primary), var(--primary));
   border-radius: 6rpx;
   transition: width 0.3s;
 }
 
 .progress-text {
   font-size: 24rpx;
-  color: #1890FF;
+  color: var(--primary);
   flex-shrink: 0;
   min-width: 70rpx;
   text-align: right;
@@ -134,7 +134,7 @@
 
 .lesson-arrow {
   font-size: 48rpx;
-  color: #BFBFBF;
+  color: var(--t3);
   font-weight: 300;
   margin-left: 20rpx;
   flex-shrink: 0;
@@ -152,7 +152,7 @@
 
 .empty-state .text {
   font-size: 28rpx;
-  color: #999;
+  color: var(--t3);
 }
 
 .bottom-space {

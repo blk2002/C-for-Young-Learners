@@ -13,7 +13,7 @@
 
   <!-- 空状态 -->
   <view class="empty-state" wx:elif="{{chapters.length === 0}}">
-    <view class="icon">📖</view>
+    <view class="icon"><text class="icon i-book-open"/></view>
     <view class="text">暂无课程章节</view>
     <view class="text" style="font-size: 24rpx; margin-top: 10rpx;">请联系老师添加课程内容</view>
   </view>
@@ -28,7 +28,7 @@
             <view class="chapter-title">{{chapter.title}}</view>
             <view class="chapter-meta">共 {{chapter.lessonCount}} 个知识点</view>
           </view>
-          <view class="chapter-badge" wx:if="{{currentChapterId === chapter._id}}">📍</view>
+          <view class="chapter-badge" wx:if="{{currentChapterId === chapter._id}}"><text class="icon i-pin"/></view>
         </view>
 
         <!-- 知识点列表 -->
@@ -43,14 +43,14 @@
             data-title="{{lesson.title}}"
             bindtap="goToLesson"
           >
-            <view class="lesson-icon">📝</view>
+            <view class="lesson-icon"><text class="icon i-edit"/></view>
             <view class="lesson-content">
               <view class="lesson-title">{{lesson.title}}</view>
               <view class="lesson-subtitle" wx:if="{{lesson.description}}">
                 {{lesson.description}}
               </view>
             </view>
-            <view class="lesson-arrow">›</view>
+            <view class="lesson-arrow"><text class="icon i-chevron"/></view>
           </view>
 
           <view class="empty-lesson" wx:if="{{chapter.lessons.length === 0}}">
