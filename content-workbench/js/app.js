@@ -41,5 +41,6 @@
     switchMode('structure');
     setInterval(refreshConn, 60000);
     window.WBRefreshStat = refreshStat;   // 各 UI 模块改草稿后调用
+    if (WB.help && WB.help.mount) WB.help.mount();
   });
 })();
