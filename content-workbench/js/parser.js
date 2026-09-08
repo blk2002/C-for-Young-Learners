@@ -106,5 +106,32 @@
     return out;
   }
 
-  return { parseMaterial, parseQuestionLine, composeContent, splitContent };
+  const uid = p => p + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  function mergeIntoDraft(draft, parsed, defaultCourseId) {
+    const courseId = defaultCourseId || 'python';
+    if (!draft.tree[courseId]) draft.tree[courseId] = { name: parsed.course || courseId, chapters: [] };
+    const course = draft.tree[courseId];
+    if (parsed.course && !course.name) course.name = parsed.course;
+    parsed.chapters.forEach(pch => {
+      let ch = course.chapters.find(x => x.title === pch.title);
+      if (!ch) { ch = { key: uid('c'), cloudId: null, title: pch.title, order: course.chapters.length + 1, lessons: [] }; course.chapters.push(ch); }
+      pch.lessons.forEach(pls => {
+        let ls = ch.lessons.find(x => x.title === pls.title);
+        if (!ls) { ls = { key: uid('l'), cloudId: null, chapterKey: ch.key, title: pls.title, order: ch.lessons.length + 1,
+          content: { concept: '', feature: '', confusion: '' }, codeExample: '', questions: [], chapterQuestions: [] }; ch.lessons.push(ls); }
+        ['concept', 'feature', 'confusion'].forEach(k => { if (!ls.content[k] && pls[k]) ls.content[k] = pls[k]; });
+        if (!ls.codeExample && pls.code) ls.codeExample = pls.code;
+        pls.questions.forEach(q => ls.questions.push(q));
+        pls.chapterQuestions.forEach(q => ls.chapterQuestions.push(q));
+      });
+    });
+    parsed.examGroups.forEach(pg => {
+      let g = draft.examQuestions.find(x => x.courseId === courseId && x.examType === pg.examType && x.level === pg.level);
+      if (!g) { g = { courseId, examType: pg.examType, level: pg.level, questions: [] }; draft.examQuestions.push(g); }
+      g.questions.push(...pg.questions);
+    });
+    return draft;
+  }
+
+  return { parseMaterial, parseQuestionLine, composeContent, splitContent, mergeIntoDraft };
 });
