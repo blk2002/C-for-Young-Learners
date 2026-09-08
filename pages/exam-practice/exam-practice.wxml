@@ -1,5 +1,5 @@
 <view class="container" wx:if="{{!loading}}">
-  <view class="progress-bar">
+  <view class="progress-section">
     <view class="progress-text">第 {{currentIndex + 1}} / {{questions.length}} 题</view>
     <view class="progress-track">
       <view class="progress-fill" style="width: {{(currentIndex + 1) / questions.length * 100}}%"></view>

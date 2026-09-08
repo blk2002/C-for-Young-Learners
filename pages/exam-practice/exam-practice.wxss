@@ -5,7 +5,7 @@
   padding-bottom: 180rpx;
 }
 
-.progress-bar {
+.progress-section {
   margin-bottom: 30rpx;
 }
 

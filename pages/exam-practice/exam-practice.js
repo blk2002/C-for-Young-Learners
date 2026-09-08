@@ -155,6 +155,7 @@ Page({
       : 0;
 
     this.setData({ submitted: true, wrongCount, answerResults, correctRate });
+    wx.pageScrollTo({ scrollTop: 0, duration: 0 });
 
     if (wrongQuestions.length > 0 && userId) {
       try {
