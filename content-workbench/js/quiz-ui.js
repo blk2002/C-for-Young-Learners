@@ -101,8 +101,9 @@
       pl.chapterQuestions.forEach(q => { ls.chapterQuestions.push(q); added++; });
     }));
     parsed.examGroups.forEach(pg => {
-      let g = d.examQuestions.find(x => x.examType === pg.examType && x.level === pg.level);
-      if (!g) { g = { courseId: 'python', examType: pg.examType, level: pg.level, questions: [] }; d.examQuestions.push(g); }
+      const cid = (sel && sel.courseId) || 'python';
+      let g = d.examQuestions.find(x => x.courseId === cid && x.examType === pg.examType && x.level === pg.level);
+      if (!g) { g = { courseId: cid, examType: pg.examType, level: pg.level, questions: [] }; d.examQuestions.push(g); }
       pg.questions.forEach(q => { g.questions.push(q); added++; });
     });
     persist(d);
