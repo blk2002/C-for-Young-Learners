@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>课程内容工作台</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="wb-top">
+  <span class="wb-title">课程内容工作台</span>
+  <span id="wb-env" class="wb-env">cloud1-d5g4wtnsn6cc1b835</span>
+  <span id="wb-tools"></span>
+</header>
+<div id="wb-conn-strip" class="wb-conn-strip">
+  <span id="wb-status-cloud" class="wb-chip">云端：检测中…</span>
+  <span id="wb-status-ollama" class="wb-chip">本地模型：检测中…</span>
+  <span id="wb-stat" class="wb-stat"></span>
+</div>
+<div id="wb-warn" class="wb-warn hidden"></div>
+<nav class="wb-tabs">
+  <button id="wb-tab-structure" class="wb-tab cur">① 结构与内容</button>
+  <button id="wb-tab-quiz" class="wb-tab">② 题目</button>
+</nav>
+<main class="wb-main">
+  <aside id="wb-tree" class="wb-tree"></aside>
+  <section id="wb-workspace" class="wb-workspace"></section>
+</main>
+<footer class="wb-syncbar" id="wb-syncbar"></footer>
+<script src="https://imgcache.qq.com/qcloud/cloudbase-js-sdk/1.7.2/cloudbase.full.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+<script src="js/state.js"></script>
+<script src="js/parser.js"></script>
+<script src="js/validate.js"></script>
+<script src="js/ollama.js"></script>
+<script src="js/cloud.js"></script>
+<script src="js/tree-ui.js"></script>
+<script src="js/content-ui.js"></script>
+<script src="js/quiz-ui.js"></script>
+<script src="js/sync.js"></script>
+<script src="js/help.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+:root { --wb-brand:#4B3FE3; --wb-brand-soft:#F2F7FF; --wb-text:#171717; --wb-muted:#52525B;
+  --wb-border:rgba(23,23,23,.12); --wb-warn:#EFAA17; --wb-ok:#1DC981; --wb-err:#E5484D; }
+* { box-sizing: border-box; }
+body { margin:0; font:14px/20px "PingFang SC", system-ui, sans-serif; color:var(--wb-text); background:#F7F7F8; }
+.hidden { display:none !important; }
+.wb-top { display:flex; gap:8px; align-items:center; padding:10px 14px; background:#fff; border-bottom:1px solid var(--wb-border); }
+.wb-title { font-weight:600; }
+.wb-env { font-size:12px; color:var(--wb-muted); border:1px solid var(--wb-border); border-radius:999px; padding:1px 10px; }
+.wb-conn-strip { display:flex; flex-wrap:wrap; gap:8px; padding:8px 14px; background:#fff; border-bottom:1px solid var(--wb-border); align-items:center; }
+.wb-chip { display:inline-flex; gap:6px; align-items:center; font-size:12px; border:1px solid var(--wb-border); border-radius:999px; padding:2px 10px; color:var(--wb-muted); }
+.wb-chip::before { content:""; width:7px; height:7px; border-radius:50%; background:var(--wb-warn); }
+.wb-chip.ok::before { background:var(--wb-ok); }
+.wb-chip.err::before { background:var(--wb-err); }
+.wb-stat { margin-left:auto; font-size:12px; color:var(--wb-muted); }
+.wb-warn { margin:8px 14px; padding:8px 10px; border:1px solid var(--wb-warn); border-radius:8px; background:rgba(239,170,23,.1); font-size:12px; }
+.wb-tabs { display:flex; gap:8px; padding:8px 14px; }
+.wb-tab { border:1px solid var(--wb-border); background:#fff; border-radius:999px; padding:4px 14px; font-size:13px; cursor:pointer; color:var(--wb-muted); }
+.wb-tab.cur { color:var(--wb-brand); background:var(--wb-brand-soft); border-color:var(--wb-brand); }
+.wb-main { display:grid; grid-template-columns:260px 1fr; gap:12px; padding:0 14px 12px; min-height:70vh; }
+.wb-tree, .wb-workspace { background:#fff; border:1px solid var(--wb-border); border-radius:10px; padding:12px; }
+.wb-syncbar { display:flex; gap:8px; align-items:center; padding:10px 14px; background:#fff; border-top:1px solid var(--wb-border); }
+.wb-btn { border:1px solid var(--wb-border); background:#fff; border-radius:8px; padding:5px 14px; font-size:13px; cursor:pointer; }
+.wb-btn.primary { background:var(--wb-brand); color:#fff; border-color:var(--wb-brand); }
+.wb-btn[disabled] { opacity:.5; cursor:not-allowed; }
+@media (max-width:640px) { .wb-main { grid-template-columns:1fr; } }
+.wb-node { display:flex; align-items:center; gap:6px; padding:3px 8px; border-radius:6px; font-size:13px; cursor:pointer; min-height:26px; }
+.wb-node:hover { background:var(--wb-brand-soft); }
+.wb-node.cur { background:var(--wb-brand-soft); color:var(--wb-brand); }
+.wb-node.course { font-weight:600; }
+.wb-node.chapter { padding-left:14px; }
+.wb-node.lesson { padding-left:28px; color:var(--wb-muted); }
+.wb-node .mark { margin-left:auto; font-size:12px; }
+.wb-node .mark.ok { color:var(--wb-ok); }
+.wb-node .mark.warn { color:var(--wb-warn); }
+.wb-node-act { opacity:0; font-size:12px; color:var(--wb-muted); padding:0 3px; }
+.wb-node:hover .wb-node-act { opacity:1; }
+.wb-node-act:hover { color:var(--wb-brand); }
+.wb-add { margin:2px 0 2px 12px; font-size:12px; padding:2px 10px; }
+.wb-tree-empty { color:var(--wb-muted); font-size:13px; padding:8px; }
+.wb-tree-actions { display:flex; gap:8px; margin-top:10px; padding-top:10px; border-top:1px solid var(--wb-border); }
