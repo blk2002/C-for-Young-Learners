@@ -13,7 +13,15 @@
   async function ensureLogin() {
     init();
     const auth = app.auth({ persistence: 'local' });
-    if (!(await auth.hasLoginState())) await auth.signInAnonymously();
+    if (!(await auth.hasLoginState())) {
+      if (typeof auth.signInAnonymously === 'function') {
+        await auth.signInAnonymously();
+      } else if (auth.anonymousAuthProvider) {
+        await auth.anonymousAuthProvider().signIn();
+      } else {
+        throw new Error('SDK 不支持匿名登录');
+      }
+    }
     return true;
   }
   async function call(name, data) {
