@@ -85,6 +85,14 @@ button, input, select, textarea { font-family:inherit; font-size:13px; color:var
 .wb-swatch { width:9px; height:9px; border-radius:3px; flex:none; background:var(--wb-brand); }
 .wb-course-name { flex:1; font-size:13px; font-weight:500; }
 .wb-caret { color:var(--wb-faint); font-size:11px; }
+.wb-side-sel-row { display:flex; align-items:center; gap:6px; }
+.wb-side-sel-row .wb-course-sel { flex:1; }
+.wb-side-del {
+  flex:none; height:33px; padding:0 10px;
+  border:1px solid var(--wb-border-2); background:var(--wb-surface); color:var(--wb-faint);
+  border-radius:var(--r-md); cursor:pointer; font-size:13px; line-height:1;
+}
+.wb-side-del:hover { border-color:var(--wb-err); color:var(--wb-err); background:var(--wb-err-bg); }
 .wb-course-menu {
   position:absolute; z-index:40; margin-top:4px; width:214px; padding:4px;
   background:var(--wb-surface); border:1px solid var(--wb-border); border-radius:var(--r-md);
@@ -93,6 +101,12 @@ button, input, select, textarea { font-family:inherit; font-size:13px; color:var
 .wb-course-opt { display:flex; align-items:center; gap:8px; padding:7px 10px; border-radius:var(--r-sm); cursor:pointer; font-size:13px; }
 .wb-course-opt:hover { background:var(--wb-brand-soft); }
 .wb-course-opt .tick { margin-left:auto; font-size:12px; color:var(--wb-brand); }
+.wb-course-opt-del {
+  margin-left:auto; font-size:12px; color:var(--wb-faint);
+  padding:2px 7px; border-radius:var(--r-sm); cursor:pointer; line-height:1;
+}
+.wb-course-opt-del:hover { color:var(--wb-err); background:var(--wb-err-bg); }
+.wb-course-opt .tick + .wb-course-opt-del { margin-left:4px; }
 .wb-side-search {
   flex:none; margin:10px 12px 4px; display:flex; align-items:center; gap:6px; padding:6px 10px;
   border:1px solid var(--wb-border); border-radius:var(--r-md); background:var(--wb-surface);
@@ -259,6 +273,19 @@ button, input, select, textarea { font-family:inherit; font-size:13px; color:var
 .wb-quiz-r { min-height:0; overflow:auto; display:flex; flex-direction:column; gap:12px; }
 .wb-quiz-r > .wb-card { flex:none; }
 .wb-quiz-src-row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:11px; }
+/* 题目页顶部分段开关（知识点题 / 考试题），跨两列占满整行 */
+.wb-quiz-seg { grid-column:1 / -1; display:flex; gap:6px; align-items:center; margin-bottom:2px; }
+.wb-quiz-seg .wb-seg-item { padding:5px 16px; border-radius:999px; border:1px solid var(--wb-border-2); color:var(--wb-muted); font-size:13px; cursor:pointer; background:var(--wb-surface); user-select:none; }
+.wb-quiz-seg .wb-seg-item:hover { border-color:var(--wb-brand); }
+.wb-quiz-seg .wb-seg-item.on { background:var(--wb-brand-soft); border-color:var(--wb-brand-line); color:var(--wb-brand-ink); font-weight:600; }
+/* 考试题分类导航 */
+.wb-exam-nav { display:flex; flex-direction:column; gap:6px; margin:2px 0 4px; }
+.wb-exam-grp { display:flex; align-items:center; gap:8px; padding:7px 10px; border:1px solid var(--wb-border-2); border-radius:var(--r-md); cursor:pointer; background:var(--wb-surface); font-size:13px; }
+.wb-exam-grp:hover { border-color:var(--wb-brand); }
+.wb-exam-grp.on { border-color:var(--wb-brand); background:var(--wb-brand-soft); }
+.wb-exam-grp-name { font-weight:500; }
+.wb-exam-grp-n { margin-left:auto; font-size:12px; color:var(--wb-faint); min-width:22px; text-align:right; }
+.wb-exam-grp-acts { display:flex; gap:5px; }
 .wb-inline { display:inline-flex; align-items:center; gap:6px; }
 .wb-sel { border:1px solid var(--wb-border-2); border-radius:var(--r-sm); padding:3px 7px; font-size:12px; background:var(--wb-surface); }
 .wb-quiz-bar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:11px; }

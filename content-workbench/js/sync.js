@@ -65,11 +65,28 @@
         });
       });
     });
+    // 考试题是**独立实体**：不挂在知识点/章节/学科下，删除它们不会株连考试题，
+// 反过来考试题的同步也不依赖 d.tree 里是否还有这门学科。
+// 合并策略（尊重本地意图 + 保护本地未同步的编辑）：
+//   · 本地排队着"清空意图"（删光了还没同步）→ 保持空，不被云端覆盖；
+//   · 本地无该组            → 从云端拉回；
+//   · 本地有该组但为空      → 用云端填（新建的组还没加题）；
+//   · 本地有该组且有题      → 保留本地（不覆盖，避免冲掉未同步的编辑）。
     (res.exams || []).forEach(cloudExam => {
-      let g = d.examQuestions.find(x => x.courseId === cloudExam.courseId && x.examType === cloudExam.examType && x.level === cloudExam.level);
+      const cid = cloudExam.courseId, et = cloudExam.examType, lv = cloudExam.level;
+      const clearPending = (d._examGroupsCleared || []).some(x => ek(x) === (cid || '(未标注)') && x.examType === et && x.level === lv);
+      let g = d.examQuestions.find(x => x.courseId === cid && x.examType === et && x.level === lv);
+      if (clearPending) {
+        // 用户已删光本地这一组、意图还没提交到云端 → 拉取时不要把云端旧题塞回来
+        if (g) g.questions = [];
+        (cloudExam.questions || []).forEach(q => snapshot.push(q));
+        return;
+      }
       if (!g) {
-        g = { courseId: cloudExam.courseId, examType: cloudExam.examType, level: cloudExam.level, questions: cloudExam.questions || [] };
+        g = { courseId: cid, examType: et, level: lv, questions: cloudExam.questions || [] };
         d.examQuestions.push(g);
+      } else if (!(g.questions || []).length) {
+        g.questions = cloudExam.questions || [];
       }
       (cloudExam.questions || []).forEach(q => snapshot.push(q));
     });
@@ -78,11 +95,21 @@
   function existing() { return snapshot; }
 
   // ===== 结构同步 =====
+  // 删除队列去重：删学科时 chapter 和它的 lesson 会各推一次，可能重复。
+  const uniqByCloudId = arr => {
+    const seen = new Set();
+    return (arr || []).filter(x => {
+      const k = x && x.cloudId;
+      if (!k || seen.has(k)) return false;
+      seen.add(k); return true;
+    });
+  };
+
   function buildStructurePayload(d) {
     const payloads = [];
+    const delCh = uniqByCloudId(d._deletedChapters).map(x => x.cloudId);
+    const delLs = uniqByCloudId(d._deletedLessons).map(x => x.cloudId);
     Object.entries(d.tree).forEach(([courseId, c]) => {
-      const delCh = (d._deletedChapters || []).map(x => x.cloudId).filter(Boolean);
-      const delLs = (d._deletedLessons || []).map(x => x.cloudId).filter(Boolean);
       if (!c.chapters.length && !delCh.length && !delLs.length) return;
       payloads.push({
         mode: 'structure', password: d.password, courseId,
@@ -97,6 +124,19 @@
         deleteLessonIds: delLs
       });
     });
+    // 学科被删光后 d.tree 为空，但删除队列里还压着云端残留 → 原来一个 payload 都生成不了，
+    // 「同步结构与内容」直接报"没有可同步的课程结构"，云端旧数据永远删不掉，拉取时又回来了。
+    // 云函数 runStructure 的删除分支是按 id 直删、不依赖 courseId，所以发一个纯删除 payload 即可，
+    // courseId 用队列里记录的（老数据可能没有，兜底 '__deleted__'）。
+    if (!payloads.length && (delCh.length || delLs.length)) {
+      const firstCh = uniqByCloudId(d._deletedChapters)[0];
+      const firstLs = uniqByCloudId(d._deletedLessons)[0];
+      payloads.push({
+        mode: 'structure', password: d.password,
+        courseId: (firstCh && firstCh.courseId) || (firstLs && firstLs.courseId) || '__deleted__',
+        chapters: [], deleteChapterIds: delCh, deleteLessonIds: delLs
+      });
+    }
     return payloads;
   }
 
@@ -105,11 +145,15 @@
     if (!ensurePassword(d)) return;
     const payloads = buildStructurePayload(d);
     if (!payloads.length) { alert('没有可同步的课程结构'); return; }
-    let adds = 0, ups = 0, dels = 0;
+    // 删除 id 会在每个 payload 里重复出现（删除队列是全局的），统计要去重，否则数字虚高
+    let adds = 0, ups = 0;
+    const delSet = new Set();
     payloads.forEach(p => {
       p.chapters.forEach(ch => { ch.cloudId ? ups++ : adds++; ch.lessons.forEach(ls => ls.cloudId ? ups++ : adds++); });
-      dels += (p.deleteChapterIds || []).length + (p.deleteLessonIds || []).length;
+      (p.deleteChapterIds || []).forEach(id => delSet.add('c:' + id));
+      (p.deleteLessonIds || []).forEach(id => delSet.add('l:' + id));
     });
+    const dels = delSet.size;
     if (!confirm(`即将同步结构与内容：新增 ${adds}、更新 ${ups}、删除 ${dels}。确认继续？`)) return;
     const failures = [];
     for (const p of payloads) {
@@ -117,16 +161,19 @@
       try { res = await WB.cloud.pushStructure(p); }
       catch (e) { failures.push({ tag: p.courseId, msg: e.message }); continue; }
       if (!res.success) { failures.push({ tag: p.courseId, msg: res.message }); continue; }
+      // 纯删除 payload 的 courseId 是占位符，d.tree 里没有 → 必须判空，否则这里会崩
       const course = d.tree[p.courseId];
-      Object.entries(res.idMap.chapters || {}).forEach(([key, id]) => {
-        const ch = course.chapters.find(x => x.key === key); if (ch) ch.cloudId = id;
+      Object.entries((res.idMap && res.idMap.chapters) || {}).forEach(([key, id]) => {
+        const ch = course && course.chapters.find(x => x.key === key); if (ch) ch.cloudId = id;
       });
-      Object.entries(res.idMap.lessons || {}).forEach(([key, id]) => {
+      Object.entries((res.idMap && res.idMap.lessons) || {}).forEach(([key, id]) => {
+        if (!course) return;
         course.chapters.forEach(ch => { const ls = ch.lessons.find(x => x.key === key); if (ls) ls.cloudId = id; });
       });
       (res.results || []).filter(r => r.ok === false).forEach(r => failures.push({ tag: r.op, msg: r.msg }));
     }
-    delete d._deletedChapters; delete d._deletedLessons;
+    // 删除队列同理：只有全部成功才清，否则失败的删除意图会丢失，云端残留永远删不掉
+    if (!failures.length) { delete d._deletedChapters; delete d._deletedLessons; }
     WB.state.save(d);
     WB.treeUI.render(); WBRefreshStat(); render();
     report(failures, '结构同步');
@@ -134,22 +181,41 @@
   }
 
   // ===== 题目同步 =====
+  // 考试题是独立实体，不依附于课程树：即便某门学科已被删除，
+  // 它的考试组（以及排队中的"清空意图"）仍然要能同步出去。
+  // 所以参与同步的 courseId = d.tree 的 key ∪ examQuestions 的 courseId ∪ _examGroupsCleared 的 courseId。
+  const ek = g => g.courseId || '(未标注)';
+  function examRelatedCourseIds(d) {
+    const ids = new Set(Object.keys(d.tree || {}));
+    // 连 courseId 都可能缺失（早期数据/孤儿题），用占位 key 兜底，
+    // 否则这些组永远进不了 ids → 又变成"没有可同步的题目"。
+    (d.examQuestions || []).forEach(g => { ids.add(ek(g)); });
+    (d._examGroupsCleared || []).forEach(x => { ids.add(ek(x)); });
+    return [...ids];
+  }
+
   function buildQuestionsPayloads(d) {
     const payloads = [];
-    Object.entries(d.tree).forEach(([courseId, c]) => {
+    examRelatedCourseIds(d).forEach(courseId => {
+      const c = d.tree[courseId];                     // 学科可能已被删除 → 只同步它的考试题
       const learnUpdates = [], chapterUpserts = [];
-      c.chapters.forEach(ch => ch.lessons.forEach(ls => {
+      if (c) (c.chapters || []).forEach(ch => ch.lessons.forEach(ls => {
         if (!ls.cloudId) return;                      // 未入库知识点：拦截
         const learnQ = (ls.questions || []).filter(q => !q._skip);
         const chapterQ = (ls.chapterQuestions || []).filter(q => !q._skip);
         if (learnQ.length) learnUpdates.push({ lessonId: ls.cloudId, questions: learnQ });
         if (chapterQ.length) chapterUpserts.push({ lessonId: ls.cloudId, questions: chapterQ });
       }));
-      const examUpserts = (d.examQuestions || []).filter(g => g.courseId === courseId)
+      // 现存的考试组（本地非空）→ 整组 upsert
+      const examUpserts = (d.examQuestions || []).filter(g => ek(g) === courseId && (g.questions || []).length)
         .map(g => ({ examType: g.examType, level: g.level, questions: (g.questions || []).filter(q => !q._skip) }))
         .filter(g => g.questions.length);
-      if (learnUpdates.length || chapterUpserts.length || examUpserts.length) {
-        payloads.push({ mode: 'questions', password: d.password, courseId, learnUpdates, chapterUpserts, examUpserts });
+      // 来自 quiz-ui 删除「最后一道题」或「清空考试题」时记下的"清空意图" → questions: [] 让云函数 update 成空
+      const examClears = (d._examGroupsCleared || []).filter(x => ek(x) === courseId)
+        .map(x => ({ examType: x.examType, level: x.level, questions: [] }));
+      const allExamOps = [...examUpserts, ...examClears];
+      if (learnUpdates.length || chapterUpserts.length || allExamOps.length) {
+        payloads.push({ mode: 'questions', password: d.password, courseId, learnUpdates, chapterUpserts, examUpserts: allExamOps });
       }
     });
     return payloads;
@@ -158,9 +224,13 @@
   function collectAllQuestions(d) {
     const arr = [];
     Object.values(d.tree).forEach(c => c.chapters.forEach(ch => ch.lessons.forEach(ls => {
-      (ls.questions || []).forEach(q => arr.push({ q, lessonId: ls.cloudId }));
-      (ls.chapterQuestions || []).forEach(q => arr.push({ q, lessonId: ls.cloudId }));
+      (ls.questions || []).forEach(q => arr.push({ q, lessonId: ls.cloudId, src: 'learn' }));
+      (ls.chapterQuestions || []).forEach(q => arr.push({ q, lessonId: ls.cloudId, src: 'chapter' }));
     })));
+    // 考试题是独立实体、不挂在知识点下，原来这函数只遍历 d.tree，导致考试题
+    // 完全逃过硬校验 —— 错题干/空答案的考试题能直接同步上云。这里一并纳入。
+    (d.examQuestions || []).forEach(g => (g.questions || []).forEach(q =>
+      arr.push({ q, src: 'exam', exam: (g.courseId || '?') + ' ' + (g.examType || '?') + '/' + (g.level || '?') })));
     return arr;
   }
 
@@ -169,12 +239,24 @@
     if (!ensurePassword(d)) return;
     // 硬校验（不含 _skip）
     const bad = collectAllQuestions(d).filter(x => !x.q._skip && WB.validate.validateQuestion(x.q).length);
-    if (bad.length) { alert('有 ' + bad.length + ' 道题未通过硬校验，请先到「② 题目」页签修正（标红项）'); return; }
+    if (bad.length) {
+      const nExam = bad.filter(x => x.src === 'exam').length;
+      const nLearn = bad.filter(x => x.src === 'learn').length;
+      const nChapter = bad.filter(x => x.src === 'chapter').length;
+      alert('有 ' + bad.length + ' 道题未通过硬校验（学习题 ' + nLearn + ' · 章节题 ' + nChapter + ' · 考试题 ' + nExam
+        + '），请先到「② 题目」页签修正标红项后重试');
+      return;
+    }
     const payloads = buildQuestionsPayloads(d);
     if (!payloads.length) { alert('没有可同步的题目（未入库知识点的题需先同步结构）'); return; }
-    let learn = 0, chapter = 0, exam = 0;
-    payloads.forEach(p => { learn += p.learnUpdates.length; chapter += p.chapterUpserts.length; exam += p.examUpserts.length; });
-    if (!confirm(`即将同步题目：学习题 ${learn} 组、章节题 ${chapter} 组、考试组 ${exam}。确认继续？`)) return;
+    let learn = 0, chapter = 0, exam = 0, examClear = 0;
+    payloads.forEach(p => {
+      learn += p.learnUpdates.length;
+      chapter += p.chapterUpserts.length;
+      p.examUpserts.forEach(g => { exam++; if (!g.questions.length) examClear++; });
+    });
+    const examText = examClear ? `${exam} 组（含 ${examClear} 组清空云端）` : `${exam}`;
+    if (!confirm(`即将同步题目：学习题 ${learn} 组、章节题 ${chapter} 组、考试组 ${examText}。确认继续？`)) return;
     const failures = [];
     for (const p of payloads) {
       let res;
@@ -182,6 +264,19 @@
       catch (e) { failures.push({ tag: p.courseId, msg: e.message }); continue; }
       if (!res.success) { failures.push({ tag: p.courseId, msg: res.message }); continue; }
       (res.results || []).filter(r => r.ok === false).forEach(r => failures.push({ tag: r.op, msg: r.msg }));
+    }
+    // 同步成功的「清空意图」才消费：已经从云端被清空，下次不再发。
+    // 失败时必须保留，否则意图丢失、云端那组永远清不掉。
+    if (!failures.length) {
+      const sentClearKeys = new Set();
+      payloads.forEach(p => p.examUpserts.forEach(g => {
+        if (!g.questions.length) sentClearKeys.add(p.courseId + '|' + g.examType + '|' + g.level);
+      }));
+      if (d._examGroupsCleared && d._examGroupsCleared.length) {
+        d._examGroupsCleared = d._examGroupsCleared.filter(x => !sentClearKeys.has(x.courseId + '|' + x.examType + '|' + x.level));
+        if (!d._examGroupsCleared.length) delete d._examGroupsCleared;
+      }
+      WB.state.save(d);
     }
     report(failures, '题目同步');
   }
@@ -205,13 +300,18 @@
       if (!ch.cloudId) adds++; else ups++;
       ch.lessons.forEach(ls => { if (!ls.cloudId) adds++; else ups++; });
     }));
-    dels = (d._deletedChapters || []).length + (d._deletedLessons || []).length;
+    dels = uniqByCloudId(d._deletedChapters).length + uniqByCloudId(d._deletedLessons).length;
+    // 考试题独立：待清空的考试组也算「删除」，即便所属学科已被删也要显示出来，
+    // 否则用户删了学科后根本看不到这些排队中的清空意图。
+    const examClears = (d._examGroupsCleared || []).length;
+    dels += examClears;
     const dirty = adds + dels;
 
     const hint = document.createElement('span');
     hint.className = 'wb-muted';
     hint.textContent = dirty
       ? `未同步：新增 ${adds} · 更新 ${ups} · 删除 ${dels}`
+        + (examClears ? `（含 ${examClears} 组考试题待清空）` : '')
       : (d.password ? '没有未同步的变更' : '尚未设置管理密码（首次同步时提示输入）');
     bar.appendChild(hint);
 

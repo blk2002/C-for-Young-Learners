@@ -120,31 +120,41 @@
   function remove(ids, level) {
     if (!confirm('确认删除？已入库的节点将在下次「同步结构与内容」时从云端删除。')) return;
     const d = draft();
+    let orphanExam = null;   // 学科被删时它名下的考试题（独立实体，不跟随删除）
     if (level === 'lesson') {
       const ch = d.tree[ids.courseId].chapters.find(x => x.key === ids.chapterKey);
       const i = ch.lessons.findIndex(x => x.key === ids.lessonKey);
       const ls = ch.lessons[i];
-      if (ls.cloudId) (d._deletedLessons = d._deletedLessons || []).push({ cloudId: ls.cloudId });
+      // 删除队列带上 courseId：学科被删光后 tree 为空，sync.js 要靠它发「纯删除」payload
+      if (ls.cloudId) (d._deletedLessons = d._deletedLessons || []).push({ cloudId: ls.cloudId, courseId: ids.courseId });
       ch.lessons.splice(i, 1); reOrder(ch.lessons);
       if (selected && selected.lessonKey === ids.lessonKey) selected = null;
     } else if (level === 'chapter') {
       const course = d.tree[ids.courseId];
       const i = course.chapters.findIndex(x => x.key === ids.chapterKey);
       const ch = course.chapters[i];
-      if (ch.cloudId) (d._deletedChapters = d._deletedChapters || []).push({ cloudId: ch.cloudId });
-      ch.lessons.forEach(ls => { if (ls.cloudId) (d._deletedLessons = d._deletedLessons || []).push({ cloudId: ls.cloudId }); });
+      if (ch.cloudId) (d._deletedChapters = d._deletedChapters || []).push({ cloudId: ch.cloudId, courseId: ids.courseId });
+      ch.lessons.forEach(ls => { if (ls.cloudId) (d._deletedLessons = d._deletedLessons || []).push({ cloudId: ls.cloudId, courseId: ids.courseId }); });
       course.chapters.splice(i, 1); reOrder(course.chapters);
       if (selected && selected.chapterKey === ids.chapterKey) selected = null;
     } else {
       const course = d.tree[ids.courseId];
       course.chapters.forEach(ch => {
-        if (ch.cloudId) (d._deletedChapters = d._deletedChapters || []).push({ cloudId: ch.cloudId });
-        ch.lessons.forEach(ls => { if (ls.cloudId) (d._deletedLessons = d._deletedLessons || []).push({ cloudId: ls.cloudId }); });
+        if (ch.cloudId) (d._deletedChapters = d._deletedChapters || []).push({ cloudId: ch.cloudId, courseId: ids.courseId });
+        ch.lessons.forEach(ls => { if (ls.cloudId) (d._deletedLessons = d._deletedLessons || []).push({ cloudId: ls.cloudId, courseId: ids.courseId }); });
       });
+      // 考试题是独立实体：不挂在知识点/章节/学科下，删学科不连带删它，
+      // 这些题会变成草稿里的孤儿 → 提示用户它们还在、仍可单独同步。
+      const groups = (d.examQuestions || []).filter(g => g.courseId === ids.courseId);
+      const n = groups.reduce((s, g) => s + (g.questions || []).length, 0);
+      if (n) orphanExam = { groups: groups.length, n };
       delete d.tree[ids.courseId];
       selected = null; currentCourse = null;
     }
     persist(d);
+    if (orphanExam) {
+      alert(`学科已删除。\n它名下的 ${orphanExam.groups} 组考试题（共 ${orphanExam.n} 道）是独立的，未被删除，\n仍可通过「同步题目」单独同步。\n如需一并清空：先恢复/新建该学科，到题目页逐题删除，再同步题目。`);
+    }
   }
 
   function addChapter(courseId) {
@@ -261,11 +271,22 @@
       o.appendChild(s2);
       o.appendChild(document.createTextNode(d.tree[id].name || id));
       if (id === cid) { const t = document.createElement('span'); t.className = 'tick'; t.textContent = '当前'; o.appendChild(t); }
+      // 新增：每个选项右边一个删除按钮（即便只剩一个学科，列表里仍能删）
+      const delOpt = document.createElement('span'); delOpt.className = 'wb-course-opt-del'; delOpt.textContent = '✕';
+      delOpt.title = '删除该学科';
+      delOpt.onclick = e => { e.stopPropagation(); menu.classList.add('hidden'); remove({ courseId: id }, 'course'); };
+      o.appendChild(delOpt);
       o.onclick = () => { menu.classList.add('hidden'); setCurrentCourse(id); };
       menu.appendChild(o);
     });
     sel.onclick = () => menu.classList.toggle('hidden');
-    hd.appendChild(label); hd.appendChild(sel); hd.appendChild(menu);
+    // 新增：当前学科卡片右侧的删除按钮（不展开菜单就能删，符合"单学科时也能删"的诉求）
+    const delCur = document.createElement('button'); delCur.className = 'wb-side-del'; delCur.textContent = '✕';
+    delCur.title = '删除当前学科';
+    delCur.onclick = e => { e.stopPropagation(); if (cid) remove({ courseId: cid }, 'course'); };
+    const selRow = document.createElement('div'); selRow.className = 'wb-side-sel-row';
+    selRow.appendChild(sel); selRow.appendChild(delCur);
+    hd.appendChild(label); hd.appendChild(selRow); hd.appendChild(menu);
     const btnNew = document.createElement('button'); btnNew.className = 'wb-btn-dash'; btnNew.textContent = '＋ 新建学科';
     btnNew.onclick = () => openNewCourseModal();
     hd.appendChild(btnNew);
