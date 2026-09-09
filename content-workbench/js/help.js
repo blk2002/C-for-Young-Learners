@@ -108,7 +108,7 @@
     const host = document.getElementById('wb-tools');
     if (!host) return;
     host.innerHTML = '';
-    const btn = (text, fn) => { const b = document.createElement('button'); b.className = 'wb-btn'; b.textContent = text; b.onclick = fn; return b; };
+    const btn = (text, fn) => { const b = document.createElement('button'); b.className = 'wb-btn sm'; b.textContent = text; b.onclick = fn; return b; };
     host.appendChild(btn('帮助', showHelp));
     host.appendChild(btn('导出备份', exportBackup));
     const fileInput = document.createElement('input');
@@ -123,9 +123,13 @@
     if (old) old.remove();
     const modal = document.createElement('div'); modal.id = 'wb-help-modal'; modal.className = 'wb-modal-mask';
     const box = document.createElement('div'); box.className = 'wb-modal';
-    const close = document.createElement('button'); close.className = 'wb-btn'; close.textContent = '关闭';
+    const hd = document.createElement('div'); hd.className = 'wb-modal-hd';
+    const hTitle = document.createElement('h3'); hTitle.textContent = '帮助'; hd.appendChild(hTitle);
+    const close = document.createElement('span'); close.className = 'x'; close.textContent = '关闭';
     close.onclick = () => modal.remove();
-    box.appendChild(close);
+    hd.appendChild(close);
+    box.appendChild(hd);
+    const bodyWrap = document.createElement('div'); bodyWrap.className = 'wb-modal-bd';
     [
       ['素材模板', TEMPLATE, '复制素材模板'],
       ['给网页 AI 的指令', AI_INSTRUCTION, '复制指令'],
@@ -133,13 +137,14 @@
       ['常见问题', TROUBLESHOOT, '复制排查表']
     ].forEach(([title, content, copyLabel]) => {
       const h = document.createElement('h3'); h.className = 'wb-panel-title'; h.textContent = title;
-      box.appendChild(h);
+      bodyWrap.appendChild(h);
       const pre = document.createElement('pre'); pre.className = 'wb-help-pre'; pre.textContent = content;
-      box.appendChild(pre);
-      const cb = document.createElement('button'); cb.className = 'wb-btn'; cb.textContent = copyLabel;
+      bodyWrap.appendChild(pre);
+      const cb = document.createElement('button'); cb.className = 'wb-btn sm'; cb.textContent = copyLabel;
       cb.onclick = () => copy(content, copyLabel);
-      box.appendChild(cb);
+      bodyWrap.appendChild(cb);
     });
+    box.appendChild(bodyWrap);
     modal.appendChild(box);
     modal.onclick = e => { if (e.target === modal) modal.remove(); };
     document.body.appendChild(modal);

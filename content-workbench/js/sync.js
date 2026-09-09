@@ -26,7 +26,10 @@
     if (!res.success) { alert('拉取失败：' + res.message); return; }
     mergePull(d, res);
     WB.state.save(d);
-    WB.treeUI.render(); WB.contentUI.render(); WB.quizUI.render(); WBRefreshStat(); render();
+    WB.treeUI.render();
+    if (window.WBRefreshPanel) WBRefreshPanel();
+    if (window.WBRefreshStat) WBRefreshStat();
+    render();
     alert('已从云端拉取并合并');
   }
 
@@ -197,16 +200,30 @@
     if (!bar) return;
     bar.innerHTML = '';
     const d = draft();
+    let adds = 0, ups = 0, dels = 0;
+    Object.values(d.tree).forEach(c => c.chapters.forEach(ch => {
+      if (!ch.cloudId) adds++; else ups++;
+      ch.lessons.forEach(ls => { if (!ls.cloudId) adds++; else ups++; });
+    }));
+    dels = (d._deletedChapters || []).length + (d._deletedLessons || []).length;
+    const dirty = adds + dels;
+
+    const hint = document.createElement('span');
+    hint.className = 'wb-muted';
+    hint.textContent = dirty
+      ? `未同步：新增 ${adds} · 更新 ${ups} · 删除 ${dels}`
+      : (d.password ? '没有未同步的变更' : '尚未设置管理密码（首次同步时提示输入）');
+    bar.appendChild(hint);
+
+    const r = document.createElement('div'); r.className = 'r';
     const btnPull = document.createElement('button'); btnPull.className = 'wb-btn'; btnPull.textContent = '从云端拉取';
     btnPull.onclick = () => pull();
-    const btnS1 = document.createElement('button'); btnS1.className = 'wb-btn primary'; btnS1.textContent = '同步结构与内容';
+    const btnS1 = document.createElement('button'); btnS1.className = 'wb-btn' + (dirty ? ' primary' : ''); btnS1.textContent = '同步结构与内容';
     btnS1.onclick = () => syncStructure();
-    const btnS2 = document.createElement('button'); btnS2.className = 'wb-btn primary'; btnS2.textContent = '同步题目';
+    const btnS2 = document.createElement('button'); btnS2.className = 'wb-btn'; btnS2.textContent = '同步题目';
     btnS2.onclick = () => syncQuestions();
-    bar.appendChild(btnPull); bar.appendChild(btnS1); bar.appendChild(btnS2);
-    const hint = document.createElement('span'); hint.className = 'wb-muted';
-    hint.textContent = d.password ? '' : '尚未设置管理密码（首次同步时提示输入）';
-    bar.appendChild(hint);
+    r.appendChild(btnPull); r.appendChild(btnS1); r.appendChild(btnS2);
+    bar.appendChild(r);
   }
 
   return { render, pull, existing, syncStructure, syncQuestions };

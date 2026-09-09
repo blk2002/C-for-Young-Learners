@@ -108,7 +108,10 @@
 
   const uid = p => p + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   function mergeIntoDraft(draft, parsed, defaultCourseId) {
-    const courseId = defaultCourseId || 'python';
+    // 学科归属必须由调用方明确给出（没有 python 兜底了，避免内容静默写进别的课）
+    const courseId = defaultCourseId
+      || (typeof WB !== 'undefined' && WB.treeUI && WB.treeUI.getCurrentCourse && WB.treeUI.getCurrentCourse());
+    if (!courseId) throw new Error('mergeIntoDraft 缺少学科归属（courseId）');
     if (!draft.tree[courseId]) draft.tree[courseId] = { name: parsed.course || courseId, chapters: [] };
     const course = draft.tree[courseId];
     if (parsed.course && !course.name) course.name = parsed.course;

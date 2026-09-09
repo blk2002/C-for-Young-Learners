@@ -41,13 +41,19 @@
       ['concept', 'feature', 'confusion'].forEach(k => { if (obj[k] && !target.content[k]) target.content[k] = String(obj[k]); });
       if (obj.code && !target.codeExample) target.codeExample = String(obj.code);
     } else {
+      // 学科归属必须显式确定：优先调用方指定，其次当前选中，最后侧栏当前学科；都没有就拦住，不再静默落到 python
       const sel = WB.treeUI.getSelected();
-      const courseId = (sel && sel.courseId) || 'python';
+      const courseId = o.courseId || (sel && sel.courseId) || (WB.treeUI.getCurrentCourse && WB.treeUI.getCurrentCourse());
+      if (!courseId) { alert('无法确定写入哪门课：请先在左侧新建或选择一个学科'); return { ok: false }; }
       const parsed = { course: obj.course || '', chapters: obj.chapters || [], examGroups: collectExams(obj), pending: obj.pending || [] };
       WB.parser.mergeIntoDraft(d, parsed, courseId);
+      WB.state.save(d);
+      WB.treeUI.setCurrentCourse(courseId);
     }
     WB.state.save(d);
-    WB.treeUI.render(); WB.contentUI.render(); WBRefreshStat();
+    WB.treeUI.render();
+    if (window.WBRefreshPanel) WBRefreshPanel();
+    if (window.WBRefreshStat) WBRefreshStat();
     const pending = obj.pending || [];
     if (pending.length) alert('有 ' + pending.length + ' 行内容未能识别，已跳过（可手动处理）');
     return { ok: true, pending };

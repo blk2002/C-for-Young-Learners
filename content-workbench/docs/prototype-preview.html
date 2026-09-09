@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="VfE5DsNV0GnGHRT9H5JSUz">
+<head data-page-node-id="HmpA0iC0XRiBmr1bl7mOU0">
+<meta charset="UTF-8" data-page-node-id="9Gb14SrlHESrRcuxgnQvYg">
+<meta name="viewport" content="width=device-width, initial-scale=1" data-page-node-id="tCPTpi4wPbbCN8H7YEYCSw">
+<title>课程内容工作台 · 改版原型预览</title>
+<style>
+:root{
+  --brand:#5B67F1; --brand-ink:#3C3489; --brand-soft:#EEEDFE; --brand-line:#CECBF6;
+  --bg:#F6F7FB; --surface:#FFFFFF; --surface-2:#F2F3F8;
+  --line:#E8E9F2; --line-2:#D9DBE9;
+  --t1:#1A1A2E; --t2:#5A5A72; --t3:#9A9AB0;
+  --ok:#1D9E75; --ok-bg:#E1F5EE; --ok-line:#9FE1CB;
+  --warn:#BA7517; --warn-bg:#FAEEDA; --warn-line:#FAC775;
+  --err:#E24B4A; --err-bg:#FCEBEB; --err-line:#F7C1C1;
+  --r-lg:12px; --r-md:8px; --r-sm:6px;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{margin:0;background:var(--bg);color:var(--t1);
+  font:14px/1.6 "PingFang SC","Microsoft YaHei",system-ui,sans-serif;}
+button,input,select,textarea{font-family:inherit;font-size:13px;color:var(--t1);}
+.hidden{display:none !important;}
+.app{display:flex;flex-direction:column;height:100vh;}
+
+/* ---------- header ---------- */
+.hd{height:52px;flex:none;display:flex;align-items:center;gap:12px;padding:0 16px;
+  background:var(--surface);border-bottom:1px solid var(--line);}
+.hd-logo{width:22px;height:22px;border-radius:7px;background:var(--brand);flex:none;}
+.hd-title{font-size:15px;font-weight:500;letter-spacing:.2px;}
+.hd-env{font-size:12px;color:var(--t3);border:1px solid var(--line);border-radius:999px;padding:1px 9px;}
+.hd-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ok);flex:none;}
+.dot.warn{background:var(--warn);} .dot.err{background:var(--err);}
+.chip-status{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--t2);}
+.btn{border:1px solid var(--line-2);background:var(--surface);border-radius:var(--r-md);
+  padding:5px 12px;font-size:13px;cursor:pointer;color:var(--t1);}
+.btn:hover{border-color:var(--brand);color:var(--brand);}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff;}
+.btn.primary:hover{background:#4A56E8;color:#fff;}
+.btn.sm{padding:3px 9px;font-size:12px;}
+.btn.danger:hover{border-color:var(--err);color:var(--err);}
+.btn[disabled]{opacity:.45;cursor:default;}
+
+/* ---------- body ---------- */
+.bd{flex:1;display:grid;grid-template-columns:236px minmax(0,1fr);min-height:0;}
+
+/* ---------- sidebar ---------- */
+.side{background:var(--surface-2);border-right:1px solid var(--line);
+  display:flex;flex-direction:column;min-height:0;}
+.side-hd{padding:12px 12px 10px;border-bottom:1px solid var(--line);}
+.side-label{font-size:11px;color:var(--t3);margin-bottom:6px;letter-spacing:.5px;}
+.course-sel{width:100%;display:flex;align-items:center;gap:8px;padding:7px 10px;
+  border:1px solid var(--line-2);border-radius:var(--r-md);background:var(--surface);cursor:pointer;}
+.course-sel:hover{border-color:var(--brand);}
+.swatch{width:9px;height:9px;border-radius:3px;flex:none;}
+.course-name{flex:1;font-size:13px;font-weight:500;}
+.caret{color:var(--t3);font-size:11px;}
+.course-menu{position:absolute;z-index:40;margin-top:4px;width:224px;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--r-md);box-shadow:0 6px 20px rgba(26,26,46,.10);padding:4px;}
+.course-opt{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--r-sm);cursor:pointer;font-size:13px;}
+.course-opt:hover{background:var(--brand-soft);}
+.course-opt .tick{margin-left:auto;font-size:12px;color:var(--brand);}
+.btn-dash{margin-top:7px;width:100%;border:1px dashed var(--line-2);background:transparent;
+  border-radius:var(--r-md);padding:5px;font-size:12px;color:var(--brand-ink);cursor:pointer;}
+.btn-dash:hover{border-color:var(--brand);background:var(--brand-soft);}
+.side-search{margin:10px 12px 4px;display:flex;align-items:center;gap:6px;padding:6px 10px;
+  border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface);}
+.side-search input{border:none;outline:none;background:transparent;width:100%;font-size:12px;color:var(--t1);}
+
+.tree{flex:1;overflow:auto;padding:6px 8px 12px;}
+.node{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:var(--r-sm);
+  cursor:pointer;font-size:13px;color:var(--t1);}
+.node:hover{background:#EAEBF4;}
+.node.ch{color:var(--t2);font-weight:500;}
+.node.cur{background:var(--brand-soft);color:var(--brand-ink);font-weight:500;}
+.node .cnt{margin-left:auto;font-size:11px;color:var(--t3);}
+.node .mark{font-size:12px;width:12px;text-align:center;}
+.node .acts{margin-left:6px;display:none;gap:2px;}
+.node:hover .acts{display:flex;}
+.node .acts span{font-size:11px;color:var(--t3);padding:0 2px;}
+.node .acts span:hover{color:var(--brand);}
+.kids{margin-left:11px;border-left:1px solid var(--line-2);padding-left:6px;}
+.empty{padding:14px 10px;font-size:12px;color:var(--t3);line-height:1.7;}
+.side-ft{flex:none;padding:10px 12px;border-top:1px solid var(--line);background:var(--surface-2);}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.stat{background:var(--surface);border-radius:var(--r-md);padding:6px 8px;text-align:center;}
+.stat i{display:block;font-style:normal;font-size:11px;color:var(--t3);}
+.stat b{display:block;font-size:15px;font-weight:500;margin-top:1px;}
+.btn-ghost{width:100%;margin-top:8px;border:1px solid var(--line-2);background:var(--surface);
+  border-radius:var(--r-md);padding:5px;font-size:12px;color:var(--t2);cursor:pointer;}
+.btn-ghost:hover{border-color:var(--brand);color:var(--brand);}
+
+/* ---------- main ---------- */
+.main{min-height:0;display:flex;flex-direction:column;background:var(--bg);}
+.tabs{flex:none;display:flex;align-items:center;gap:22px;padding:0 18px;
+  background:var(--surface);border-bottom:1px solid var(--line);}
+.tab{padding:9px 1px 8px;font-size:14px;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;}
+.tab.cur{color:var(--brand-ink);border-bottom-color:var(--brand);}
+.tabs .r{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t3);}
+.pane{flex:1;min-height:0;padding:13px 18px 15px;}
+
+/* 结构页：两列等高撑满 */
+#pane-struct{display:grid;grid-template-columns:388px minmax(0,1fr);gap:13px;align-items:stretch;}
+.struct-l{display:flex;flex-direction:column;min-height:0;gap:12px;}
+.struct-r{display:flex;flex-direction:column;min-height:0;}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+  display:flex;flex-direction:column;min-height:0;}
+.card-hd{display:flex;align-items:center;gap:8px;padding:9px 13px;border-bottom:1px solid var(--line);
+  background:var(--surface-2);border-radius:var(--r-lg) var(--r-lg) 0 0;flex:none;}
+.card-hd h3{margin:0;font-size:14px;font-weight:500;}
+.card-hd .sub{font-size:12px;color:var(--t3);}
+.card-hd .right{margin-left:auto;display:flex;align-items:center;gap:6px;}
+.card-bd{padding:11px 13px;min-height:0;}
+.card.grow{flex:1;}
+.card.grow .card-bd{flex:1;display:flex;flex-direction:column;}
+.drop{border:1px dashed var(--line-2);border-radius:var(--r-md);padding:11px;text-align:center;
+  color:var(--t3);font-size:12px;cursor:pointer;flex:none;}
+.drop:hover{border-color:var(--brand);background:var(--brand-soft);color:var(--brand-ink);}
+.ta{width:100%;flex:1;min-height:100px;margin-top:9px;padding:9px 11px;border:1px solid var(--line-2);
+  border-radius:var(--r-md);resize:none;font:12px/1.7 Consolas,monospace;outline:none;color:var(--t1);background:var(--surface);}
+.ta:focus{border-color:var(--brand);}
+.meta{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:12px;color:var(--t3);flex:none;}
+.meta .r{margin-left:auto;display:flex;gap:8px;}
+.seg{display:flex;gap:6px;}
+.seg span{padding:4px 11px;border-radius:999px;font-size:12px;cursor:pointer;
+  border:1px solid var(--line-2);color:var(--t2);}
+.seg span.on{background:var(--brand-soft);border-color:var(--brand-line);color:var(--brand-ink);}
+.note{font-size:11px;color:var(--t3);margin-top:8px;line-height:1.6;flex:none;}
+.tgt{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--t2);background:var(--surface-2);
+  border:1px solid var(--line);border-radius:var(--r-sm);padding:5px 9px;margin-bottom:9px;flex:none;}
+.tgt .r{margin-left:auto;color:var(--t3);font-size:11px;}
+
+/* 编辑区：2x2 网格填满 */
+.crumb{display:flex;align-items:center;gap:7px;padding:7px 13px;border-bottom:1px solid var(--line);
+  font-size:12px;color:var(--t3);flex:none;background:var(--surface);}
+.crumb .here{color:var(--t1);font-weight:500;font-size:13px;}
+.crumb .nav{margin-left:auto;display:flex;gap:6px;}
+.seg-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:12px;min-height:0;}
+.seg-cell{display:flex;flex-direction:column;min-height:0;}
+.fld-lb{display:flex;align-items:center;font-size:12px;color:var(--t2);margin-bottom:4px;flex:none;}
+.fld-lb .n{margin-left:auto;font-size:11px;color:var(--t3);}
+.fld-lb .n.over{color:var(--warn);}
+.ta2{flex:1;width:100%;min-height:58px;padding:8px 10px;border:1px solid var(--line-2);
+  border-radius:var(--r-md);resize:none;font-size:13px;line-height:1.65;outline:none;background:var(--surface);}
+.ta2:focus{border-color:var(--brand);}
+.ta2.code{font-family:Consolas,monospace;font-size:12px;}
+.mini{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:11px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--t2);flex:none;}
+.mini .r{margin-left:auto;}
+.badge{font-size:11px;border-radius:999px;padding:1px 8px;}
+.badge.warn{background:var(--warn-bg);color:var(--warn);}
+.badge.ok{background:var(--ok-bg);color:var(--ok);}
+.badge.brand{background:var(--brand-soft);color:var(--brand-ink);}
+.badge.err{background:var(--err-bg);color:var(--err);}
+
+/* ---------- quiz ---------- */
+#pane-quiz{display:grid;grid-template-columns:minmax(0,1fr) 296px;gap:13px;align-items:stretch;}
+.quiz-l{min-height:0;overflow:auto;padding-right:2px;}
+.quiz-r{min-height:0;overflow:auto;display:flex;flex-direction:column;gap:12px;}
+.bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:11px;}
+.filters{display:flex;gap:6px;}
+.f-item{padding:4px 11px;border-radius:999px;font-size:12px;cursor:pointer;
+  border:1px solid var(--line-2);color:var(--t2);background:var(--surface);}
+.f-item.on{background:var(--brand-soft);border-color:var(--brand-line);color:var(--brand-ink);}
+.qcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+  padding:10px 13px;margin-bottom:9px;}
+.qcard.err{border-color:var(--err-line);background:var(--err-bg);}
+.qcard.dup{border-color:var(--warn-line);background:#FFFBF3;}
+.qcard.skip{opacity:.5;}
+.qcard.flash{box-shadow:0 0 0 3px rgba(91,103,241,.28);}
+.qcard-hd{display:flex;align-items:center;gap:7px;margin-bottom:8px;flex-wrap:wrap;}
+.qcard-hd .right{margin-left:auto;display:flex;gap:6px;}
+.sel{border:1px solid var(--line-2);border-radius:var(--r-sm);padding:3px 7px;font-size:12px;background:var(--surface);}
+.qtext{font-size:13px;color:var(--t1);margin-bottom:8px;line-height:1.6;}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;}
+.opt{border:1px solid var(--line);border-radius:var(--r-sm);padding:5px 9px;font-size:12px;color:var(--t2);}
+.opt.right{border-color:var(--ok-line);background:var(--ok-bg);color:#0F6E56;}
+.qrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.qrow .inp{flex:1;min-width:120px;}
+.qrow .ans{max-width:128px;flex:none;}
+.inp{width:100%;padding:6px 10px;border:1px solid var(--line-2);border-radius:var(--r-md);outline:none;background:var(--surface);}
+.inp:focus{border-color:var(--brand);}
+.qerr{font-size:12px;color:var(--err);margin-bottom:7px;}
+.qfoot{display:flex;align-items:center;gap:9px;margin-top:9px;padding-top:9px;
+  border-top:1px solid var(--line);font-size:12px;color:var(--t3);flex-wrap:wrap;}
+.qfoot .lb{color:var(--t2);}
+
+/* 质量检查面板 */
+.qstat{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.qstat div{background:var(--surface-2);border-radius:var(--r-sm);padding:7px 9px;}
+.qstat i{display:block;font-style:normal;font-size:11px;color:var(--t3);}
+.qstat b{display:block;font-size:16px;font-weight:500;margin-top:1px;}
+.dist{margin-top:12px;}
+.dist-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t2);margin-bottom:6px;}
+.dist-bar{flex:1;height:5px;border-radius:3px;background:var(--line);overflow:hidden;}
+.dist-bar i{display:block;height:100%;background:var(--brand);}
+.iss{display:flex;gap:8px;padding:6px 8px;border-radius:var(--r-sm);cursor:pointer;font-size:12px;
+  color:var(--t2);align-items:flex-start;}
+.iss:hover{background:var(--surface-2);}
+.iss .k{flex:none;font-size:11px;border-radius:999px;padding:0 6px;margin-top:2px;}
+.iss .k.e{background:var(--err-bg);color:var(--err);}
+.iss .k.d{background:var(--warn-bg);color:var(--warn);}
+.iss span.t{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+/* ---------- sync bar ---------- */
+.sync{flex:none;height:52px;display:flex;align-items:center;gap:10px;padding:0 18px;
+  background:var(--surface);border-top:1px solid var(--line);}
+.sync .info{font-size:12px;color:var(--t2);}
+.sync .info b{color:var(--t1);font-weight:500;}
+.sync .right{margin-left:auto;display:flex;gap:8px;align-items:center;}
+
+/* ---------- modal ---------- */
+.mask{position:fixed;inset:0;background:rgba(20,20,40,.42);display:flex;
+  align-items:center;justify-content:center;z-index:100;}
+.modal{background:var(--surface);border-radius:14px;width:640px;max-width:92vw;max-height:82vh;
+  overflow:auto;box-shadow:0 12px 40px rgba(20,20,40,.18);}
+.modal-hd{display:flex;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line);
+  background:var(--surface-2);}
+.modal-hd h3{margin:0;font-size:15px;font-weight:500;}
+.modal-hd .x{margin-left:auto;cursor:pointer;color:var(--t3);font-size:13px;}
+.modal-bd{padding:16px 18px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.fld-lb2{display:block;font-size:12px;color:var(--t2);margin-bottom:4px;}
+.snip{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:10px 12px;font:12px/1.8 Consolas,monospace;color:var(--t1);white-space:pre;}
+.help-sec{margin-bottom:16px;}
+.help-sec h4{margin:0 0 6px;font-size:13px;font-weight:500;}
+.help-pre{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:10px 12px;font:12px/1.8 Consolas,monospace;white-space:pre-wrap;max-height:170px;overflow:auto;}
+.toast{position:fixed;left:50%;bottom:70px;transform:translateX(-50%);background:var(--t1);
+  color:#fff;padding:8px 16px;border-radius:999px;font-size:13px;z-index:200;opacity:.96;}
+
+/* ---------- 标记 / 引导 / 改动说明 ---------- */
+.tag-new{font-size:10px;color:#2C6BE0;border:1px solid #B8D0F8;background:#EEF4FF;
+  border-radius:999px;padding:0 5px;margin-left:5px;vertical-align:1px;}
+.guide{background:var(--surface);border:1px dashed var(--line-2);border-radius:var(--r-lg);
+  padding:13px 14px;margin:2px 6px 10px;}
+.guide b{font-size:13px;font-weight:500;display:block;margin-bottom:6px;}
+.guide ol{margin:0;padding-left:17px;font-size:12px;color:var(--t2);line-height:1.9;}
+.guide .acts2{margin-top:10px;display:flex;gap:8px;}
+.guide .acts2 .btn{padding:3px 10px;font-size:12px;}
+.chg-sec{margin-bottom:15px;}
+.chg-sec h4{margin:0 0 6px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:7px;}
+.chg-list{margin:0;padding-left:18px;font-size:12px;color:var(--t2);line-height:1.85;}
+.chg-list li{margin-bottom:2px;}
+.chg-list code{background:var(--surface-2);border-radius:3px;padding:0 4px;font-size:11px;}
+.chg-warn{background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:var(--r-md);
+  padding:10px 12px;font-size:12px;color:#7A4E00;line-height:1.85;}
+.chg-warn b{display:block;margin-bottom:4px;color:#8A5A00;}
+</style>
+</head>
+<body data-page-node-id="BxW0a7Ohxog5j5IXkA7IeG">
+<div class="app" data-page-node-id="0pvwaxFVRCIf9DXBQfOE7V">
+
+  <header class="hd" data-page-node-id="tbWTXA1AUwYYBDkHvdcn43">
+    <div class="hd-logo" data-page-node-id="Cxw9SU41q7HFcIxoUDqMkG"></div>
+    <span class="hd-title" data-page-node-id="c6HzQfmnRsrCJajCBY60yj">课程内容工作台</span>
+    <span class="hd-env" data-page-node-id="WYCB2VQs1TQ1bbcl5KCuYh">cloud1-d5g4wtnsn6cc1b835</span>
+    <div class="hd-right" data-page-node-id="f383AWBh4E5p79CbQzQaBq">
+      <span class="chip-status" data-page-node-id="msXmRwWQAn3MH2gVztLja0"><i class="dot" data-page-node-id="U59XbBa10fVL0sNL1YsqmQ"></i>云端已连接</span>
+      <span class="chip-status" data-page-node-id="EN7ipHixJGePZ8VBGFLqQL"><i class="dot" data-page-node-id="rIKJzeP09AzUrrYJpXR5RB"></i>本地模型 qwen3:4b</span>
+      <button class="btn sm" id="btn-changelog" data-page-node-id="cATXRQl7QP8VB4ZMqyrDCW">改动说明</button>
+      <button class="btn sm" id="btn-help" data-page-node-id="8KGbwx2BFt4NOmO2kWEpJc">帮助</button>
+      <button class="btn sm" id="btn-export" data-page-node-id="r30Je2s6Ju4Tjq4TVVLlrS">导出备份</button>
+      <button class="btn sm" id="btn-import" data-page-node-id="czlRGasMKRyYUQ7f9DXKwW">导入备份</button>
+      <button class="btn primary" id="btn-sync-top" data-page-node-id="fn4b6wJntTuNJvQWfyEcHh">同步变更</button>
+    </div>
+  </header>
+
+  <div class="bd" data-page-node-id="NPpjnXF36SRTgl0UanSvlb">
+    <aside class="side" data-page-node-id="g7AB6abEbBtzuOJHQYj75b">
+      <div class="side-hd" data-page-node-id="3SWu656DcxtAHqzx1P2o11">
+        <div class="side-label" data-page-node-id="la0IjmyC26N1vnn3d9Rhwu">当前学科</div>
+        <div class="course-sel" id="course-sel" data-page-node-id="7huylHWGrbp51CoRxo8jSf">
+          <span class="swatch" id="course-sw" data-page-node-id="12vBHh5USdPDZY6ix8uHWL"></span>
+          <span class="course-name" id="course-nm" data-page-node-id="wV2SUK2sFTfgGIlIapDr8W">Python</span>
+          <span class="caret" data-page-node-id="DBtxZEasMDFCuJp5bd3OwD">切换</span>
+        </div>
+        <div id="course-menu" class="course-menu hidden" data-page-node-id="ONNPAKVsmNe58Ex1L3iNUH"></div>
+        <button class="btn-dash" id="btn-new-course" data-page-node-id="NA6mEnFNEF0MVBQqECsrit">＋ 新建学科</button>
+      </div>
+      <div class="side-search" data-page-node-id="rHHstBdrfAvqLDNurYdvGq">
+        <span style="color:var(--t3);font-size:12px;" data-page-node-id="p9gSmueochgwc4Ii1xhu6Y">搜索</span>
+        <input id="tree-search" placeholder="章节 / 知识点" data-page-node-id="Vg6gNDuFXflCOL0TFMc66p">
+      </div>
+      <div class="tree" id="tree" data-page-node-id="TETZ78vlN06gIZMuEI4Ofv"></div>
+      <div class="side-ft" data-page-node-id="QAC9gNjVEpPrwy5JIGnB3B">
+        <div class="stats" data-page-node-id="TsOiArDpz4KQDr5cyzsBCo">
+          <div class="stat" data-page-node-id="UzLVDUANRRP1dM9SaqnZe0"><i data-page-node-id="hD8BUmUfjSMLjvlQwveBH0">章节</i><b id="st-ch" data-page-node-id="XKhFuUK5pfF3Hq74TTsuRA">0</b></div>
+          <div class="stat" data-page-node-id="3A4jB7ELaQgW4FMMbnxT3g"><i data-page-node-id="TIhT5r9EJYVp8NlCTot0nS">知识点</i><b id="st-ls" data-page-node-id="Z0yDyAvbh1NaAil6UeaLGf">0</b></div>
+          <div class="stat" data-page-node-id="nxpnF8F0Ab0HxP76i8nzvn"><i data-page-node-id="2mOTrbYlG5KDsmIjdoJhc0">题目</i><b id="st-q" data-page-node-id="7EzB15bEgrpkx7G6G8HHNU">0</b></div>
+        </div>
+        <button class="btn-ghost" id="btn-pull" data-page-node-id="Bin35Z4Leqn9ipCCPAyFd1">从云端拉取</button>
+      </div>
+    </aside>
+
+    <main class="main" data-page-node-id="NvmG3ZfNPDGLjF0r3XPVvp">
+      <div class="tabs" data-page-node-id="Ki7n4y1aLMrHe3WwqVr9PK">
+        <span class="tab cur" data-tab="struct" data-page-node-id="8nJtMhm2HyndXZJUQcxO4e">结构与内容</span>
+        <span class="tab" data-tab="quiz" data-page-node-id="xjtxjVzs1LgRaOeOMWLLOr">题目</span>
+        <span class="r" data-page-node-id="nfi2eQeaW23pCEl5b4wOu7">
+          <span id="tab-course" data-page-node-id="oMKbk2foTSDV0iLnuDDC2A"></span>
+          <span class="badge warn" id="tab-dirty" data-page-node-id="bmFmQl8ZNguJVMjEkARGyz">12 处未同步</span>
+        </span>
+      </div>
+
+      <section id="pane-struct" class="pane" data-page-node-id="Zq7EJDhQXQoYNJFC3qwYfE">
+        <div class="struct-l" data-page-node-id="xOI2XqtZsz5jftM4TZM9BA">
+          <div class="card grow" data-page-node-id="pGFCwuO8la8j49WD2DrvIk">
+            <div class="card-hd" data-page-node-id="U0g8evFb91dGvy2IgeHdhb">
+              <h3 data-page-node-id="kSP1Kc0rhNtKu8VLYZYrCN">素材输入</h3>
+              <span class="sub" data-page-node-id="QSGrHtTvbUsFWA99XyypBc">粘贴或拖入 Word / TXT</span>
+              <div class="right" data-page-node-id="ODc6d2kGHWfZnanZ70KAsS"><button class="btn sm" id="btn-clear" data-page-node-id="8q88wAEtZBGNFhZadBIERU">清空</button></div>
+            </div>
+            <div class="card-bd" data-page-node-id="KkFqAYb8FFKtdT9u6ODxtk">
+              <div class="drop" id="drop" data-page-node-id="tQZNuhMTW6KWZibjo2XXOP">把 .docx / .txt 拖到这里，或点击选择文件</div>
+              <textarea class="ta" id="material" placeholder="# 学科：Python&#10;## 第1章 认识 Python&#10;### 知识点：1.1 什么是编程&#10;【概念】…"></textarea>
+              <div class="meta" data-page-node-id="k97YvDrvqH9bBKZKYvwopI">
+                <span id="mat-stat" data-page-node-id="thZLBanR1q1QCy596DvZQk">字数 0 · 章节 0 · 知识点 0 · 题目 0</span>
+                <span class="r" data-page-node-id="AEsoHlSKn1mPHtJdJzRZUm">
+                  <button class="btn sm" id="btn-tpl" data-page-node-id="ES8QnDsKZaW8dAXKOdZh6a">插入模板</button>
+                  <button class="btn sm" id="btn-parse" data-page-node-id="6mXSbeFmHLzt9xdWEDZRwA">解析入树<span class="tag-new" data-page-node-id="QTA2D2NskFcucNso64NgWH">新</span></button>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-page-node-id="ATwAU563fWQWSia4BlXOU4">
+            <div class="card-hd" data-page-node-id="WTj93jOW6UPQWe0DSSWDPB"><h3 data-page-node-id="tjuS3225hdDezepWSOTLH2">AI 整理</h3><span class="sub" data-page-node-id="La3rTukGv7Wn3BoABrZtVl">本机 qwen3:4b</span></div>
+            <div class="card-bd" data-page-node-id="UKlGKwD4CBYGVchAaRaC3q">
+              <div class="tgt" id="ai-target" data-page-node-id="axMp6WQXJ4dyDOAyXS4G0v"></div>
+              <div class="seg" id="ai-seg" data-page-node-id="1Ox3Ve5COUdBYry1QoQO1w">
+                <span class="on" data-mode="tree" data-page-node-id="qJzhW9HkO2V8Ms0zZvj7rC">整树模式</span>
+                <span data-mode="fill" data-page-node-id="ztNufXAHBRwgk8WB2DB8Gm">填空模式</span>
+              </div>
+              <div style="height:9px;" data-page-node-id="6trbQrzmjNfOXtyTY5PtBg"></div>
+              <button class="btn primary" id="btn-ai" style="width:100%;" data-page-node-id="VC1DBFKPyiczW8Lv46Cphx">开始 AI 整理</button>
+              <div class="note" data-page-node-id="mx52DNFMcUmdfopUuHHRwA">整树模式：整份素材重生成整棵树（写入当前学科）。填空模式：只补当前知识点。</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="struct-r" data-page-node-id="UC1QWUGSN8PEOlFAEmHRaQ">
+          <div class="card grow" data-page-node-id="LZT75jgz52BK3xFQPBMARB">
+            <div class="card-hd" data-page-node-id="th0qVI2KU3RCqzdBIgEd5A">
+              <h3 id="ed-title" data-page-node-id="WaFkKGVYzyDuMaKHpsPNW1">未选择知识点</h3>
+              <span class="badge warn hidden" id="ed-cloud" data-page-node-id="9Ks4Y0oyQaxDLZ5UihBq9S">未入库</span>
+              <div class="right" data-page-node-id="fVj5juQAWhWO3O3wEG687O"><span class="sub" id="ed-course" data-page-node-id="RQzpBVbVUKa9cs75n19DW3"></span></div>
+            </div>
+            <div class="crumb" id="ed-crumb" data-page-node-id="DhoQQL4P55IVT3sOFWLbmT"></div>
+            <div class="card-bd" id="ed-body" data-page-node-id="Uy4cTRaWLOBHFMGHKUfrej"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="pane-quiz" class="pane hidden" data-page-node-id="WPTXcBFvEarytuclzr4AFa">
+        <div class="quiz-l" data-page-node-id="Wauyav4Ha8gW8AgYWQV6vj">
+          <div class="bar" data-page-node-id="03955VWxx6xbwILRk8gNey">
+            <button class="btn" id="btn-manual" data-page-node-id="A9ZvfOttUBjHiwmjxo5TCD">＋ 手动加题</button>
+            <span style="display:inline-flex;align-items:center;gap:6px;" data-page-node-id="jRejxnCPTbtbg5wzSAeEYY">
+              <select class="sel" id="gen-n" data-page-node-id="foL9GaUnvqYTrcJWjgdgKF"><option data-page-node-id="ndx6TLTUJ2H8qysUpsmdUi">2 道</option><option data-page-node-id="cZjt4wlLZeu8BDMP3FFHSE">3 道</option><option data-page-node-id="vbUO8NeJoKo5tWbqTakT1o">5 道</option></select>
+              <button class="btn" id="btn-gen" data-page-node-id="HFdJxVlYA2KF7FvJDAHuZN">基于本知识点现编</button>
+            </span>
+            <button class="btn" id="btn-paste" data-page-node-id="m6rnIYjjhLM8LMwj5jAzDs">粘贴题目素材</button>
+            <span style="margin-left:auto;display:inline-flex;gap:6px;" data-page-node-id="DKl8h7AAs7NBFZOdzDIvKF">
+              <button class="btn" id="btn-validate" data-page-node-id="PA3DqWKyugjyTlbGL16IGs">校验全部</button>
+              <button class="btn" id="btn-dedup" data-page-node-id="yn8290QUDYVRfR1SaJ74So">检查重复</button>
+            </span>
+          </div>
+          <div class="bar" data-page-node-id="rqafmAaY6HmQLsB6ZFy3u6">
+            <div class="filters" id="filters" data-page-node-id="iOCCfzTgSsdycwaKbDKxbm">
+              <span class="f-item on" data-f="all" data-page-node-id="OPeSBSQJLN4P1MY7lapJU0">全部</span>
+              <span class="f-item" data-f="learn" data-page-node-id="1zVUDuaAVSztpUEMG0XZ82">学习题</span>
+              <span class="f-item" data-f="chapter" data-page-node-id="0j3GLBq1daFrvoBBEAOOrI">章节题</span>
+              <span class="f-item" data-f="exam" data-page-node-id="DDaIxvLAjtiv15ea6IpS7w">考试题</span>
+            </div>
+            <span style="margin-left:auto;font-size:12px;color:var(--t3);" id="q-count" data-page-node-id="NhaiDVTcLBAguWUwD5pNsV"></span>
+          </div>
+          <div id="manual-form" data-page-node-id="lyXdrL5CXI95FeSVJAHoBD"></div>
+          <div id="paste-box" data-page-node-id="12ePXM71pbplAOHTX1e0Fo"></div>
+          <div id="qlist" data-page-node-id="6x1moZ62updoYAVqr2mUUf"></div>
+        </div>
+        <aside class="quiz-r" id="inspector" data-page-node-id="aBXQCDinWr1CHow13aOXfN"></aside>
+      </section>
+    </main>
+  </div>
+
+  <footer class="sync" data-page-node-id="THCspSl6mAOXUUf7gZxSdj">
+    <span class="info" data-page-node-id="Fuwutr550Rlx3fOsFapaCK"><b id="sync-n" data-page-node-id="wgESw3fixfeOrs5c18oRya">12</b> 处未同步 · 保存于 13:00 · 管理密码已保存</span>
+    <div class="right" data-page-node-id="HjbvQHAXVMKcAyCevcacDB">
+      <button class="btn" id="btn-pull2" data-page-node-id="uFXTzF2OEHlolaQPpSbJPt">从云端拉取</button>
+      <button class="btn" id="btn-s1" data-page-node-id="VwE1rlsr1Wub4bzfm1a6ch">同步结构</button>
+      <button class="btn primary" id="btn-s2" data-page-node-id="OjQ4biDB8UnyZHPITLnWYK">同步题目</button>
+    </div>
+  </footer>
+</div>
+
+<script>
+(function(){
+var COURSES=[
+ {id:'python',name:'Python',color:'#45B0E0',icon:'i-code'},
+ {id:'cpp',name:'C++',color:'#4E6EF2',icon:'i-chip'},
+ {id:'scratch',name:'Scratch',color:'#F0997B',icon:'i-block'}
+];
+var TREE={
+ python:[
+  {title:'第1章 认识 Python',open:true,cloud:true,lessons:[
+    {title:'1.1 什么是编程',cloud:true,seg:[1,1,1],qs:5},
+    {title:'1.2 输出与输入',cloud:true,seg:[1,1,0],qs:4},
+    {title:'1.3 变量与类型',cloud:false,seg:[1,0,0],qs:2}]},
+  {title:'第2章 分支结构',open:false,cloud:true,lessons:[
+    {title:'2.1 if 结构',cloud:true,seg:[1,1,1],qs:3},
+    {title:'2.2 多分支',cloud:false,seg:[0,0,0],qs:0}]},
+  {title:'第3章 循环结构',open:false,cloud:false,lessons:[
+    {title:'3.1 while 循环',cloud:false,seg:[0,0,0],qs:1}]}
+ ],
+ cpp:[
+  {title:'第1章 基础语法',open:true,cloud:true,lessons:[
+    {title:'1.1 main 函数',cloud:true,seg:[1,1,1],qs:3},
+    {title:'1.2 cin / cout',cloud:true,seg:[1,1,1],qs:4}]},
+  {title:'第2章 数组',open:false,cloud:false,lessons:[
+    {title:'2.1 一维数组',cloud:false,seg:[0,0,0],qs:0}]}
+ ],
+ scratch:[]
+};
+var QS={
+ python:[
+  {id:1,target:'learn',lesson:'1.1 什么是编程',type:'choice',
+   q:'下列哪个函数能把文字输出到屏幕？',o:{A:'print',B:'input',C:'len',D:'type'},a:'A',e:'print 用于输出。'},
+  {id:2,target:'learn',lesson:'1.1 什么是编程',type:'fill',
+   q:'Python 源文件的后缀名是____',a:'.py',e:'保存为 .py 文件。'},
+  {id:3,target:'chapter',lesson:'1.2 输出与输入',type:'choice',
+   q:'print("Hi") 运行后屏幕显示什么？',o:{A:'Hi',B:'"Hi"',C:'报错',D:'空'},a:'A',e:'引号本身不显示。'},
+  {id:4,target:'chapter',lesson:'1.3 变量与类型',type:'choice',
+   q:'下列哪个是合法的变量名？',o:{A:'2name',B:'my_name',C:'my-name',D:'print'},a:'B',e:'不能数字开头。'},
+  {id:5,target:'exam',lesson:'',examType:'GESP',level:'一级',type:'choice',
+   q:'表达式 3 + 2 * 2 的结果是？',o:{A:'10',B:'7',C:'12',D:'9'},a:'B',e:'先乘除后加减。'},
+  {id:6,target:'exam',lesson:'',examType:'GESP',level:'一级',type:'fill',
+   q:'在 Python 中，用 ____ 输出内容到屏幕。',a:'',e:''}
+ ],
+ cpp:[
+  {id:11,target:'learn',lesson:'1.1 main 函数',type:'choice',
+   q:'C++ 程序的入口函数是？',o:{A:'start',B:'main',C:'run',D:'begin'},a:'B',e:'从 main 开始执行。'}
+ ],
+ scratch:[]
+};
+var EXAM_TYPES=['CIE','GESP','CSP-J'],LEVELS=['一级','二级','三级','入门级'];
+var SEG_TXT=['编程就是告诉计算机一步一步做什么。','语法简单、一行一句、适合初学者。','编程语言 ≠ 程序文件。','print("Hello World")'];
+var state={course:'python',lesson:'1.1 什么是编程',tab:'struct',filter:'all',aiMode:'tree',kw:''};
+var drag=null;
+var $=function(id){return document.getElementById(id);};
+
+function toast(msg){
+  var t=document.createElement('div');t.className='toast';t.textContent=msg;
+  document.body.appendChild(t);setTimeout(function(){t.remove();},1800);
+}
+function course(){for(var i=0;i<COURSES.length;i++){if(COURSES[i].id===state.course)return COURSES[i];}return COURSES[0];}
+function chs(){return TREE[state.course]||[];}
+function qs(){return QS[state.course]||[];}
+function findLessonInfo(t){
+  var c=chs();
+  for(var i=0;i<c.length;i++)for(var j=0;j<c[i].lessons.length;j++)
+    if(c[i].lessons[j].title===t)return {ch:c[i],l:c[i].lessons[j],ci:i};
+  return null;
+}
+function findLesson(t){var r=findLessonInfo(t);return r?r.l:null;}
+function flatLessons(){
+  var out=[],c=chs();
+  for(var i=0;i<c.length;i++)for(var j=0;j<c[i].lessons.length;j++)out.push(c[i].lessons[j]);
+  return out;
+}
+function segDone(l){return l&&l.seg[0]&&l.seg[1]&&l.seg[2];}
+function qErr(q){
+  var e=[];
+  if(!q.q||!q.q.trim())e.push('题干为空');
+  if(q.type==='choice'){
+    ['A','B','C','D'].forEach(function(k){if(!q.o||!q.o[k]||!String(q.o[k]).trim())e.push('选项'+k+'为空');});
+    if(!/^[A-D]$/.test(q.a||''))e.push('答案不在 A-D');
+  }else if(!q.a||!String(q.a).trim())e.push('填空答案为空');
+  return e;
+}
+
+/* ---------- 侧栏 ---------- */
+function renderCourseSel(){
+  var c=course();
+  $('course-sw').style.background=c.color;
+  $('course-nm').textContent=c.name;
+  $('tab-course').textContent='当前学科：'+c.name;
+  var m=$('course-menu');m.innerHTML='';
+  COURSES.forEach(function(x){
+    var d=document.createElement('div');d.className='course-opt';
+    d.innerHTML='<span class="swatch" style="background:'+x.color+'"></span>'+x.name+
+      (x.id===state.course?'<span class="tick">当前</span>':'');
+    d.onclick=function(){
+      state.course=x.id;m.classList.add('hidden');
+      var f=(TREE[x.id]||[])[0];
+      state.lesson=(f&&f.lessons[0])?f.lessons[0].title:'';
+      renderAll();
+    };
+    m.appendChild(d);
+  });
+}
+function renderTree(){
+  var host=$('tree');host.innerHTML='';
+  var list=chs(),kw=state.kw.trim();
+  var shown=0;
+  list.forEach(function(ch,ci){
+    var kids=ch.lessons.filter(function(l){return !kw||l.title.indexOf(kw)>=0;});
+    var hitCh=kw&&ch.title.indexOf(kw)>=0;
+    if(kw&&!kids.length&&!hitCh)return;
+    shown++;
+    var n=document.createElement('div');
+    n.className='node ch';
+    n.innerHTML='<span style="width:11px;color:var(--t3);font-size:10px;">'+(ch.open?'▼':'▶')+'</span>'+
+      '<span>'+ch.title+'</span>'+(ch.cloud?'':'<span class="mark" style="color:var(--t3);">○</span>')+
+      '<span class="cnt">'+ch.lessons.length+'</span>'+
+      '<span class="acts"><span data-a="edit">✎</span><span data-a="del">✕</span></span>';
+    n.onclick=function(e){
+      var a=e.target.getAttribute&&e.target.getAttribute('data-a');
+      if(a==='del'){toast('删除章节（已入库的将在同步时删除）');return;}
+      if(a==='edit'){toast('重命名章节');return;}
+      ch.open=!ch.open;renderTree();
+    };
+    host.appendChild(n);
+    if(!ch.open)return;
+    var box=document.createElement('div');box.className='kids';
+    (kids.length?kids:ch.lessons).forEach(function(l){
+      var cur=state.lesson===l.title;
+      var m=document.createElement('div');
+      m.className='node'+(cur?' cur':'');
+      var mark=segDone(l)?'<span class="mark" style="color:var(--ok);">✓</span>'
+        :(l.seg[0]?'<span class="mark" style="color:var(--warn);">!</span>'
+        :'<span class="mark" style="color:var(--t3);">○</span>');
+      m.innerHTML='<span>'+l.title+'</span>'+mark+
+        '<span class="cnt">'+l.qs+'</span>'+
+        '<span class="acts"><span data-a="edit">✎</span><span data-a="del">✕</span></span>';
+      m.draggable=true;
+      m.ondragstart=function(e){drag={ci:ci,title:l.title};e.dataTransfer.effectAllowed='move';};
+      m.ondragover=function(e){e.preventDefault();m.style.boxShadow='inset 0 2px 0 var(--brand)';};
+      m.ondragleave=function(){m.style.boxShadow='';};
+      m.ondragend=function(){drag=null;};
+      m.ondrop=function(e){
+        e.preventDefault();m.style.boxShadow='';
+        if(!drag)return;
+        var d=drag;drag=null;
+        if(d.ci!==ci){toast('只能在同一个章节内排序');return;}
+        var arr=list[ci].lessons,from=-1,to=-1;
+        for(var i=0;i<arr.length;i++){if(arr[i].title===d.title)from=i;if(arr[i].title===l.title)to=i;}
+        if(from<0||to<0||from===to)return;
+        arr.splice(to,0,arr.splice(from,1)[0]);
+        renderTree();toast('已调整顺序：'+d.title);
+      };
+      m.onclick=function(e){
+        var a=e.target.getAttribute&&e.target.getAttribute('data-a');
+        if(a==='del'){toast('删除知识点（级联清题目）');return;}
+        if(a==='edit'){toast('重命名知识点');return;}
+        state.lesson=l.title;renderAll();
+      };
+      box.appendChild(m);
+    });
+    var add=document.createElement('div');
+    add.className='node';add.style.color='var(--t3)';add.style.fontSize='12px';
+    add.textContent='＋ 知识点';
+    add.onclick=function(){toast('新建知识点');};
+    box.appendChild(add);
+    host.appendChild(box);
+  });
+  if(!shown){
+    host.innerHTML='<div class="guide"><b>「'+course().name+'」还没有内容</b>'+
+      '<ol><li>把教程 / 大纲粘进右边素材框，或拖入 .docx</li>'+
+      '<li>模式选「整树模式」→ 开始 AI 整理，章节 + 知识点一次生成</li>'+
+      '<li>素材已按模板写好的，点「解析入树」，不开模型也能成树</li>'+
+      '<li>云端已有这门课 → 点左下「从云端拉取」</li></ol>'+
+      '<div class="acts2"><button class="btn" id="g-ai">去素材框</button>'+
+      '<button class="btn" id="g-pull">从云端拉取</button>'+
+      '<button class="btn" id="g-manual">手动加章节</button></div></div>';
+    $('g-ai').onclick=function(){switchTab('struct');$('material').focus();toast('粘贴素材后再点「开始 AI 整理」');};
+    $('g-pull').onclick=function(){toast('已从云端拉取并合并');};
+    $('g-manual').onclick=function(){toast('新建章节');};
+  }
+  var addCh=document.createElement('div');
+  addCh.className='node';addCh.style.color='var(--t3)';addCh.style.fontSize='12px';
+  addCh.textContent='＋ 章节';addCh.onclick=function(){toast('新建章节');};
+  host.appendChild(addCh);
+
+  var c=0,l=0;
+  chs().forEach(function(ch){c++;l+=ch.lessons.length;});
+  $('st-ch').textContent=c;$('st-ls').textContent=l;$('st-q').textContent=qs().length;
+}
+
+/* ---------- 结构页：知识点编辑 ---------- */
+function renderEdit(){
+  var info=findLessonInfo(state.lesson),l=info?info.l:null;
+  $('ed-title').textContent=l?l.title:'未选择知识点';
+  $('ed-cloud').classList.toggle('hidden',!(l&&!l.cloud));
+  $('ed-course').textContent=course().name;
+  var cr=$('ed-crumb');
+  if(l){
+    var flat=flatLessons(),idx=-1;
+    for(var i=0;i<flat.length;i++)if(flat[i]===l)idx=i;
+    cr.innerHTML='<span>'+course().name+'</span><span>›</span><span>'+info.ch.title+'</span>'+
+      '<span>›</span><span class="here">'+l.title+'</span>'+
+      '<span class="nav"><button class="btn sm" id="ed-prev"'+(idx<=0?' disabled':'')+'>‹ 上一个</button>'+
+      '<button class="btn sm" id="ed-next"'+(idx<0||idx>=flat.length-1?' disabled':'')+'>下一个 ›</button></span>';
+    $('ed-prev').onclick=function(){state.lesson=flat[idx-1].title;renderAll();};
+    $('ed-next').onclick=function(){state.lesson=flat[idx+1].title;renderAll();};
+  }else{
+    cr.innerHTML='<span>先在左侧选一个知识点，再编辑它的三段速记</span>';
+  }
+  var b=$('ed-body');
+  if(!l){
+    b.innerHTML='<div style="font-size:13px;color:var(--t3);padding:8px 0;">当前学科「'+
+      course().name+'」共 '+chs().length+' 章、'+flatLessons().length+' 个知识点。</div>';
+    return;
+  }
+
+  var SEG=[['概念','一句话说清是什么',60],['特征','判断要点，2~3 条',60],
+           ['易混淆','最常混的 1~3 组对比',60],['代码示例','最小可运行示例（可为空）',0]];
+  var html='<div class="seg-grid">';
+  SEG.forEach(function(s,i){
+    var txt=(i===3)?(l.seg[0]?SEG_TXT[3]:''):(l.seg[i]?SEG_TXT[i]:'');
+    var n=txt.length,lbl=s[2]?(n+' / '+s[2]):(n+' 字');
+    html+='<div class="seg-cell"><div class="fld-lb">'+s[0]+
+      '<span class="n'+((s[2]&&n>s[2])?' over':'')+'" data-n="'+i+'">'+lbl+'</span></div>'+
+      '<textarea class="ta2'+(i===3?' code':'')+'" data-i="'+i+'" placeholder="'+s[1]+'">'+txt+'</textarea></div>';
+  });
+  html+='</div>';
+  html+='<div class="mini"><span>本知识点题目 <b>'+l.qs+'</b> 道</span>'+
+    '<span class="r"><button class="btn sm" id="ed-goto">去题目页</button>'+
+    '<button class="btn sm danger" id="ed-del">删除知识点</button></span></div>';
+  b.innerHTML=html;
+  var tas=b.querySelectorAll('.ta2');
+  for(var k=0;k<tas.length;k++){
+    tas[k].oninput=function(){
+      var idx=this.getAttribute('data-i'),n=this.value.length;
+      var max=SEG[parseInt(idx,10)][2];
+      var el=b.querySelector('[data-n="'+idx+'"]');
+      if(el){el.textContent=max?(n+' / '+max):(n+' 字');
+        el.className='n'+((max&&n>max)?' over':'');}
+    };
+  }
+  $('ed-goto').onclick=function(){switchTab('quiz');};
+  $('ed-del').onclick=function(){toast('已标记删除，同步后从云端移除');};
+}
+
+/* ---------- 题目页 ---------- */
+function renderQuiz(){
+  var list=qs().filter(function(q){return state.filter==='all'||q.target===state.filter;});
+  $('q-count').textContent='共 '+list.length+' 题 · 待修正 '+
+    list.filter(function(q){return qErr(q).length;}).length+' 道';
+  var host=$('qlist');host.innerHTML='';
+  if(!list.length){host.innerHTML='<div class="empty"><b>还没有题目</b>用上方入口添加：手动加题 / AI 现编 / 粘贴素材。</div>';}
+  else{list.forEach(function(q){host.appendChild(qcard(q));});}
+  renderInspector();
+}
+function qcard(q){
+  var errs=q._err||[];
+  var c=document.createElement('div');
+  c.className='qcard'+(errs.length?' err':'')+(q._dup?' dup':'')+(q._skip?' skip':'');
+  c.id='q'+q.id;
+  var tagTxt=q.target==='learn'?'学习题':q.target==='chapter'?'章节题':'考试题';
+  var h=document.createElement('div');h.className='qcard-hd';
+  var typeSel='<select class="sel" data-k="type"><option value="choice"'+(q.type==='choice'?' selected':'')+'>选择题</option>'+
+    '<option value="fill"'+(q.type==='fill'?' selected':'')+'>填空题</option></select>';
+  var stTxt=q._skip?'已跳过':q._dup?'重复':errs.length?'有错误':'正常';
+  var stCls=q._skip?'':q._dup?'badge warn':errs.length?'badge err':'badge ok';
+  h.innerHTML=typeSel+'<span class="badge brand">'+tagTxt+'</span>'+
+    '<span class="'+stCls+'">'+stTxt+'</span>'+
+    '<span style="font-size:12px;color:var(--t3);">'+(q.lesson||(q.examType+' '+q.level))+'</span>'+
+    '<span class="right"><button class="btn sm" data-k="skip">'+(q._skip?'恢复':'跳过')+'</button>'+
+    '<button class="btn sm danger" data-k="del">删除</button></span>';
+  c.appendChild(h);
+  if(errs.length){var e=document.createElement('div');e.className='qerr';e.textContent=errs.join('；');c.appendChild(e);}
+  var body=document.createElement('div');
+  body.innerHTML='<div class="qtext">'+(q.q||'（题干为空）')+'</div>';
+  if(q.type==='choice'&&q.o){
+    var og=document.createElement('div');og.className='opts';
+    ['A','B','C','D'].forEach(function(k){
+      og.innerHTML+='<div class="opt'+(q.a===k?' right':'')+'">'+k+'. '+q.o[k]+'</div>';
+    });
+    body.appendChild(og);
+  }
+  var row=document.createElement('div');row.className='qrow';
+  row.innerHTML='<input class="inp ans" value="'+q.a+'" placeholder="答案" data-k="a">'+
+    '<input class="inp" value="'+(q.e||'')+'" placeholder="解析（可选）" data-k="e">';
+  body.appendChild(row);
+  var foot=document.createElement('div');foot.className='qfoot';
+  if(q.target==='exam'){
+    foot.innerHTML='<span class="lb">考试类型</span><select class="sel" data-k="et">'+
+      EXAM_TYPES.map(function(t){return '<option'+(t===q.examType?' selected':'')+'>'+t+'</option>';}).join('')+
+      '</select><span class="lb">级别</span><select class="sel" data-k="lv">'+
+      LEVELS.map(function(t){return '<option'+(t===q.level?' selected':'')+'>'+t+'</option>';}).join('')+'</select>';
+  }else{
+    var opts=[];chs().forEach(function(ch){ch.lessons.forEach(function(l){opts.push(l.title);});});
+    foot.innerHTML='<span class="lb">归属知识点</span><select class="sel" data-k="lesson">'+
+      opts.map(function(t){return '<option'+(t===q.lesson?' selected':'')+'>'+t+'</option>';}).join('')+'</select>'+
+      '<span class="lb">归属类型</span><select class="sel" data-k="target">'+
+      '<option value="learn"'+(q.target==='learn'?' selected':'')+'>学习题</option>'+
+      '<option value="chapter"'+(q.target==='chapter'?' selected':'')+'>章节题</option></select>';
+  }
+  body.appendChild(foot);
+  c.appendChild(body);
+  c.addEventListener('change',function(ev){
+    var k=ev.target.getAttribute('data-k');if(!k||k==='skip')return;
+    q[k]=ev.target.value;
+    if(k==='type'&&q.type==='choice'&&!q.o)q.o={A:'',B:'',C:'',D:''};
+    q._err=qErr(q);renderQuiz();
+  });
+  c.addEventListener('click',function(ev){
+    var k=ev.target.getAttribute&&ev.target.getAttribute('data-k');
+    if(k==='skip'){q._skip=!q._skip;renderQuiz();}
+    if(k==='del'){for(var i=0;i<QS[state.course].length;i++){if(QS[state.course][i]===q){QS[state.course].splice(i,1);break;}}renderQuiz();renderTree();}
+  });
+  return c;
+}
+/* 右侧质量检查面板：把空出来的右边用起来 */
+function renderInspector(){
+  var list=qs(),total=list.length||1;
+  var errs=[],dups=[],skipN=0,byType={learn:0,chapter:0,exam:0};
+  list.forEach(function(q){
+    if((q._err||[]).length)errs.push(q);
+    if(q._dup)dups.push(q);
+    if(q._skip)skipN++;
+    byType[q.target]=(byType[q.target]||0)+1;
+  });
+  function bar(name,n,color){
+    return '<div class="dist-row"><span style="width:44px;">'+name+'</span>'+
+      '<span class="dist-bar"><i style="width:'+Math.round(n*100/total)+'%;background:'+color+'"></i></span>'+
+      '<span style="width:22px;text-align:right;color:var(--t3);">'+n+'</span></div>';
+  }
+  var html='<div class="card"><div class="card-hd"><h3>质量检查</h3>'+
+    '<div class="right"><span class="sub">'+course().name+'</span></div></div>'+
+    '<div class="card-bd"><div class="qstat">'+
+    '<div><i>题目总数</i><b>'+list.length+'</b></div>'+
+    '<div><i>待修正</i><b style="color:'+(errs.length?'var(--err)':'var(--t1)')+';">'+errs.length+'</b></div>'+
+    '<div><i>疑似重复</i><b style="color:'+(dups.length?'var(--warn)':'var(--t1)')+';">'+dups.length+'</b></div>'+
+    '<div><i>已跳过</i><b>'+skipN+'</b></div></div>'+
+    '<div class="dist">'+bar('学习题',byType.learn||0,'#5B67F1')+
+    bar('章节题',byType.chapter||0,'#1D9E75')+bar('考试题',byType.exam||0,'#BA7517')+'</div></div></div>';
+
+  html+='<div class="card"><div class="card-hd"><h3>问题清单</h3>'+
+    '<div class="right"><span class="sub">'+(errs.length+dups.length)+' 条</span></div></div>'+
+    '<div class="card-bd" style="padding:6px 8px;">';
+  if(!errs.length&&!dups.length){
+    html+='<div style="font-size:12px;color:var(--t3);padding:8px 6px;line-height:1.7;">'+
+      '还没跑校验。点上方「校验全部 / 检查重复」，问题会汇总到这里，点一条可直接跳到那道题。</div>';
+  }else{
+    errs.forEach(function(q){
+      html+='<div class="iss" data-go="'+q.id+'"><span class="k e">错误</span><span class="t">'+
+        (q.q||'（空题干）')+'</span></div>';
+    });
+    dups.forEach(function(q){
+      html+='<div class="iss" data-go="'+q.id+'"><span class="k d">重复</span><span class="t">'+
+        (q.q||'（空题干）')+'</span></div>';
+    });
+  }
+  html+='</div></div>';
+
+  html+='<div class="card"><div class="card-hd"><h3>批量操作</h3></div><div class="card-bd">'+
+    '<button class="btn sm" id="ins-expand" style="width:100%;margin-bottom:6px;">展开全部题卡</button>'+
+    '<button class="btn sm" id="ins-clearskip" style="width:100%;margin-bottom:6px;">清除已跳过（'+skipN+'）</button>'+
+    '<button class="btn sm" id="ins-export" style="width:100%;">导出本学科题目 JSON</button>'+
+    '<div class="note" style="margin-top:9px;">同步前会先跑硬校验；有错题会拦住，已跳过的题不参与。</div>'+
+    '</div></div>';
+  var host=$('inspector');host.innerHTML=html;
+  var gos=host.querySelectorAll('[data-go]');
+  for(var i=0;i<gos.length;i++){
+    gos[i].onclick=function(){
+      var el=document.getElementById('q'+this.getAttribute('data-go'));
+      if(!el){toast('这道题被当前筛选隐藏了');return;}
+      el.scrollIntoView({block:'center'});
+      el.classList.add('flash');
+      setTimeout(function(){el.classList.remove('flash');},900);
+    };
+  }
+  $('ins-expand').onclick=function(){toast('已展开全部题卡');};
+  $('ins-clearskip').onclick=function(){
+    var n=0;
+    QS[state.course]=qs().filter(function(q){if(q._skip)n++;return !q._skip;});
+    renderQuiz();toast(n?'已清除 '+n+' 道跳过题':'没有已跳过的题');
+  };
+  $('ins-export').onclick=function(){toast('已导出 '+course().id+'-questions.json（'+qs().length+' 题）');};
+}
+
+/* ---------- tab / 总渲染 ---------- */
+function switchTab(t){
+  state.tab=t;
+  var a=document.querySelectorAll('.tab');
+  for(var i=0;i<a.length;i++)a[i].classList.toggle('cur',a[i].getAttribute('data-tab')===t);
+  $('pane-struct').classList.toggle('hidden',t!=='struct');
+  $('pane-quiz').classList.toggle('hidden',t!=='quiz');
+}
+function renderAiTarget(){
+  var t=$('ai-target');if(!t)return;
+  var c=course(),l=findLesson(state.lesson);
+  if(state.aiMode==='fill'){
+    t.innerHTML='<span>写入目标</span>'+
+      '<span class="badge '+(l?'brand':'warn')+'">'+(l?(c.name+' · '+l.title):'未选知识点')+'</span>'+
+      '<span class="r">'+(l?'只补这一个知识点':'请先在左侧点一个知识点')+'</span>';
+  }else{
+    t.innerHTML='<span>写入目标</span><span class="badge brand">'+c.name+'</span>'+
+      '<span class="r">整棵树按素材重新生成</span>';
+  }
+}
+function renderAll(){renderCourseSel();renderTree();renderEdit();renderQuiz();renderAiTarget();}
+
+/* ---------- 事件 ---------- */
+var tabs=document.querySelectorAll('.tab');
+for(var i=0;i<tabs.length;i++)tabs[i].onclick=function(){switchTab(this.getAttribute('data-tab'));};
+$('course-sel').onclick=function(){$('course-menu').classList.toggle('hidden');};
+$('tree-search').oninput=function(e){state.kw=e.target.value;renderTree();};
+$('btn-new-course').onclick=function(){openNewCourse();};
+$('btn-help').onclick=function(){openHelp();};
+$('btn-changelog').onclick=function(){openChangelog();};
+$('btn-export').onclick=function(){toast('已导出 backup-20260909-1300.json');};
+$('btn-import').onclick=function(){toast('选择备份 JSON 恢复');};
+$('btn-pull').onclick=$('btn-pull2').onclick=function(){toast('已从云端拉取并合并');};
+$('btn-sync-top').onclick=function(){toast('即将同步：新增 3 · 更新 9 · 删除 0');};
+$('btn-s1').onclick=function(){toast('结构同步完成');};
+$('btn-s2').onclick=function(){toast('题目同步前先校验，有 1 题未通过');};
+$('btn-clear').onclick=function(){$('material').value='';$('mat-stat').textContent='字数 0 · 章节 0 · 知识点 0 · 题目 0';};
+$('btn-tpl').onclick=function(){
+  $('material').value='# 学科：Python\n## 第1章 认识 Python\n### 知识点：1.1 什么是编程\n【概念】编程就是告诉计算机一步一步做什么。\n【特征】语法简单、一行一句。\n【易混淆】编程语言 ≠ 程序文件。\n【代码】print("Hello World")\n【学习题】\n- 选择|下列哪个函数能输出文字？|A:print|B:input|C:len|D:type|答案:A|解析:print 用于输出。';
+  $('mat-stat').textContent='字数 218 · 章节 1 · 知识点 1 · 题目 1';
+};
+$('btn-parse').onclick=function(){
+  if(!$('material').value.trim()){toast('请先粘贴按模板写好的素材');return;}
+  toast('已解析入「'+course().name+'」：章节 1 · 知识点 1 · 题目 1');
+};
+$('drop').onclick=function(){toast('选择 .docx / .txt（Word 用 mammoth 抽取）');};
+$('material').oninput=function(e){
+  $('mat-stat').textContent='字数 '+e.target.value.length+' · 章节 0 · 知识点 0 · 题目 0';
+};
+var segs=document.querySelectorAll('#ai-seg span');
+for(var s=0;s<segs.length;s++)segs[s].onclick=function(){
+  var p=document.querySelectorAll('#ai-seg span');
+  for(var i=0;i<p.length;i++)p[i].classList.remove('on');
+  this.classList.add('on');state.aiMode=this.getAttribute('data-mode');renderAiTarget();
+};
+$('btn-ai').onclick=function(){
+  if(!$('material').value.trim()){toast('请先粘贴素材');return;}
+  if(state.aiMode==='fill'&&!findLesson(state.lesson)){toast('填空模式需要先在左侧选中一个知识点');return;}
+  var c=course();
+  var b=$('btn-ai');b.disabled=true;b.textContent='整理中…';
+  setTimeout(function(){b.disabled=false;b.textContent='开始 AI 整理';
+    toast('已写入「'+c.name+'」：章节 1 · 知识点 3 · 题目 6');},900);
+};
+var fs=document.querySelectorAll('#filters .f-item');
+for(var f=0;f<fs.length;f++)fs[f].onclick=function(){
+  var p=document.querySelectorAll('#filters .f-item');
+  for(var i=0;i<p.length;i++)p[i].classList.remove('on');
+  this.classList.add('on');state.filter=this.getAttribute('data-f');renderQuiz();
+};
+$('btn-validate').onclick=function(){
+  var n=0;qs().forEach(function(q){q._err=qErr(q);if(q._err.length)n++;});
+  renderQuiz();toast(n?'有 '+n+' 题未通过校验（已标红，见右侧问题清单）':'全部通过校验');
+};
+$('btn-dedup').onclick=function(){
+  qs().forEach(function(q,i){q._dup=(i===3);});renderQuiz();toast('已与云端快照比对，1 题重复');
+};
+$('btn-manual').onclick=function(){
+  var h=$('manual-form');
+  if(h.innerHTML){h.innerHTML='';return;}
+  h.innerHTML='<div class="qcard"><div class="qcard-hd"><span class="badge brand">手动加题</span>'+
+    '<span style="font-size:12px;color:var(--t3);">归属：'+(state.lesson||'当前学科')+'</span></div>'+
+    '<div class="qrow" style="margin-bottom:8px;">'+
+    '<select class="sel" id="mf-type"><option value="choice">选择题</option><option value="fill">填空题</option></select>'+
+    '<select class="sel" id="mf-target"><option value="chapter">章节题</option><option value="learn">学习题</option></select></div>'+
+    '<input class="inp" id="mf-q" placeholder="题干" style="margin-bottom:8px;">'+
+    '<div class="opts"><input class="inp" id="mf-a" placeholder="A"><input class="inp" id="mf-b" placeholder="B">'+
+    '<input class="inp" id="mf-c" placeholder="C"><input class="inp" id="mf-d" placeholder="D"></div>'+
+    '<div class="qrow" style="margin-top:8px;"><input class="inp ans" id="mf-ans" placeholder="答案">'+
+    '<input class="inp" id="mf-exp" placeholder="解析（可选）">'+
+    '<button class="btn primary" id="mf-save">加入</button></div></div>';
+  $('mf-save').onclick=function(){
+    QS[state.course].push({id:Date.now(),target:$('mf-target').value,lesson:state.lesson,type:$('mf-type').value,
+      q:$('mf-q').value,o:{A:$('mf-a').value,B:$('mf-b').value,C:$('mf-c').value,D:$('mf-d').value},
+      a:$('mf-ans').value,e:$('mf-exp').value});
+    h.innerHTML='';renderQuiz();renderTree();toast('已加入 1 道题');
+  };
+};
+$('btn-gen').onclick=function(){
+  var l=findLesson(state.lesson);
+  if(!l){toast('请先选中知识点');return;}
+  if(!segDone(l)){toast('请先完成该知识点的三段内容');return;}
+  var b=$('btn-gen');b.disabled=true;b.textContent='生成中…';
+  setTimeout(function(){
+    b.disabled=false;b.textContent='基于本知识点现编';
+    var n=parseInt($('gen-n').value,10);
+    for(var i=0;i<n;i++){
+      QS[state.course].push({id:Date.now()+i,target:'chapter',lesson:state.lesson,type:'choice',
+        q:'（AI 现编）关于「'+state.lesson+'」，下列说法正确的是？',
+        o:{A:'说法一',B:'说法二',C:'说法三',D:'说法四'},a:'B',e:'AI 生成，请逐题校对。'});
+    }
+    renderQuiz();renderTree();toast('已生成 '+n+' 道题，请逐题校对');
+  },1000);
+};
+$('btn-paste').onclick=function(){
+  var h=$('paste-box');
+  if(h.innerHTML){h.innerHTML='';return;}
+  h.innerHTML='<div class="qcard"><div class="qcard-hd"><span class="badge brand">粘贴题目素材</span></div>'+
+    '<textarea class="ta" id="pb-ta" style="min-height:90px;" placeholder="【学习题】&#10;- 选择|题干|A:选项|B:选项|C:选项|D:选项|答案:A|解析:…&#10;- 填空|题干|答案:xxx|解析:…&#10;【考试题】(GESP,一级)"></textarea>'+
+    '<div class="qrow" style="margin-top:8px;"><button class="btn primary" id="pb-ok">解析入表</button>'+
+    '<span style="font-size:12px;color:var(--t3);">按模板解析，挂到当前知识点</span></div></div>';
+  $('pb-ok').onclick=function(){
+    QS[state.course].push({id:Date.now(),target:'chapter',lesson:state.lesson,type:'fill',
+      q:'（粘贴）Python 中用来获取用户输入的函数是____',a:'input',e:'input() 读取一行。'});
+    h.innerHTML='';renderQuiz();renderTree();toast('已加入 1 道题');
+  };
+};
+
+function modal(title,bodyHTML){
+  var m=document.createElement('div');m.className='mask';
+  m.innerHTML='<div class="modal"><div class="modal-hd"><h3>'+title+'</h3><span class="x">关闭</span></div>'+
+    '<div class="modal-bd">'+bodyHTML+'</div></div>';
+  m.querySelector('.x').onclick=function(){m.remove();};
+  m.onclick=function(e){if(e.target===m)m.remove();};
+  document.body.appendChild(m);
+  return m;
+}
+function cli(t){return '<li>'+t+'</li>';}
+function openChangelog(){
+  var A=cli('顶部三行合一：顶栏 / 连接状态条 / Tab 条 → 一条 52px 顶栏；Tab 下沉为主区下划线分段');
+  A+=cli('左侧 236px 独立侧栏：学科切换器 + 搜索 + 可折叠章节树 + 底部统计，单独滚动');
+  A+=cli('主区左右两列<b>等高撑满</b>：素材输入自适应剩余高度，不再底部留白');
+  A+=cli('结构页右列三段速记改 <b>2×2 网格</b>（概念 / 特征 / 易混淆 / 代码），横向空间用满');
+  A+=cli('题目页右侧新增 <b>质量检查面板</b>：统计、类型分布、问题清单（点击定位）、批量操作');
+  A+=cli('设计 token 统一：主色 <code>#5B67F1</code>、圆角 12/8/6、字重只用 400 与 500、几乎不用阴影');
+  var B=cli('侧栏学科下拉，一次只展开当前学科 —— 课程从 2 门变 20 门侧栏长度不变');
+  B+=cli('「＋ 新建学科」表单实时生成小程序 <code>app.js</code> 配置代码，可一键复制');
+  B+=cli('新建后自动切到该学科，并给出空状态引导');
+  var C=cli('素材框加「解析入树」：模板文本不用开模型直接成树（卡片上标「新」）');
+  C+=cli('新建学科后自动选中并跳回结构页');
+  C+=cli('去掉 4 处 <code>|| &#39;python&#39;</code> 兜底（<code>ai-flow.js:45</code> / <code>parser.js:111</code> / <code>quiz-ui.js:84</code> / <code>quiz-ui.js:104</code>）');
+  C+=cli('改为 AI 卡片常显「写入目标」，没选知识点就明确拦住，不再静默写进 Python');
+  var D='<b>下面这些本版没有解决，需要你拍板</b>'+
+    '1. 课程配置上云没做：新建学科仍要手动改小程序 <code>app.js</code> 的 globalData.courses 并重新发版。<br>'+
+    '2. 管理密码仍是 localStorage 明文。<br>'+
+    '3. 删除没有撤销；删除已入库节点靠同步时从云端删。<br>'+
+    '4. 本地模型依赖本机 Ollama，没起模型就只剩「解析入树」这一条路。<br>'+
+    '5. 题型只支持选择题 / 填空题。<br>'+
+    '6. 草稿只存在浏览器 localStorage，换电脑或清缓存会丢，没有云同步和版本历史。<br>'+
+    '7. 三段速记各 60 字上限是硬编码。<br>'+
+    '8. 侧栏折叠成图标条、滚动 sticky 抬头 —— 只在方案里提了，本版没做交互。';
+  modal('改动说明 · 对照你现在这一版',
+    '<div class="chg-sec"><h4>一、布局重构</h4><ul class="chg-list">'+A+'</ul></div>'+
+    '<div class="chg-sec"><h4>二、多课程支持</h4><ul class="chg-list">'+B+'</ul></div>'+
+    '<div class="chg-sec"><h4>三、你提的那三件事</h4><ul class="chg-list">'+C+'</ul></div>'+
+    '<div class="chg-sec"><h4>四、<span class="badge warn">还没做</span>已知遗留</h4>'+
+    '<div class="chg-warn">'+D+'</div></div>'+
+    '<div style="font-size:12px;color:var(--t3);">这是示意图，<b>真实代码一行没动</b>。你确认哪几条要落地，我再改 js / css。</div>');
+}
+function openNewCourse(){
+  var m=modal('新建学科',
+    '<div class="grid2"><div><label class="fld-lb2">显示名称</label>'+
+    '<input class="inp" id="nc-name" value="Scratch"></div>'+
+    '<div><label class="fld-lb2">课程 id（英文，入库后不可改）</label>'+
+    '<input class="inp" id="nc-id" value="scratch"></div></div>'+
+    '<div class="grid2"><div><label class="fld-lb2">图标</label>'+
+    '<input class="inp" id="nc-icon" value="i-block"></div>'+
+    '<div><label class="fld-lb2">主题色</label>'+
+    '<input class="inp" id="nc-color" value="#F0997B"></div></div>'+
+    '<label class="fld-lb2">建好后，把这段粘到小程序 app.js 的 globalData.courses</label>'+
+    '<div class="snip" id="nc-snip"></div>'+
+    '<div style="display:flex;gap:8px;margin-top:12px;">'+
+    '<button class="btn" id="nc-copy">复制代码</button>'+
+    '<button class="btn primary" id="nc-ok" style="margin-left:auto;">创建学科</button></div>');
+  function snip(){
+    return "{ id: '"+$('nc-id').value+"',\n  name: '"+$('nc-name').value+"',\n  icon: '"+
+      $('nc-icon').value+"',\n  color: '"+$('nc-color').value+"' }";
+  }
+  $('nc-snip').textContent=snip();
+  ['nc-name','nc-id','nc-icon','nc-color'].forEach(function(id){$(id).oninput=function(){$('nc-snip').textContent=snip();};});
+  $('nc-copy').onclick=function(){toast('配置代码已复制');};
+  $('nc-ok').onclick=function(){
+    var id=$('nc-id').value.trim();
+    if(!id){toast('请填课程 id');return;}
+    if(TREE[id]){toast('该学科已存在');return;}
+    var nm=$('nc-name').value||id;
+    COURSES.push({id:id,name:nm,color:$('nc-color').value,icon:$('nc-icon').value});
+    TREE[id]=[];QS[id]=[];state.course=id;state.lesson='';
+    m.remove();switchTab('struct');renderAll();
+    toast('已创建并切到「'+nm+'」· 下一步：粘贴素材 → AI 整理');
+  };
+}
+function openHelp(){
+  var TPL='# 学科：Python\n## 第1章 认识 Python\n### 知识点：1.1 什么是编程\n【概念】…\n【特征】…\n【易混淆】…\n【代码】…\n【学习题】\n- 选择|题干|A:…|B:…|C:…|D:…|答案:A|解析:…';
+  var AI='请把下面这段教程内容，整理成如下固定格式：\n# 学科：<学科名>\n## <第N章 章节标题>\n### 知识点：<编号 标题>\n【概念】≤60字 …\n（完整指令见帮助面板）';
+  var DEP='1. 安装 Ollama\n2. setx OLLAMA_MODELS "D:\\ollama\\models"\n3. setx OLLAMA_ORIGINS "*"\n4. ollama pull qwen3:4b\n5. 上传 importContent / getCourseTree 云函数\n6. 开通静态托管并上传本页\n7. 开启匿名登录并给两个云函数放行';
+  var TR='· 本地模型黄灯：双击「启动本地模型.bat」\n· 云端红灯：检查匿名登录是否开启\n· 同步失败：检查 ADMIN_PASSWORD\n· 新学科学生端不显示：需在小程序 app.js 加配置';
+  var m=modal('帮助',
+    sec('素材模板','tpl',TPL,'复制素材模板')+sec('给网页 AI 的指令','ai',AI,'复制指令')+
+    sec('部署步骤','dep',DEP,'复制部署步骤')+sec('常见问题','tr',TR,'复制排查表'));
+  m.querySelectorAll('[data-copy]').forEach(function(b){
+    b.onclick=function(){toast(b.getAttribute('data-copy')+'已复制');};
+  });
+}
+function sec(title,id,txt,label){
+  return '<div class="help-sec"><h4>'+title+'</h4><div class="help-pre">'+txt+'</div>'+
+    '<button class="btn sm" style="margin-top:6px;" data-copy="'+label+'">'+label+'</button></div>';
+}
+
+renderAll();
+switchTab('struct');
+})();
+</script>
+</body>
+</html>
