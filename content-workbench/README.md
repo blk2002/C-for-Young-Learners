@@ -16,16 +16,17 @@
 
 ## 一次性部署（约 40 分钟，只做一次）
 
-1. 安装 Ollama：ollama.com 下载 Windows 版，安装路径选 `D:\ollama`
-2. 模型存 D 盘（不占 C 盘）：命令行运行 `setx OLLAMA_MODELS "D:\ollama\models"`
-3. 拉取模型：命令行运行 `ollama pull qwen3:4b`（约 2.5GB）
-4. 每次使用前双击工具包内 `启动本地模型.bat`，模型常驻后台
-5. 微信开发者工具 → 云开发控制台 → 静态网站托管 → 开通
-6. 把 `index.html` + `css/` + `js/` 上传到托管根目录，收藏得到的网址
-7. 云开发控制台 → 环境 → 登录授权 → 启用「匿名登录」
-8. 开发者工具里右键 `importContent`、`getCourseTree` → 上传并部署（云端安装依赖）
-9. 云开发控制台 → 云函数 → `importContent` → 配置 → 环境变量，添加 `ADMIN_PASSWORD=<你的管理密码>`（`getCourseTree` 同样配置）
-10. 打开网址，两盏连接灯变绿即就绪
+完整分步说明见 `DEPLOYMENT.md`，这里列关键步骤和容易踩的坑：
+
+1. 安装 Ollama：ollama.com 下载 Windows 版，程序默认装 C 盘即可（安装器不支持选路径）
+2. 模型存 D 盘：`setx OLLAMA_MODELS "D:\ollama\models"`
+3. 允许网页跨域：`setx OLLAMA_ORIGINS "*"`（漏掉这步，网页访问本地模型会报 403）
+4. 拉取模型：`ollama pull qwen3:4b`（约 2.5GB；国内慢则先 `setx OLLAMA_HF_MIRROR "https://modelscope.cn"`）
+5. 微信开发者工具里右键 `importContent`、`getCourseTree` → 上传并部署，两个函数都配 `ADMIN_PASSWORD` 环境变量
+6. 开通静态托管，把 `index.html` + `css/` + `js/` 上传到根目录，收藏网址
+7. 网页版控制台（tcb.cloud.tencent.com，选微信公众号登录）→ 身份认证 → 登录方式 → 开启匿名登录
+8. 云函数「权限控制」里给 `getCourseTree`、`importContent` 单独放行匿名调用（否则报 PERMISSION_DENIED）
+9. 双击 `启动本地模型.bat` 启动本地模型，打开网址，两盏灯变绿即就绪
 
 ## 日常使用
 
@@ -36,7 +37,7 @@
 
 ## 常见问题
 
-见工具内「帮助」面板的「常见问题」，或 `docs/` 目录。
+部署与连通类问题见 `DEPLOYMENT.md` 末尾的「常见问题」；使用类问题见工具内「帮助」面板，或 `docs/` 目录。
 
 ## 自定义指南
 
@@ -51,6 +52,7 @@ content-workbench/
 ├─ index.html            # 工作台单文件页面入口
 ├─ 启动本地模型.bat       # 设跨域参数 + 后台启动 Ollama（模型存 D 盘）
 ├─ README.md
+├─ DEPLOYMENT.md         # 部署指南（含踩坑记录）
 ├─ css/style.css
 ├─ js/                   # 前端模块（state/parser/validate/ollama/cloud/ai-flow/tree-ui/content-ui/quiz-ui/sync/help/app）
 ├─ tests/                # node --test 单元测试
