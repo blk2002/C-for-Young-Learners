@@ -7,6 +7,27 @@ try {
   console.warn("请复制 env.template.js 并重命名为 env.local.js，填入你的云环境ID");
 }
 
+// 内置学科（python / cpp）的等级考试默认配置。
+// 云端 courses 文档没有 examConfig 字段时兜底用（等价于旧版写死在页面里的数据）；
+// 一旦在工作台「考试类型配置」里保存过，就以云端配置为准。
+// type 是关联键，与 examQuestions / wrongQuestions 的 examType 字段对应。
+const DEFAULT_EXAM_CONFIG = {
+  python: [
+    { type: 'CIE', name: 'CIE 等级考试', desc: '中国电子学会 Python 编程等级考试', icon: 'i-book', color: '#5B67F1', colorDark: '#8E5CF6',
+      levels: ['一级', '二级', '三级', '四级', '五级', '六级'] },
+    { type: 'GESP', name: 'GESP 等级考试', desc: 'CCF 编程能力等级认证', icon: 'i-target', color: '#22C08A', colorDark: '#1D9E75',
+      levels: ['一级', '二级', '三级', '四级', '五级', '六级', '七级', '八级'] }
+  ],
+  cpp: [
+    { type: 'CIE', name: 'CIE 等级考试', desc: '中国电子学会 C++ 编程等级考试', icon: 'i-book', color: '#5B67F1', colorDark: '#8E5CF6',
+      levels: ['一级', '二级', '三级', '四级', '五级', '六级', '七级', '八级', '九级', '十级'] },
+    { type: 'GESP', name: 'GESP 等级考试', desc: 'CCF 编程能力等级认证', icon: 'i-target', color: '#22C08A', colorDark: '#1D9E75',
+      levels: ['一级', '二级', '三级', '四级', '五级', '六级', '七级', '八级'] },
+    { type: 'CSP-JS', name: 'CSP-J/S 竞赛', desc: '信息学奥赛入门级/提高级', icon: 'i-trophy', color: '#8E5CF6', colorDark: '#5B67F1',
+      levels: ['CSP-J（入门级）', 'CSP-S（提高级）'] }
+  ]
+};
+
 App({
   onLaunch() {
     if (!wx.cloud) {
@@ -43,7 +64,11 @@ App({
           name: c.name,
           icon: c.icon || 'i-book',
           color: c.color || '#5B67F1',
-          builtin: !!c.builtin
+          builtin: !!c.builtin,
+          // 等级考试配置随文档走；内置学科缺字段时用默认配置兜底，其余学科缺省为空（= 未配置）
+          examConfig: Array.isArray(c.examConfig) && c.examConfig.length
+            ? c.examConfig
+            : (DEFAULT_EXAM_CONFIG[c._id] || [])
         }));
         // 内置学科兜底：云端缺哪门补哪门（按 fallback 的顺序插到最前面）
         const missing = builtinFallback.filter(fb => !cloudCourses.some(c => c.id === fb.id));
@@ -117,8 +142,8 @@ App({
     userInfo: null,
     isLoggedIn: false,
     courses: [
-      { id: 'python', name: 'Python', icon: 'i-code', color: '#45B0E0', builtin: true },
-      { id: 'cpp', name: 'C++', icon: 'i-chip', color: '#4E6EF2', builtin: true }
+      { id: 'python', name: 'Python', icon: 'i-code', color: '#45B0E0', builtin: true, examConfig: DEFAULT_EXAM_CONFIG.python },
+      { id: 'cpp', name: 'C++', icon: 'i-chip', color: '#4E6EF2', builtin: true, examConfig: DEFAULT_EXAM_CONFIG.cpp }
     ]
   }
 });

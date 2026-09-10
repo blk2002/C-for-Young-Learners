@@ -82,6 +82,34 @@ exports.main = async (event, context) => {
         return { success: true, data: levels };
       }
 
+      // 按学科聚合「实际有题的考试类型」（题数 > 0）。
+      // 用途：习题页在学科未配置 examConfig 时兜底展示，
+      // 防止「题在云端但配置丢失/未配置」导致题目不可达。
+      case 'getTypesWithQuestions': {
+        if (!courseId) {
+          return { success: false, message: '参数不完整' };
+        }
+
+        const result = await db.collection('examQuestions').where({
+          courseId: courseId
+        }).field({
+          examType: true,
+          questions: true
+        }).get();
+
+        const map = {};
+        (result.data || []).forEach(item => {
+          const t = item.examType || '';
+          map[t] = (map[t] || 0) + ((item.questions || []).length);
+        });
+
+        const data = Object.keys(map)
+          .filter(t => map[t] > 0)
+          .map(t => ({ examType: t, questionCount: map[t] }));
+
+        return { success: true, data };
+      }
+
       default:
         return { success: false, message: '未知操作' };
     }

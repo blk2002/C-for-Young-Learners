@@ -72,31 +72,19 @@ Page({
     }
   },
 
+  // 等级名称/序号优先取学科 examConfig 里该类型的 levels；
+  // 未配置时返回空列表，loadLevels 里会用云端实际错题的 level 兜底展示。
   getAllLevels() {
     const { courseId, examType } = this.data;
-    const levels = [];
-
-    if (examType === 'CIE') {
-      if (courseId === 'python') {
-        ['一级', '二级', '三级', '四级', '五级', '六级'].forEach((name, i) => {
-          levels.push({ level: name, levelName: name, levelIndex: i + 1 });
-        });
-      } else {
-        ['一级', '二级', '三级', '四级', '五级', '六级', '七级', '八级', '九级', '十级'].forEach((name, i) => {
-          levels.push({ level: name, levelName: name, levelIndex: i + 1 });
-        });
-      }
-    } else if (examType === 'GESP') {
-      ['一级', '二级', '三级', '四级', '五级', '六级', '七级', '八级'].forEach((name, i) => {
-        levels.push({ level: name, levelName: name, levelIndex: i + 1 });
-      });
-    } else {
-      ['CSP-J（入门级）', 'CSP-S（提高级）'].forEach((name, i) => {
-        levels.push({ level: name, levelName: name, levelIndex: i + 1 });
-      });
+    const courses = app.globalData.courses || [];
+    const course = courses.find(c => c.id === courseId);
+    const cfg = (((course && course.examConfig) || []) || []).find(t => t.type === examType);
+    if (cfg && Array.isArray(cfg.levels) && cfg.levels.length) {
+      return cfg.levels.filter(Boolean).map((name, i) => ({
+        level: name, levelName: name, levelIndex: i + 1
+      }));
     }
-
-    return levels;
+    return [];
   },
 
   goToPractice(e) {

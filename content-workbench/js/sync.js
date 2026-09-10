@@ -33,11 +33,14 @@
             color: c.color || '#5B67F1',
             chapters: []
           };
+          if (Array.isArray(c.examConfig)) d.tree[c._id].examConfig = c.examConfig;
         } else if (c._id && d.tree[c._id]) {
           // 已有学科：名称/主题色以云端 registry 为准（改名在小程序端发生）
           if (c.name) d.tree[c._id].name = c.name;
           if (c.color) d.tree[c._id].color = c.color;
           if (c.icon) d.tree[c._id].icon = c.icon;
+          // 考试类型配置以云端为准（配置在工作台保存后即上云，两端一致）
+          if (Array.isArray(c.examConfig)) d.tree[c._id].examConfig = c.examConfig;
         }
       });
     } catch (e) { console.warn('学科 registry 拉取失败，跳过', e); }

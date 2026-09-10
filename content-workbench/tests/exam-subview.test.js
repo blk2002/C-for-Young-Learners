@@ -51,7 +51,7 @@ test('考试题子区：新建分类 + 手动加一道，进入该组', async ()
   d0.tree = { cpp: { name: 'C++', color: '#4E6EF2', chapters: [] } };
   state.save(d0);
   global.confirm = () => true; global.alert = () => {};
-  global.WB = { state: { load: () => state.load(), save: d => state.save(d), contentDone: state.contentDone }, validate, treeUI: { getSelected: () => null, getCurrentCourse: () => undefined, render: () => {} } };
+  global.WB = { state: { load: () => state.load(), save: d => state.save(d), contentDone: state.contentDone, getExamConfig: state.getExamConfig }, validate, treeUI: { getSelected: () => null, getCurrentCourse: () => undefined, render: () => {} } };
 
   delete require.cache[require.resolve(quizPath)];
   require(quizPath).render();
@@ -101,7 +101,7 @@ test('考试题子区：AI 按本分类生成 路由到当前选中的组', asyn
     { type: 'fill', question: 'AI题2', answer: 'x', explanation: '' }
   ];
   global.WB = {
-    state: { load: () => state.load(), save: d => state.save(d), contentDone: state.contentDone },
+    state: { load: () => state.load(), save: d => state.save(d), contentDone: state.contentDone, getExamConfig: state.getExamConfig },
     validate,
     treeUI: { getSelected: () => null, getCurrentCourse: () => undefined, render: () => {} },
     ollama: { ...ollama, chat: async () => '```json\n' + JSON.stringify(fakeArr) + '\n```' }

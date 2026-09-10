@@ -2,7 +2,7 @@
   <view class="page-title">{{courseName}} 等级考试</view>
   <view class="page-subtitle">选择考试类型开始练习</view>
 
-  <view class="exam-list">
+  <view class="exam-list" wx:if="{{examTypes.length > 0}}">
     <view class="exam-card"
           wx:for="{{examTypes}}"
           wx:key="type"
@@ -17,5 +17,11 @@
       </view>
       <view class="exam-arrow"><text class="icon i-chevron-w"/></view>
     </view>
+  </view>
+
+  <view class="empty-state" wx:if="{{examTypes.length === 0}}">
+    <view class="empty-icon"><text class="icon i-book"/></view>
+    <view class="empty-text">该学科暂未配置等级考试</view>
+    <view class="empty-sub">管理员可在课程内容工作台的「考试类型配置」中添加</view>
   </view>
 </view>

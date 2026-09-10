@@ -65,7 +65,7 @@ test('学科为空时考试题仍可见、可批量清空、可同步', async ()
   ];
   setupStorage(d0);
   global.WB = {
-    state: { load: () => state.load(), save: d => state.save(d), contentDone: state.contentDone },
+    state: { load: () => state.load(), save: d => state.save(d), contentDone: state.contentDone, getExamConfig: state.getExamConfig },
     validate,
     treeUI: { getSelected: () => null, getCurrentCourse: () => undefined, render: () => {} }
   };

@@ -444,6 +444,17 @@ const examQuestions = {
         examType
       }
     });
+  },
+
+  // 按学科聚合「实际有题的考试类型」（题数 > 0），习题页未配置类型时兜底用
+  getTypesWithQuestions(courseId) {
+    return wx.cloud.callFunction({
+      name: 'examQuestions',
+      data: {
+        action: 'getTypesWithQuestions',
+        courseId
+      }
+    });
   }
 };
 

@@ -64,7 +64,7 @@ test('场景A：学科空着但还在树里 → 考试题可见、逐题删除�
   global.confirm = () => true;
   global.alert = () => {};
   global.WB = {
-    state: { load: () => state.load(), save: d => state.save(d), contentDone: state.contentDone },
+    state: { load: () => state.load(), save: d => state.save(d), contentDone: state.contentDone, getExamConfig: state.getExamConfig },
     validate,
     treeUI: { getSelected: () => null, getCurrentCourse: () => 'cpp', render: () => {} },
     cloud: {

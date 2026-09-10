@@ -11,6 +11,37 @@
     { id: 'python', name: 'Python', icon: 'i-code', color: '#45B0E0' },
     { id: 'cpp', name: 'C++', icon: 'i-chip', color: '#4E6EF2' }
   ];
+  // 内置学科的等级考试默认配置（与小程序 app.js 的 DEFAULT_EXAM_CONFIG 保持一致）。
+  // 仅当学科节点上没有 examConfig 字段（未从云端拉取过、也未编辑过）时兜底；
+  // 一旦在工作台保存过「考试类型配置」，以本地/云端的 examConfig 为准。
+  // type 是关联键，与 examQuestions / wrongQuestions 的 examType 字段对应。
+  const DEFAULT_EXAM_CONFIG = {
+    python: [
+      { type: 'CIE', name: 'CIE 等级考试', desc: '中国电子学会 Python 编程等级考试', icon: 'i-book', color: '#5B67F1', colorDark: '#8E5CF6',
+        levels: ['一级', '二级', '三级', '四级', '五级', '六级'] },
+      { type: 'GESP', name: 'GESP 等级考试', desc: 'CCF 编程能力等级认证', icon: 'i-target', color: '#22C08A', colorDark: '#1D9E75',
+        levels: ['一级', '二级', '三级', '四级', '五级', '六级', '七级', '八级'] }
+    ],
+    cpp: [
+      { type: 'CIE', name: 'CIE 等级考试', desc: '中国电子学会 C++ 编程等级考试', icon: 'i-book', color: '#5B67F1', colorDark: '#8E5CF6',
+        levels: ['一级', '二级', '三级', '四级', '五级', '六级', '七级', '八级', '九级', '十级'] },
+      { type: 'GESP', name: 'GESP 等级考试', desc: 'CCF 编程能力等级认证', icon: 'i-target', color: '#22C08A', colorDark: '#1D9E75',
+        levels: ['一级', '二级', '三级', '四级', '五级', '六级', '七级', '八级'] },
+      { type: 'CSP-JS', name: 'CSP-J/S 竞赛', desc: '信息学奥赛入门级/提高级', icon: 'i-trophy', color: '#8E5CF6', colorDark: '#5B67F1',
+        levels: ['CSP-J（入门级）', 'CSP-S（提高级）'] }
+    ]
+  };
+  // 读某门学科的考试类型配置：节点上有就用节点上的（编辑后 / 云端拉取后），
+  // 没有则内置学科回落默认配置，其他学科返回空数组（= 未配置）。
+  // 返回的是兜底数据的引用时复制一份，避免调用方直接改到默认模板。
+  function getExamConfig(d, courseId) {
+    const node = d && d.tree && d.tree[courseId];
+    if (node && Array.isArray(node.examConfig)) return node.examConfig;
+    if (isBuiltinCourse(courseId) && DEFAULT_EXAM_CONFIG[courseId]) {
+      return JSON.parse(JSON.stringify(DEFAULT_EXAM_CONFIG[courseId]));
+    }
+    return [];
+  }
   const builtinTree = () => BUILTIN_COURSES.reduce((t, c) => {
     t[c.id] = { name: c.name, icon: c.icon, color: c.color, chapters: [], builtin: true };
     return t;
@@ -53,5 +84,5 @@
     return !!(c && c.concept && c.feature && c.confusion);
   }
   function isBuiltinCourse(id) { return BUILTIN_COURSES.some(c => c.id === id); }
-  return { uid, blankDraft, load, save, clear, contentDone, BUILTIN_COURSES, isBuiltinCourse, ensureBuiltinCourses };
+  return { uid, blankDraft, load, save, clear, contentDone, BUILTIN_COURSES, DEFAULT_EXAM_CONFIG, getExamConfig, isBuiltinCourse, ensureBuiltinCourses };
 });

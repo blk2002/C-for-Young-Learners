@@ -1,12 +1,6 @@
 const app = getApp();
 const db = require('../../utils/db.js');
 
-const EXAM_TYPE_CONFIG = {
-  CIE: { examType: 'CIE', examName: 'CIE', icon: "i-trophy", color: '#5B67F1', colorDark: '#8E5CF6' },
-  GESP: { examType: 'GESP', examName: 'GESP', icon: "i-target", color: '#FF9A62', colorDark: '#FF7A45' },
-  CSP: { examType: 'CSP-JS', examName: 'CSP-J/S', icon: "i-code", color: '#3EC8E0', colorDark: '#2AA8D6' }
-};
-
 Page({
   data: {
     courseId: '',
@@ -17,16 +11,12 @@ Page({
 
   onLoad(options) {
     const courseId = options.courseId;
-    const courses = app.globalData.courses;
-    const course = courses.find(c => c.id === courseId);
-
     this.setData({
-      courseId: courseId,
-      courseName: course ? course.name : ''
+      courseId: courseId
     });
 
     wx.setNavigationBarTitle({
-      title: course ? `${course.name} - 考试错题` : '等级考试错题'
+      title: '等级考试错题'
     });
 
     this.loadExamTypes();
@@ -38,10 +28,15 @@ Page({
     }
   },
 
+  // 本页按 wrongQuestions 实际错题聚合（数据驱动，做错什么显示什么）；
+  // 名称 / 图标 / 颜色从学科 examConfig 里取，未配置的类型走灰色兜底。
   async loadExamTypes() {
     this.setData({ loading: true });
 
     try {
+      // 先刷一次学科（管理员可能刚在工作台改过配置）
+      try { await app.loadCourses(); } catch (e) { /* 拉取失败沿用现有 globalData */ }
+
       const userInfo = app.getUserInfo();
       if (!userInfo || !userInfo._id) {
         this.setData({ loading: false });
@@ -57,21 +52,29 @@ Page({
         ? result.result.data
         : [];
 
+      const courses = app.globalData.courses || [];
+      const course = courses.find(c => c.id === this.data.courseId);
+      const config = (course && course.examConfig) || [];
+
       const examTypes = wrongTypes.map(item => {
-        const config = EXAM_TYPE_CONFIG[item.examType] || {
-          examType: item.examType,
-          examName: item.examType,
-          icon: "i-edit",
-          color: '#9AA0B0',
-          colorDark: '#666'
-        };
+        const cfg = config.find(t => t.type === item.examType);
         return {
-          ...config,
+          examType: item.examType,
+          examName: (cfg && cfg.name) || item.examType,
+          icon: (cfg && cfg.icon) || 'i-edit',
+          color: (cfg && cfg.color) || '#9AA0B0',
+          colorDark: (cfg && cfg.colorDark) || '#666',
           wrongCount: item.wrongCount
         };
       });
 
-      this.setData({ examTypes, loading: false });
+      // 标题带上学科名（此时 courses 已刷新）
+      const courseFresh = courses.find(c => c.id === this.data.courseId);
+      if (courseFresh && courseFresh.name) {
+        wx.setNavigationBarTitle({ title: courseFresh.name + ' - 考试错题' });
+      }
+
+      this.setData({ examTypes, courseName: (courseFresh && courseFresh.name) || '', loading: false });
     } catch (err) {
       console.error('加载考试错题类型失败', err);
       this.setData({ loading: false });

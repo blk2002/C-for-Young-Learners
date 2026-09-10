@@ -3,8 +3,37 @@
   if (typeof module === 'object' && module.exports) module.exports = api;
   else { root.WB = root.WB || {}; root.WB.quizUI = api; }
 })(typeof self !== 'undefined' ? self : this, function () {
-  const EXAM_TYPES = ['CIE', 'GESP', 'CSP-J'];
-  const LEVELS = ['一级', '二级', '三级', '入门级'];
+  // 清空下拉选项：children.length=0 对测试 FakeEl（数组）生效，innerHTML='' 对真实 DOM 生效
+  function clearSel(selx) {
+    if (selx.children && selx.children.length) selx.children.length = 0;
+    selx.innerHTML = '';
+  }
+  function clearChildren(node) {
+    if (node.children && node.children.length) node.children.length = 0;
+    node.innerHTML = '';
+  }
+  // 考试类型 / 等级不再写死：优先取学科 examConfig（题目页「⚙ 考试类型配置」维护，
+  // 随 courses 集合云端下发；内置 python / cpp 缺配置时由 state.getExamConfig 兜底默认值）。
+  // 再合并该学科已有题目里出现过的值（兼容旧数据 / 未配置类型），保证已有值始终能选中。
+  function examTypeOptions(d, courseId, current) {
+    const set = new Set();
+    WB.state.getExamConfig(d, courseId).forEach(t => { if (t && t.type) set.add(t.type); });
+    (d.examQuestions || []).forEach(g => {
+      if ((!courseId || g.courseId === courseId) && g.examType) set.add(g.examType);
+    });
+    if (current) set.add(current);
+    return [...set];
+  }
+  function levelOptions(d, courseId, examType, current) {
+    const set = new Set();
+    const cfg = WB.state.getExamConfig(d, courseId).find(t => t.type === examType);
+    ((cfg && cfg.levels) || []).forEach(l => { if (l) set.add(l); });
+    (d.examQuestions || []).forEach(g => {
+      if ((!courseId || g.courseId === courseId) && g.examType === examType && g.level) set.add(g.level);
+    });
+    if (current) set.add(current);
+    return [...set];
+  }
   const draft = () => WB.state.load();
 
   // 题目页两个子区：知识点题（学习题/章节题，挂在选中的知识点下）/ 考试题（独立实体）。
@@ -359,7 +388,9 @@
     filterRow.appendChild(el('span', 'wb-muted', '学科'));
     const fsel = document.createElement('select'); fsel.className = 'wb-sel';
     const oAll = document.createElement('option'); oAll.value = 'all'; oAll.textContent = '全部学科'; fsel.appendChild(oAll);
-    const examCids = [...new Set((d.examQuestions || []).map(g => g.courseId || '(未标注)'))];
+    // 下拉 = 本地树全部学科 ∪ 实际有考试题的学科（含已删学科/未标注的残留组）
+    const groupCids = [...new Set((d.examQuestions || []).map(g => g.courseId || '(未标注)'))];
+    const examCids = [...Object.keys(d.tree || {}), ...groupCids.filter(c => !d.tree[c])];
     examCids.forEach(cid => {
       const o = document.createElement('option'); o.value = cid;
       const alive = d.tree[cid];
@@ -394,11 +425,57 @@
       card.onclick = () => { activeExamKey = (activeExamKey === key ? null : key); render(); };
       nav.appendChild(card);
     });
+
+    // 已配置未建题的分类（来自学科 examConfig）：「全部学科」视图下不展开（内置两门就有 20+ 级，太吵），
+    // 选中具体学科时以虚线幽灵卡显示，点击即创建本地空组（空组不会上传云端，安全）。
+    function expectedCombos(cid) {
+      const c = d.tree[cid];
+      if (!c || !Array.isArray(c.examConfig)) return [];
+      const have = new Set((d.examQuestions || []).map(examGroupKey));
+      const out = [];
+      c.examConfig.forEach(t => {
+        (t.levels || []).forEach(lv => {
+          const g = { courseId: cid, examType: t.type, level: lv };
+          if (!have.has(examGroupKey(g))) out.push(g);
+        });
+      });
+      return out;
+    }
+    if (examCourseFilter !== 'all' && d.tree[examCourseFilter]) {
+      expectedCombos(examCourseFilter).forEach(g => {
+        const key = examGroupKey(g);
+        const card = el('div', 'wb-exam-grp ghost');
+        const sw = el('span', 'wb-swatch');
+        sw.style.background = (d.tree[g.courseId] && d.tree[g.courseId].color) || '#BA7517';
+        sw.style.opacity = '.45';
+        card.appendChild(sw);
+        card.appendChild(el('span', 'wb-exam-grp-name', (g.examType || '?') + ' · ' + (g.level || '?')));
+        card.appendChild(el('span', 'wb-exam-grp-n', '未建题'));
+        card.title = '已在「考试类型配置」里配置、还没建题的分类。点击创建该分类即可加题（空分类不会上传云端）。';
+        card.onclick = () => {
+          const dd = draft();
+          dd.examQuestions = dd.examQuestions || [];
+          dd.examQuestions.push({ courseId: g.courseId, examType: g.examType, level: g.level, questions: [] });
+          WB.state.save(dd);
+          activeExamKey = key;
+          render();
+        };
+        nav.appendChild(card);
+      });
+    } else if (examCourseFilter === 'all') {
+      const hidden = Object.keys(d.tree || {}).reduce((n, cid) => n + expectedCombos(cid).length, 0);
+      if (hidden) nav.appendChild(el('div', 'wb-muted', '另有 ' + hidden + ' 个已配置未建题的分类——在上方「学科」选中具体学科后显示，点击即可建题。'));
+    }
     left.appendChild(nav);
 
-    const newBtn = el('button', 'wb-btn-dash', '＋ 新建分类'); newBtn.style.margin = '7px 0 11px';
+    const navBtnRow = el('div', 'wb-quiz-src-row'); navBtnRow.style.margin = '7px 0 11px';
+    const newBtn = el('button', 'wb-btn-dash', '＋ 新建分类'); newBtn.style.flex = '1'; newBtn.style.marginTop = '0';
     newBtn.onclick = () => showNewCategoryForm();
-    left.appendChild(newBtn);
+    const cfgBtn = el('button', 'wb-btn primary', '⚙ 考试类型配置'); cfgBtn.style.flex = '1';
+    cfgBtn.title = '配置各学科的等级考试类型与等级列表（保存即上云，小程序端随之生效）';
+    cfgBtn.onclick = () => showExamConfigForm();
+    navBtnRow.appendChild(newBtn); navBtnRow.appendChild(cfgBtn);
+    left.appendChild(navBtnRow);
 
     // 当前组来源入口：手动加一道 / 粘贴素材 / AI 按本分类生成（目标优先，直接进当前组）
     const srcRow = el('div', 'wb-quiz-src-row');
@@ -522,13 +599,14 @@
     body.appendChild(bottom);
 
     if (row.target === 'exam') {
+      const dNow = draft();
       const move = el('div', 'wb-qcard-move');
-      const typeOpts = [...new Set([...EXAM_TYPES, row.examType].filter(Boolean))];
+      const typeOpts = examTypeOptions(dNow, row.courseId, row.examType);
       const ts = document.createElement('select'); ts.className = 'wb-sel';
       typeOpts.forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = t; if (t === row.examType) o.selected = true; ts.appendChild(o); });
       ts.onchange = () => moveExamRow(row, ts.value, row.level);
       move.appendChild(label('考试类型', ts));
-      const levelOpts = [...new Set([...LEVELS, row.level].filter(Boolean))];
+      const levelOpts = levelOptions(dNow, row.courseId, row.examType, row.level);
       const lsel = document.createElement('select'); lsel.className = 'wb-sel';
       levelOpts.forEach(l => { const o = document.createElement('option'); o.value = l; o.textContent = l; if (l === row.level) o.selected = true; lsel.appendChild(o); });
       lsel.onchange = () => moveExamRow(row, row.examType, lsel.value);
@@ -721,9 +799,28 @@
       if (!cids.length) cidSel.innerHTML = '<option value="">（暂无学科，请先建学科）</option>';
       cids.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = (d.tree[c] && d.tree[c].name) || c; if (gk && gk.courseId === c) o.selected = true; cidSel.appendChild(o); });
       etSel = document.createElement('select'); etSel.className = 'wb-sel';
-      [...new Set([...EXAM_TYPES, gk ? gk.examType : null].filter(Boolean))].forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = t; if (gk && gk.examType === t) o.selected = true; etSel.appendChild(o); });
       lvSel = document.createElement('select'); lvSel.className = 'wb-sel';
-      [...new Set([...LEVELS, gk ? gk.level : null].filter(Boolean))].forEach(l => { const o = document.createElement('option'); o.value = l; o.textContent = l; if (gk && gk.level === l) o.selected = true; lvSel.appendChild(o); });
+      // 类型/级别选项来自当前学科 examConfig + 已有题目出现过的值（兼容旧数据）
+      const fillTypes = () => {
+        const cur = gk && gk.courseId === cidSel.value ? gk.examType : null;
+        clearSel(etSel);
+        examTypeOptions(d, cidSel.value, cur).forEach(t => {
+          const o = document.createElement('option'); o.value = t; o.textContent = t;
+          if (t === cur) o.selected = true; etSel.appendChild(o);
+        });
+      };
+      const fillLevels = () => {
+        const match = gk && gk.courseId === cidSel.value && gk.examType === etSel.value;
+        const cur = match ? gk.level : null;
+        clearSel(lvSel);
+        levelOptions(d, cidSel.value, etSel.value, cur).forEach(l => {
+          const o = document.createElement('option'); o.value = l; o.textContent = l;
+          if (l === cur) o.selected = true; lvSel.appendChild(o);
+        });
+      };
+      cidSel.onchange = () => { fillTypes(); fillLevels(); };
+      etSel.onchange = fillLevels;
+      fillTypes(); fillLevels();
       form.appendChild(label('学科', cidSel));
       form.appendChild(label('考试类型', etSel));
       form.appendChild(label('级别', lvSel));
@@ -770,9 +867,24 @@
     if (!cids.length) cidSel.innerHTML = '<option value="">（暂无学科）</option>';
     cids.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = (d.tree[c] && d.tree[c].name) || c; cidSel.appendChild(o); });
     const etSel = document.createElement('select'); etSel.className = 'wb-sel';
-    EXAM_TYPES.forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = t; etSel.appendChild(o); });
     const lvSel = document.createElement('select'); lvSel.className = 'wb-sel';
-    LEVELS.forEach(l => { const o = document.createElement('option'); o.value = l; o.textContent = l; lvSel.appendChild(o); });
+    // 类型/级别选项来自所选学科的 examConfig + 已有题目出现过的值（兼容旧数据）；
+    // 想要新的类型/等级，去「⚙ 考试类型配置」里加。
+    const fillTypes = () => {
+      clearSel(etSel);
+      examTypeOptions(d, cidSel.value, null).forEach(t => {
+        const o = document.createElement('option'); o.value = t; o.textContent = t; etSel.appendChild(o);
+      });
+    };
+    const fillLevels = () => {
+      clearSel(lvSel);
+      levelOptions(d, cidSel.value, etSel.value, null).forEach(l => {
+        const o = document.createElement('option'); o.value = l; o.textContent = l; lvSel.appendChild(o);
+      });
+    };
+    cidSel.onchange = () => { fillTypes(); fillLevels(); };
+    etSel.onchange = fillLevels;
+    fillTypes(); fillLevels();
     form.appendChild(label('学科', cidSel));
     form.appendChild(label('考试类型', etSel));
     form.appendChild(label('级别', lvSel));
@@ -853,6 +965,156 @@
     const cb = el('button', 'wb-btn sm', '复制提示词');
     cb.onclick = () => copyText(text, '提示词');
     bd.appendChild(cb);
+    box.appendChild(bd);
+    mask.appendChild(box);
+    mask.onclick = e => { if (e.target === mask) mask.remove(); };
+    document.body.appendChild(mask);
+  }
+
+  // ===== 考试类型配置（学科级，保存即上云） =====
+  // examConfig 存在 courses 文档里（manageCourses 的 setExamConfig action），
+  // 小程序端的考试类型卡 / 等级列表全部以此为准，不再写死。
+  function showExamConfigForm() {
+    const d = draft();
+    const cids = Object.keys(d.tree);
+    if (!cids.length) { alert('还没有学科。请管理员先在小程序首页「新建学科」，再点「从云端拉取」'); return; }
+    const defaultCid = (examCourseFilter !== 'all' && d.tree[examCourseFilter]) ? examCourseFilter : (currentCourseId() || cids[0]);
+
+    const mask = el('div', 'wb-modal-mask');
+    const box = el('div', 'wb-modal');
+    const hd = el('div', 'wb-modal-hd');
+    hd.appendChild(el('h3', null, '考试类型配置'));
+    const x = el('span', 'x', '关闭'); x.onclick = () => mask.remove();
+    hd.appendChild(x);
+    box.appendChild(hd);
+    const bd = el('div', 'wb-modal-bd');
+    bd.appendChild(el('div', 'wb-help-tip',
+      '为学科配置「等级考试类型」：名称 / 描述 / 颜色显示在小程序考试页的卡片上，等级列表决定考试页展示哪些级别。'
+      + 'type 是题目归档的关联键（对应考试题的 examType），已有题目后请勿随意改动。保存即上云，小程序端随即生效。'));
+
+    const cidSel = document.createElement('select'); cidSel.className = 'wb-sel';
+    cids.forEach(c => {
+      const o = document.createElement('option'); o.value = c;
+      o.textContent = (d.tree[c] && d.tree[c].name) || c;
+      if (c === defaultCid) o.selected = true;
+      cidSel.appendChild(o);
+    });
+    bd.appendChild(label('学科', cidSel));
+
+    const listWrap = el('div');
+    bd.appendChild(listWrap);
+
+    // 本地编辑副本（从当前配置 / 内置默认值读出，点「保存」才落库）。
+    // 切换学科时重新加载该学科的配置，避免界面上看着换了学科、实际还在改上一门的。
+    function loadRows() {
+      rows = WB.state.getExamConfig(d, cidSel.value).map(t => ({
+        type: t.type || '', name: t.name || '', desc: t.desc || '',
+        icon: t.icon || 'i-book', color: t.color || '#5B67F1', colorDark: t.colorDark || t.color || '#8E5CF6',
+        levelsText: (t.levels || []).filter(Boolean).join('\n')
+      }));
+      renderRows();
+    }
+    let rows = [];
+    cidSel.onchange = loadRows;
+    loadRows();
+
+    function typeRow(r, idx) {
+      const card = el('div', 'wb-qcard');
+      const row1 = el('div', 'wb-qcard-head');
+      const mkInp = (host, ph, val, onch, w) => {
+        const i = document.createElement('input'); i.className = 'wb-qinput';
+        i.placeholder = ph; i.value = val || '';
+        if (w) i.style.width = w;
+        i.oninput = () => onch(i.value);
+        host.appendChild(i); return i;
+      };
+      mkInp(row1, '类型标识 type（如 CIE）', r.type, v => { r.type = v; });
+      mkInp(row1, '显示名称（如 CIE 等级考试）', r.name, v => { r.name = v; });
+      const delBtn = el('button', 'wb-btn sm danger', '删除');
+      delBtn.onclick = () => { rows.splice(idx, 1); renderRows(); };
+      row1.appendChild(delBtn);
+      card.appendChild(row1);
+
+      const row2 = el('div', 'wb-qopts');
+      mkInp(row2, '描述（卡片副标题）', r.desc, v => { r.desc = v; });
+      mkInp(row2, '图标（icons.wxss 类名）', r.icon, v => { r.icon = v; });
+      mkInp(row2, '主色', r.color, v => { r.color = v; }, '90px');
+      mkInp(row2, '深色', r.colorDark, v => { r.colorDark = v; }, '90px');
+      card.appendChild(row2);
+
+      const lv = document.createElement('textarea'); lv.className = 'wb-material'; lv.style.minHeight = '64px';
+      lv.placeholder = '等级列表，一行一个（如：一级\\n二级\\n三级）';
+      lv.value = r.levelsText;
+      lv.oninput = () => { r.levelsText = lv.value; };
+      card.appendChild(lv);
+      return card;
+    }
+
+    function renderRows() {
+      clearChildren(listWrap);
+      if (!rows.length) listWrap.appendChild(el('div', 'wb-muted', '该学科还没有考试类型。点下方「添加考试类型」，或保持为空（小程序考试页会显示未配置提示）。'));
+      rows.forEach((r, i) => listWrap.appendChild(typeRow(r, i)));
+    }
+    renderRows();
+
+    const addBtn = el('button', 'wb-btn-dash', '＋ 添加考试类型'); addBtn.style.margin = '8px 0';
+    addBtn.onclick = () => { rows.push({ type: '', name: '', desc: '', icon: 'i-book', color: '#5B67F1', colorDark: '#8E5CF6', levelsText: '一级\n二级' }); renderRows(); };
+    bd.appendChild(addBtn);
+
+    const saveBtn = el('button', 'wb-btn primary', '保存并上云'); saveBtn.style.width = '100%';
+    saveBtn.onclick = () => saveConfig();
+    bd.appendChild(saveBtn);
+    bd.appendChild(el('div', 'wb-note', '保存写入云端 courses 集合（manageCourses.setExamConfig，需管理密码），本地草稿同步更新。小程序端下次进入考试页即生效。'));
+
+    async function saveConfig() {
+      const cid = cidSel.value;
+      const cfg = rows.map(r => ({
+        type: (r.type || '').trim(),
+        name: (r.name || '').trim(),
+        desc: (r.desc || '').trim(),
+        icon: (r.icon || 'i-book').trim(),
+        color: (r.color || '#5B67F1').trim(),
+        colorDark: (r.colorDark || r.color || '#8E5CF6').trim(),
+        levels: (r.levelsText || '').split('\n').map(s => s.trim()).filter(Boolean)
+      })).filter(r => r.type);
+      const types = cfg.map(t => t.type);
+      if (new Set(types).size !== types.length) { alert('类型标识（type）有重复'); return; }
+      const emptyLv = cfg.find(t => !t.levels.length);
+      if (emptyLv) { alert('类型「' + emptyLv.type + '」至少要有一个等级'); return; }
+
+      const dd = draft();
+      if (!dd.password) {
+        const p = prompt('请输入管理密码（部署云函数时配置的 ADMIN_PASSWORD）');
+        if (!p) return;
+        dd.password = p;
+      }
+      saveBtn.disabled = true; saveBtn.textContent = '保存中…';
+      let res;
+      try {
+        await WB.cloud.ensureLogin();
+        res = await WB.cloud.call('manageCourses', { action: 'setExamConfig', courseId: cid, examConfig: cfg, password: dd.password });
+      } catch (e) {
+        saveBtn.disabled = false; saveBtn.textContent = '保存并上云';
+        const msg = (e && e.message) || '';
+        if (msg.indexOf('PERMISSION_DENIED') !== -1) {
+          alert('保存失败：云函数「manageCourses」未开放网页端调用权限。\n\n'
+            + '修复方法（一次性配置）：\n'
+            + '微信开发者工具 → 云开发控制台 → 云函数 → manageCourses → 「权限控制」，\n'
+            + '把安全规则改成和 importContent 一样（如 { "invoke": true }），保存后重试。');
+        } else {
+          alert('保存失败：' + msg);
+        }
+        return;
+      }
+      saveBtn.disabled = false; saveBtn.textContent = '保存并上云';
+      if (!res || !res.success) { alert('保存失败：' + ((res && res.message) || '未知错误')); return; }
+      dd.tree[cid].examConfig = cfg;
+      WB.state.save(dd);
+      mask.remove();
+      render();
+      alert('考试类型配置已保存并同步到云端');
+    }
+
     box.appendChild(bd);
     mask.appendChild(box);
     mask.onclick = e => { if (e.target === mask) mask.remove(); };

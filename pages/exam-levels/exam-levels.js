@@ -1,3 +1,4 @@
+const app = getApp();
 const db = require('../../utils/db.js');
 
 Page({
@@ -27,22 +28,15 @@ Page({
     }
   },
 
+  // 等级列表不再写死：从学科 examConfig 里该考试类型的 levels 取
+  // （配置在工作台「考试类型配置」维护，随 courses 集合下发）。
+  // 未配置时先留空，loadLevelCounts 会用云端实际有题的等级兜底。
   initLevels() {
     const { courseId, examType } = this.data;
-    let levels = [];
-
-    if (examType === 'CIE') {
-      if (courseId === 'python') {
-        levels = ['一级', '二级', '三级', '四级', '五级', '六级'];
-      } else {
-        levels = ['一级', '二级', '三级', '四级', '五级', '六级', '七级', '八级', '九级', '十级'];
-      }
-    } else if (examType === 'GESP') {
-      levels = ['一级', '二级', '三级', '四级', '五级', '六级', '七级', '八级'];
-    } else if (examType === 'CSP-JS') {
-      levels = ['CSP-J（入门级）', 'CSP-S（提高级）'];
-    }
-
+    const courses = app.globalData.courses || [];
+    const course = courses.find(c => c.id === courseId);
+    const cfg = (((course && course.examConfig) || []) || []).find(t => t.type === examType);
+    const levels = (cfg && Array.isArray(cfg.levels)) ? cfg.levels.filter(Boolean) : [];
     this.setData({ levels });
   },
 
@@ -58,6 +52,13 @@ Page({
       levelData.forEach(item => {
         levelQuestionCounts[item.level] = item.questionCount;
       });
+
+      // 兜底：该考试类型未配置等级列表时，用云端实际有题的等级展示
+      let levels = this.data.levels;
+      if (!levels.length && levelData.length) {
+        levels = levelData.filter(item => item.questionCount > 0).map(item => item.level);
+        this.setData({ levels });
+      }
 
       this.setData({ levelQuestionCounts });
     } catch (err) {

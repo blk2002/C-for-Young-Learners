@@ -4,21 +4,35 @@
 
 文档里所有 `<尖括号>` 内容都是需要你自己填的占位符，不含任何个人账号信息。
 
+## 目录
+
+- [这套工具是什么](#这套工具是什么)
+- [部署前准备](#部署前准备)
+- [第一步 部署云函数](#第一步-部署云函数)
+- [第二步 安装本地模型](#第二步-安装本地模型)
+- [第三步 部署网页](#第三步-部署网页)
+- [第四步 配置云端权限](#第四步-配置云端权限)
+- [第五步 验证连通](#第五步-验证连通)
+- [日常使用](#日常使用)
+- [常见问题](#常见问题)
+
 ## 这套工具是什么
 
 工作台由四个部分拼成一条链路：
 
 ```mermaid
 flowchart LR
-    A[浏览器网页] -->|匿名登录| B[云函数 getCourseTree / importContent]
-    B --> C[云数据库 chapters / lessons / chapterQuestions / examQuestions]
+    A[浏览器网页] -->|匿名登录| B[云函数 getCourseTree / importContent / manageCourses]
+    B --> C[云数据库 courses / chapters / lessons / chapterQuestions / examQuestions]
     A -->|fetch 本地接口| D[本机 Ollama 模型]
     D -->|AI 结构化转换| A
 ```
 
 - 网页托管在微信云开发的静态网站托管，得到一个正式网址。
 - 素材转成三段速记、题目结构化，靠本机 Ollama 本地模型（免费、离线、隐私数据不出本机）。
-- 网页用匿名登录调用两个云函数：`getCourseTree` 读取课程树，`importContent` 写入结构和题目。两个函数内部都用 `ADMIN_PASSWORD` 环境变量做管理密码校验。
+- 网页用匿名登录调用三个云函数：`getCourseTree` 读取课程树，`importContent` 写入结构和题目，`manageCourses` 写入各学科的等级考试类型配置（`examConfig`）。三个函数内部都用 `ADMIN_PASSWORD` 环境变量做管理密码校验。
+
+> 说明：本部署只涉及工作台自身的三个云函数，与小程序端云函数（登录、学生管理等）相互独立。学科的新建 / 删除 / 改名在小程序端完成，工作台「从云端拉取」会自动合并学科列表；学科的考试类型配置在工作台「⚙ 考试类型配置」完成。
 
 ## 部署前准备
 
@@ -28,13 +42,15 @@ flowchart LR
 
 ## 第一步 部署云函数
 
-### 1.1 上传两个云函数
+### 1.1 上传三个云函数
 
 1. 用微信开发者工具打开小程序项目。
-2. 在编辑器文件树里展开 `cloudfunctions`，找到 `importContent` 和 `getCourseTree` 两个目录。
+2. 在编辑器文件树里展开 `cloudfunctions`，找到 `importContent`、`getCourseTree` 和 `manageCourses` 三个目录。
 3. 分别右键每个目录，选择「上传并部署：云端安装依赖」，等它完成。
 
-> 这两个云函数必须在同一个云环境里，且和后面网页要连的环境一致。
+> 这三个云函数必须在同一个云环境里，且和后面网页要连的环境一致。
+
+> ✅ **完成标志**：云开发控制台 → 云函数列表中能看到三个函数，状态为部署成功。
 
 ### 1.2 配置管理密码
 
@@ -42,10 +58,12 @@ flowchart LR
 2. 点进 `importContent`，切到「配置」，找到「环境变量」，添加一行：
    - 变量名：`ADMIN_PASSWORD`
    - 变量值：`<你的管理密码>`
-3. 对 `getCourseTree` 重复同样的配置，两个函数的 `ADMIN_PASSWORD` 要设成同一个值。
-4. 顺手把两个函数的「执行超时」从默认的 3 秒改到 60 秒，避免写入批量数据时被中断。
+3. 对 `getCourseTree` 和 `manageCourses` 重复同样的配置，**三个函数的 `ADMIN_PASSWORD` 要设成同一个值**（`manageCourses` 漏配时，保存考试类型配置会报「缺少操作者身份」）。
+4. 顺手把三个函数的「执行超时」从默认的 3 秒改到 60 秒，避免写入批量数据时被中断。
 
-记好这个密码，网页里同步和拉取都要用到。
+记好这个密码，网页里同步、拉取和保存考试类型配置都要用到。
+
+> ✅ **完成标志**：三个函数的环境变量里都有 `ADMIN_PASSWORD`，超时为 60 秒。
 
 ## 第二步 安装本地模型
 
@@ -56,6 +74,8 @@ flowchart LR
 > 安装器不提供「选择安装路径」的选项，这是正常现象。真正占空间的是模型文件，下一步会把它放到 D 盘。
 >
 > 如果安装过程中进度条长时间停在 0 B/s，是安装器在从境外服务器下载程序文件、国内直连慢。可以改用魔搭（modelscope.cn）搜索 Ollama 的国内安装包，或用浏览器、下载工具重新下载安装包。
+
+> ✅ **完成标志**：命令行执行 `ollama --version` 能返回版本号。
 
 ### 2.2 把模型存到 D 盘
 
@@ -69,6 +89,8 @@ setx OLLAMA_MODELS "D:\ollama\models"
 
 如果电脑上已经打开过 Ollama 桌面应用，需要在它的设置页里把 Model location 也改成 `D:\ollama\models`——桌面应用的设置优先级高于环境变量，两者都改最稳妥。同时把设置里的 Cloud 开关关掉，否则会优先连 ollama.com 的云端模型而不是本机模型。
 
+> ✅ **完成标志**：环境变量已设置；如装过桌面应用，其 Model location 也指向 D 盘。
+
 ### 2.3 允许网页跨域访问（关键）
 
 网页是 https 地址，要访问本机的 `http://127.0.0.1:11434`，必须让 Ollama 放行跨域，否则会报 403。在同一个 PowerShell 里再执行：
@@ -79,6 +101,8 @@ setx OLLAMA_ORIGINS "*"
 
 改完后完全退出 Ollama（托盘图标右键 → Quit），再重新打开，让两个环境变量生效。
 
+> ✅ **完成标志**：环境变量已设置，Ollama 已完全重启过一次。
+
 ### 2.4 拉取模型
 
 新开一个 PowerShell 窗口，执行：
@@ -88,6 +112,8 @@ ollama pull qwen3:4b
 ```
 
 模型约 2.5GB，视网速需要几分钟到十几分钟。国内网络如果下载慢，可以先执行 `setx OLLAMA_HF_MIRROR "https://modelscope.cn"` 再拉取，让它走魔搭镜像加速。
+
+> ✅ **完成标志**：`ollama list` 里能看到 `qwen3:4b`。
 
 ### 2.5 启动脚本
 
@@ -101,6 +127,8 @@ ollama pull qwen3:4b
 
 微信开发者工具 → 云开发控制台 → 找到「静态网站托管」→ 开通（选免费额度即可）。
 
+> ✅ **完成标志**：静态托管控制台能打开，且显示默认域名。
+
 ### 3.2 上传文件
 
 1. 进入静态托管的「文件管理」，回到根目录 `/`。
@@ -112,6 +140,10 @@ ollama pull qwen3:4b
 3. 不要上传 `启动本地模型.bat` 和 `tests/`，前者是本机脚本，后者是单元测试。
 
 上传完成后，在「网站配置」里找到默认域名（形如 `https://<你的环境ID>-<appid>.tcloudbaseapp.com`），收藏它，这就是工作台网址。
+
+> ✅ **完成标志**：浏览器打开默认域名，能看到工作台页面（此时顶部指示灯可能还没绿，属正常，下一步配权限）。
+>
+> 💡 以后每次更新代码：重新上传改动文件，并把 `index.html` 里对应 js/css 的 `?v=` 版本戳 +1（CDN 对 `.js`/`.css` 默认缓存 365 天，靠版本戳破缓存）。
 
 ## 第四步 配置云端权限
 
@@ -125,9 +157,13 @@ ollama pull qwen3:4b
 2. 左侧菜单进入「身份认证 → 登录方式」。
 3. 把「匿名登录」打开。
 
+> ✅ **完成标志**：登录方式列表里「匿名登录」显示已启用。
+
 ### 4.2 确认安全域名
 
 进入「环境配置 → 安全来源」页面（直达链接 `https://tcb.cloud.tencent.com/dev?#/env/safety-source`）。静态托管域名通常已经在默认白名单里（系统会预置 `env-id.tcloudbaseapp.com` 这一条）。如果列表里没有你的完整域名，就点「添加域名」补上。
+
+> ✅ **完成标志**：安全来源列表里包含你的静态托管域名。
 
 ### 4.3 配置云函数调用权限（关键）
 
@@ -143,11 +179,16 @@ ollama pull qwen3:4b
   },
   "importContent": {
     "invoke": true
+  },
+  "manageCourses": {
+    "invoke": true
   }
 }
 ```
 
-含义是：其他所有云函数保持「拒绝匿名用户」的默认保护，只对这两个工作台函数放行匿名调用。放行是安全的，因为它们内部还有 `ADMIN_PASSWORD` 校验，没有密码做不了任何写操作。
+含义是：其他所有云函数保持「拒绝匿名用户」的默认保护，只对这三个工作台函数放行匿名调用。放行是安全的，因为它们内部还有 `ADMIN_PASSWORD` 校验，没有密码做不了任何写操作。权限修改后 1~3 分钟生效。
+
+> ✅ **完成标志**：权限控制页面保存了上述 JSON 规则。
 
 ## 第五步 验证连通
 
@@ -156,23 +197,77 @@ ollama pull qwen3:4b
 3. 看页面顶部两个指示灯：本地模型、云端都应变成绿色。
 4. 点「从云端拉取」，输入管理密码，能返回数据就说明整条链路通了。
 
+> ✅ **完成标志**：两盏灯全绿，「从云端拉取」能返回课程树。部署到此完成。
+
 ## 日常使用
 
-- 新建课程结构：左侧树点「+ 学科」「+ 章节」逐级建，右侧编辑知识点内容，最后「同步结构与内容」。
-- 补知识点：选中知识点，粘贴素材，选「填空模式」让本地 AI 填入。
-- 导入题目：切到「② 题目」页签，粘贴题目素材或手动加题，逐题校对后「同步题目」。
+- **新建课程结构**：左侧树点「＋ 章节」「＋ 知识点」逐级建（学科本身在小程序端创建），右侧编辑知识点内容，最后「同步结构与内容」。
+- **补知识点**：选中知识点，粘贴素材，选「填空模式」让本地 AI 填入。
+- **导入题目**：切到「题目」页签，粘贴题目素材或手动加题，逐题校对后「同步题目」。
+- **换电脑 / 清缓存前**：先「导出备份」把本地草稿存档；导入备份是整体覆盖，导入前先导出留底。
 - 每次用本地 AI 之前，都要先启动本地模型脚本。
 
 ## 常见问题
 
-- 安装 Ollama 时进度条卡在 0 B/s：安装器在从境外服务器下载程序文件，国内直连慢。改用魔搭（modelscope.cn）搜索 Ollama 国内安装包，或用浏览器、下载工具重新下载安装包。
-- 模型下载到了 C 盘而不是 D 盘：`OLLAMA_MODELS` 设晚了或没生效。先看 Ollama 桌面应用设置里的 Model location 是否指向 D 盘，再确认执行 `setx OLLAMA_MODELS "D:\ollama\models"` 之后完全重启过 Ollama。
-- 网页打开是 404：`index.html` 没放在托管根目录，重新上传到 `/` 下，不要套一层文件夹。
-- 云端指示灯不绿，控制台报 `cloudbase is not defined`：网页里 CloudBase SDK 没加载，检查网络，或确认 `index.html` 里 SDK 地址是 `https://static.cloudbase.net/cloudbase-js-sdk/2.17.3/cloudbase.full.js`。
-- 拉取报 `PERMISSION_DENIED`：回到第四步 4.3，确认云函数安全规则已放行 `getCourseTree`、`importContent` 两个函数。
-- 本地模型指示灯不绿：先确认启动了脚本，再执行 `curl.exe http://127.0.0.1:11434/api/tags` 看能否返回模型列表；如果带 Origin 头的请求返回 403，说明 `OLLAMA_ORIGINS` 没生效，回到第二步 2.3。
-- 模型下载慢或失败：设置 `OLLAMA_HF_MIRROR` 走魔搭镜像，见第二步 2.4。
-- 本地模型在跑，却用上了云端模型：Ollama 桌面应用的 Cloud 开关没关，把它关掉。
+<details>
+<summary><b>安装 Ollama 时进度条卡在 0 B/s</b></summary>
+
+安装器在从境外服务器下载程序文件，国内直连慢。改用魔搭（modelscope.cn）搜索 Ollama 国内安装包，或用浏览器、下载工具重新下载安装包。
+</details>
+
+<details>
+<summary><b>模型下载到了 C 盘而不是 D 盘</b></summary>
+
+`OLLAMA_MODELS` 设晚了或没生效。先看 Ollama 桌面应用设置里的 Model location 是否指向 D 盘，再确认执行 `setx OLLAMA_MODELS "D:\ollama\models"` 之后完全重启过 Ollama。
+</details>
+
+<details>
+<summary><b>网页打开是 404</b></summary>
+
+`index.html` 没放在托管根目录，重新上传到 `/` 下，不要套一层文件夹。
+</details>
+
+<details>
+<summary><b>云端指示灯不绿，控制台报 <code>cloudbase is not defined</code></b></summary>
+
+网页里 CloudBase SDK 没加载，检查网络，或确认 `index.html` 里 SDK 地址是 `https://static.cloudbase.net/cloudbase-js-sdk/2.17.3/cloudbase.full.js`。
+</details>
+
+<details>
+<summary><b>拉取报 <code>PERMISSION_DENIED</code></b></summary>
+
+回到第四步 4.3，确认云函数安全规则已放行 `getCourseTree`、`importContent`、`manageCourses` 三个函数（顶级通配 key 必须是单个 `*`，旧配置里的 `**` 在新版控制台保存会报 INVALID_CONFIG）。
+</details>
+
+<details>
+<summary><b>保存考试类型配置报「缺少操作者身份」</b></summary>
+
+`manageCourses` 没配管理密码：云开发控制台 → 云函数 → manageCourses → 配置 → 环境变量，添加 `ADMIN_PASSWORD`（与 `importContent` 同值），必要时重新部署一次该函数。
+</details>
+
+<details>
+<summary><b>本地模型指示灯不绿</b></summary>
+
+先确认启动了脚本，再执行 `curl.exe http://127.0.0.1:11434/api/tags` 看能否返回模型列表；如果带 Origin 头的请求返回 403，说明 `OLLAMA_ORIGINS` 没生效，回到第二步 2.3。
+</details>
+
+<details>
+<summary><b>模型下载慢或失败</b></summary>
+
+设置 `OLLAMA_HF_MIRROR` 走魔搭镜像，见第二步 2.4。
+</details>
+
+<details>
+<summary><b>本地模型在跑，却用上了云端模型</b></summary>
+
+Ollama 桌面应用的 Cloud 开关没关，把它关掉。
+</details>
+
+<details>
+<summary><b>改了代码重新上传，页面还是旧的</b></summary>
+
+静态托管 CDN 对 `.js` / `.css` 默认缓存 365 天。把 `index.html` 里所有 `?v=` 版本戳 +1 再上传，或在静态托管控制台点「刷新」清缓存。
+</details>
 
 ## 作者
 

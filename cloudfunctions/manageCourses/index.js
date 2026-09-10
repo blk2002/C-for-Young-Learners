@@ -1,5 +1,7 @@
-// cloudfunctions/manageCourses/index.js - 学科（课程）管理：新增 / 删除 / 改名
-// 仅小程序端管理员可调用（沿用 admin 系列云函数的 operatorId 软校验范式）。
+// cloudfunctions/manageCourses/index.js - 学科（课程）管理：新增 / 删除 / 改名 / 考试类型配置
+// 两条鉴权路径：
+//   ① 小程序端管理员：operatorId 软校验（沿用 admin 系列云函数范式）
+//   ② 工作台（浏览器端，没有用户体系）：password = 部署时配置的 ADMIN_PASSWORD
 // 学科唯一真源是 courses 集合；删除学科时级联清理其云端内容与学生个人数据：
 //   chapters / lessons / chapterQuestions / examQuestions / progress / wrongQuestions / favorites
 //   （favorites 没有 courseId 字段，需先收集该学科全部 lessonId 再按 lessonId 删）
@@ -84,10 +86,15 @@ async function uniqueId(base) {
 
 exports.main = async (event) => {
   const action = event && event.action;
-  const { operatorId } = event || {};
+  const { operatorId, password } = event || {};
 
-  // 权限校验（三个 action 都需要管理员）
-  const auth = await assertAdmin(operatorId);
+  // 权限校验：工作台走管理密码（与 importContent 同一把 ADMIN_PASSWORD），小程序端走 operatorId
+  let auth;
+  if (password && process.env.ADMIN_PASSWORD && password === process.env.ADMIN_PASSWORD) {
+    auth = { ok: true, operator: { nickname: '工作台(密码鉴权)' } };
+  } else {
+    auth = await assertAdmin(operatorId);
+  }
   if (!auth.ok) {
     return { success: false, message: auth.message };
   }
@@ -217,6 +224,53 @@ exports.main = async (event) => {
 
       await db.collection('courses').doc(courseId).update({ data: { name } });
       return { success: true, message: '已改名', data: { _id: courseId, name } };
+    }
+
+    // ============ 设置考试类型配置（等级考试类型 + 等级列表） ============
+    // examConfig 是学科级配置，随 courses 文档存取；type 是关联键，
+    // 与 examQuestions / wrongQuestions 文档里的 examType 字段对应。
+    // 内置学科允许配置（学科本体只读，但考试类型可配）。
+    if (action === 'setExamConfig') {
+      const courseId = event.courseId;
+      const examConfig = event.examConfig;
+      if (!courseId) return { success: false, message: '缺少学科 id' };
+      if (!Array.isArray(examConfig)) return { success: false, message: 'examConfig 必须是数组' };
+      if (examConfig.length > 20) return { success: false, message: '考试类型最多 20 个' };
+
+      const seenTypes = new Set();
+      for (const t of examConfig) {
+        const type = String((t && t.type) || '').trim();
+        if (!type) return { success: false, message: '考试类型标识（type）不能为空' };
+        if (type.length > 20) return { success: false, message: '类型标识最长 20 字符：' + type };
+        if (seenTypes.has(type)) return { success: false, message: '类型标识重复：' + type };
+        seenTypes.add(type);
+        const levels = Array.isArray(t.levels) ? t.levels.filter(Boolean) : [];
+        if (!levels.length) return { success: false, message: `类型「${type}」至少要有一个等级` };
+        if (new Set(levels).size !== levels.length) {
+          return { success: false, message: `类型「${type}」的等级有重复` };
+        }
+      }
+
+      let course;
+      try {
+        course = (await db.collection('courses').doc(courseId).get()).data;
+      } catch (e) {
+        return { success: false, message: '学科不存在或已被删除' };
+      }
+
+      // 清洗：只保留白名单字段，防脏数据进库
+      const clean = examConfig.map(t => ({
+        type: String(t.type).trim(),
+        name: String(t.name || t.type).trim().slice(0, 30),
+        desc: String(t.desc || '').trim().slice(0, 60),
+        icon: String(t.icon || 'i-book').trim(),
+        color: String(t.color || '#5B67F1').trim(),
+        colorDark: String(t.colorDark || t.color || '#8E5CF6').trim(),
+        levels: (t.levels || []).filter(Boolean).map(l => String(l).trim()).filter(Boolean)
+      }));
+
+      await db.collection('courses').doc(courseId).update({ data: { examConfig: clean } });
+      return { success: true, message: '考试类型配置已保存', data: { _id: courseId, examConfig: clean } };
     }
 
     return { success: false, message: '未知操作：' + action };
