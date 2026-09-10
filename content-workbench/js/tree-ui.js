@@ -11,6 +11,9 @@
   const uid = p => p + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   const draft = () => WB.state.load();
   const $ = id => document.getElementById(id);
+  // 内置学科（python / cpp）：默认存在，不可删除、不可改名
+  const isBuiltin = id => !!(WB.state.isBuiltinCourse && WB.state.isBuiltinCourse(id));
+  const BUILTIN_TIP = 'Python 和 C++ 是内置学科，不能删除，也不能改名。';
 
   function persist(d) { WB.state.save(d); render(); if (window.WBRefreshStat) WBRefreshStat(); }
 
@@ -58,11 +61,17 @@
     if (extra && extra.count != null) {
       const c = document.createElement('span'); c.className = 'cnt'; c.textContent = extra.count; el.appendChild(c);
     }
-    const edit = document.createElement('span'); edit.className = 'wb-node-act'; edit.textContent = '✎';
-    edit.onclick = e => { e.stopPropagation(); rename(ids, level); };
-    const del = document.createElement('span'); del.className = 'wb-node-act'; del.textContent = '✕';
-    del.onclick = e => { e.stopPropagation(); remove(ids, level); };
-    el.appendChild(edit); el.appendChild(del);
+    // 内置学科：不挂 ✎ / ✕，改成一个「内置」标记
+    if (level === 'course' && isBuiltin(ids.courseId)) {
+      const lock = document.createElement('span'); lock.className = 'wb-node-lock'; lock.textContent = '内置';
+      el.appendChild(lock);
+    } else {
+      const edit = document.createElement('span'); edit.className = 'wb-node-act'; edit.textContent = '✎';
+      edit.onclick = e => { e.stopPropagation(); rename(ids, level); };
+      const del = document.createElement('span'); del.className = 'wb-node-act'; del.textContent = '✕';
+      del.onclick = e => { e.stopPropagation(); remove(ids, level); };
+      el.appendChild(edit); el.appendChild(del);
+    }
     el.onclick = () => select(ids, level);
     return el;
   }
@@ -105,6 +114,7 @@
   }
 
   function rename(ids, level) {
+    if (level === 'course' && isBuiltin(ids.courseId)) { alert(BUILTIN_TIP); return; }
     const d = draft();
     const node = findNode(d, ids, level);
     if (level === 'course') {
@@ -118,6 +128,8 @@
   }
 
   function remove(ids, level) {
+    // 内置学科兜底：不管从哪个入口进来都不能删
+    if (level === 'course' && isBuiltin(ids.courseId)) { alert(BUILTIN_TIP); return; }
     if (!confirm('确认删除？已入库的节点将在下次「同步结构与内容」时从云端删除。')) return;
     const d = draft();
     let orphanExam = null;   // 学科被删时它名下的考试题（独立实体，不跟随删除）
@@ -231,6 +243,7 @@
       const name = document.getElementById('nc-name').value.trim();
       const id = (document.getElementById('nc-id').value.trim() || slug(name) || 'course-' + uid('x'));
       if (!name) { alert('请填学科名称'); return; }
+      if (isBuiltin(id)) { alert('python / cpp 是内置学科的保留 id，请换一个（如 scratch）'); return; }
       const d = draft();
       if (d.tree[id]) { alert('该学科已存在'); return; }
       d.tree[id] = { name, chapters: [], icon: document.getElementById('nc-icon').value, color: document.getElementById('nc-color').value };
@@ -271,18 +284,33 @@
       o.appendChild(s2);
       o.appendChild(document.createTextNode(d.tree[id].name || id));
       if (id === cid) { const t = document.createElement('span'); t.className = 'tick'; t.textContent = '当前'; o.appendChild(t); }
-      // 新增：每个选项右边一个删除按钮（即便只剩一个学科，列表里仍能删）
-      const delOpt = document.createElement('span'); delOpt.className = 'wb-course-opt-del'; delOpt.textContent = '✕';
-      delOpt.title = '删除该学科';
-      delOpt.onclick = e => { e.stopPropagation(); menu.classList.add('hidden'); remove({ courseId: id }, 'course'); };
-      o.appendChild(delOpt);
+      if (isBuiltin(id)) {
+        // 内置学科：不显示删除，改成「内置」标记
+        const bi = document.createElement('span'); bi.className = 'wb-course-opt-del ro'; bi.textContent = '内置';
+        bi.title = '内置学科，不可删除';
+        o.appendChild(bi);
+      } else {
+        // 每个选项右边一个删除按钮（即便只剩一个学科，列表里仍能删）
+        const delOpt = document.createElement('span'); delOpt.className = 'wb-course-opt-del'; delOpt.textContent = '✕';
+        delOpt.title = '删除该学科';
+        delOpt.onclick = e => { e.stopPropagation(); menu.classList.add('hidden'); remove({ courseId: id }, 'course'); };
+        o.appendChild(delOpt);
+      }
       o.onclick = () => { menu.classList.add('hidden'); setCurrentCourse(id); };
       menu.appendChild(o);
     });
     sel.onclick = () => menu.classList.toggle('hidden');
     // 新增：当前学科卡片右侧的删除按钮（不展开菜单就能删，符合"单学科时也能删"的诉求）
     const delCur = document.createElement('button'); delCur.className = 'wb-side-del'; delCur.textContent = '✕';
-    delCur.title = '删除当前学科';
+    if (isBuiltin(cid)) {
+      // 不用 disabled 属性：Chrome 对 disabled 元素不显示 title 气泡，用户会以为按钮坏了。
+      // 改成灰化 + 点击弹提示；remove() 里还有兜底拦截，真删不掉。
+      delCur.classList.add('is-disabled');
+      delCur.setAttribute('aria-disabled', 'true');
+      delCur.title = 'Python / C++ 是内置学科，不可删除';
+    } else {
+      delCur.title = '删除当前学科';
+    }
     delCur.onclick = e => { e.stopPropagation(); if (cid) remove({ courseId: cid }, 'course'); };
     const selRow = document.createElement('div'); selRow.className = 'wb-side-sel-row';
     selRow.appendChild(sel); selRow.appendChild(delCur);

@@ -800,8 +800,14 @@
     const box = el('div', 'wb-qcard'); box.id = 'wb-paste-box';
     box.appendChild(el('h3', 'wb-panel-title', '粘贴题目素材'));
     const ta = document.createElement('textarea'); ta.className = 'wb-material'; ta.style.minHeight = '110px';
-    ta.placeholder = '按模板粘贴题目行（【学习题】【章节题】【考试题】(类型,级别)）';
+    ta.placeholder = mode === 'exam'
+      ? '把真题整段粘进来（可带题号、选项、答案）；格式乱的点「用提示词整理」'
+      : '按模板粘贴题目行（【学习题】【章节题】【考试题】(类型,级别)）';
     box.appendChild(ta);
+    if (mode === 'exam') {
+      box.appendChild(el('div', 'wb-help-note',
+        '真题拿回来一般可以直接解析入表。如果格式不规整（没标类型、选项没有 A~D、夹着题号页码），先点「用提示词整理」让线上 AI 过一遍。'));
+    }
     const btn = el('button', 'wb-btn primary', '解析入表');
     btn.onclick = () => {
       const target = (mode === 'exam' && activeExamKey) ? parseExamKey(activeExamKey) : null;
@@ -809,7 +815,62 @@
       box.remove();
     };
     box.appendChild(btn);
+    if (mode === 'exam') {
+      const hp = el('button', 'wb-btn sm', '格式乱？用提示词整理');
+      hp.style.marginLeft = '8px';
+      hp.onclick = () => showExamPrompt();
+      box.appendChild(hp);
+    }
     host.insertBefore(box, host.children[2] || host.firstChild);
+  }
+
+  // 真题从网上复制下来常常格式乱：没标类型、选项没 A~D、夹着题号页码。
+  // 给一份提示词让用户丢给线上 AI 整理，回来再解析入表（考试题只走线上这一条路）。
+  function showExamPrompt() {
+    const src = (WB.help && WB.help.PROMPTS && WB.help.PROMPTS.exam && WB.help.PROMPTS.exam.parse) || '';
+    if (!src) return;
+    const cur = activeExamKey ? parseExamKey(activeExamKey) : null;
+    // 提示词里的示例类型/级别换成当前分类卡的，用户就不用自己改
+    const text = (cur && cur.examType && cur.level)
+      ? src.split('GESP,一级').join(cur.examType + ',' + cur.level) : src;
+
+    const mask = el('div', 'wb-modal-mask');
+    const box = el('div', 'wb-modal');
+    const hd = el('div', 'wb-modal-hd');
+    hd.appendChild(el('h3', null, '考试题整理提示词'));
+    const x = el('span', 'x', '关闭'); x.onclick = () => mask.remove();
+    hd.appendChild(x);
+    box.appendChild(hd);
+    const bd = el('div', 'wb-modal-bd');
+    bd.appendChild(el('div', 'wb-help-tip',
+      '真题从网上复制下来常常格式乱：没标类型、选项没有 A~D、夹着题号页码。把这份提示词连同你的真题一起发给网页 AI，整理好再粘回素材框，点「解析入表」就行。'));
+    if (cur && cur.examType && cur.level) {
+      bd.appendChild(el('div', 'wb-help-note', '已按当前分类填好：' + cur.examType + ' · ' + cur.level));
+    } else {
+      bd.appendChild(el('div', 'wb-help-note', '提示：先在左侧选中一个考试分类，提示词会自动带上它的类型与级别。'));
+    }
+    bd.appendChild(el('pre', 'wb-help-pre', text));
+    const cb = el('button', 'wb-btn sm', '复制提示词');
+    cb.onclick = () => copyText(text, '提示词');
+    bd.appendChild(cb);
+    box.appendChild(bd);
+    mask.appendChild(box);
+    mask.onclick = e => { if (e.target === mask) mask.remove(); };
+    document.body.appendChild(mask);
+  }
+
+  function copyText(text, label) {
+    const done = () => alert((label || '内容') + '已复制');
+    const fallback = () => {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) { alert('复制失败，请手动选择复制'); }
+      document.body.removeChild(ta);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(fallback);
+    } else fallback();
   }
 
   let persistTimer = null;
