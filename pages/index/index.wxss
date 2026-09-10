@@ -186,6 +186,70 @@
   opacity: 0.6;
 }
 
+/* 管理员操作角标（课程卡片右上角） */
+.admin-tools {
+  position: absolute;
+  top: 20rpx;
+  right: 20rpx;
+  display: flex;
+  gap: 12rpx;
+  z-index: 2;
+}
+
+.adm-btn {
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  border: 2rpx solid rgba(255, 255, 255, 0.5);
+  color: #fff;
+  font-size: 26rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.adm-btn:active {
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.adm-btn-danger:active {
+  background: rgba(229, 77, 66, 0.85);
+}
+
+/* 新建学科占位卡片（虚线边框） */
+.add-card {
+  background: #fff;
+  border: 4rpx dashed #c5c9e8;
+  box-shadow: none;
+  color: var(--t2);
+  text-align: center;
+  padding: 44rpx 40rpx;
+}
+
+.add-card:active {
+  transform: scale(0.98);
+  opacity: 0.85;
+}
+
+.add-icon {
+  width: 88rpx;
+  height: 88rpx;
+  margin: 0 auto 20rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-deep) 100%);
+  color: #fff;
+  font-size: 52rpx;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-card .course-desc {
+  color: var(--t3);
+}
+
 /* 提示区域 */
 .tip-section {
   padding: 20rpx 40rpx 40rpx;

@@ -47,6 +47,31 @@
       <view class="course-name">{{item.name}}</view>
       <view class="course-desc">点击开始学习</view>
       <view class="course-arrow"><text class="icon i-arrow-right-w"/></view>
+
+      <!-- 管理员操作角标（内置学科不渲染；catchtap 阻止冒泡到卡片跳转） -->
+      <view class="admin-tools" wx:if="{{isAdmin && !item.builtin}}">
+        <view
+          class="adm-btn"
+          catchtap="renameCourse"
+          data-id="{{item.id}}"
+          data-name="{{item.name}}"
+          data-builtin="{{item.builtin}}"
+        >✎</view>
+        <view
+          class="adm-btn adm-btn-danger"
+          catchtap="removeCourse"
+          data-id="{{item.id}}"
+          data-name="{{item.name}}"
+          data-builtin="{{item.builtin}}"
+        >✕</view>
+      </view>
+    </view>
+
+    <!-- 管理员：新建学科入口 -->
+    <view class="course-card add-card" wx:if="{{isAdmin}}" bindtap="addCourse">
+      <view class="add-icon">＋</view>
+      <view class="course-name">新建学科</view>
+      <view class="course-desc">添加一门新课程</view>
     </view>
   </view>
 

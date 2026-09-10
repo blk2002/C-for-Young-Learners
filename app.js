@@ -22,6 +22,37 @@ App({
       this.globalData.userInfo = userInfo;
       this.globalData.isLoggedIn = true;
     }
+
+    // 学科唯一真源是云端 courses 集合，启动即水合（失败时保留下方硬编码兜底）
+    this.loadCourses();
+  },
+
+  // 从云端 courses 集合拉取学科列表，合并进 globalData.courses
+  // 合并策略：以云端为准，但 python / cpp 两门内置学科强制保留——
+  // 云端没 seed、集合被清空时也不会出现"内置学科消失"
+  async loadCourses() {
+    const builtinFallback = this.globalData.courses.filter(c => c.builtin);
+    try {
+      const res = await wx.cloud.database().collection('courses')
+        .orderBy('order', 'asc')
+        .limit(50)
+        .get();
+      if (res.data && res.data.length) {
+        const cloudCourses = res.data.map(c => ({
+          id: c._id,
+          name: c.name,
+          icon: c.icon || 'i-book',
+          color: c.color || '#5B67F1',
+          builtin: !!c.builtin
+        }));
+        // 内置学科兜底：云端缺哪门补哪门（按 fallback 的顺序插到最前面）
+        const missing = builtinFallback.filter(fb => !cloudCourses.some(c => c.id === fb.id));
+        this.globalData.courses = missing.concat(cloudCourses);
+      }
+      // 集合为空 / 拉取失败时不动 globalData（保留兜底，防白屏）
+    } catch (e) {
+      console.warn('学科列表拉取失败，沿用兜底', e);
+    }
   },
   checkLogin() {
     return this.globalData.isLoggedIn && this.globalData.userInfo;
@@ -79,13 +110,15 @@ App({
   onShow() {
     // 从后台切回前台时检查一次有效期
     this.enforceValidity();
+    // 前台回来时刷新一次学科（管理员可能刚在别端增删过）
+    this.loadCourses();
   },
   globalData: {
     userInfo: null,
     isLoggedIn: false,
     courses: [
-      { id: 'python', name: 'Python', icon: 'i-code', color: '#45B0E0' },
-      { id: 'cpp', name: 'C++', icon: 'i-chip', color: '#4E6EF2' }
+      { id: 'python', name: 'Python', icon: 'i-code', color: '#45B0E0', builtin: true },
+      { id: 'cpp', name: 'C++', icon: 'i-chip', color: '#4E6EF2', builtin: true }
     ]
   }
 });

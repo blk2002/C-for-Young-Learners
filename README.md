@@ -142,15 +142,8 @@ c_young_learn/
 │   ├── exam-practice/       # 学生端-等级考试练习页
 │   ├── exam-wrong/          # 学生端-等级考试错题类型选择
 │   ├── exam-wrong-levels/   # 学生端-等级考试错题等级列表
-│   ├── admin/               # 管理后台（学生管理/课程管理/习题管理）
-│   ├── admin-student-edit/  # 学生账号创建/编辑（续期/重置密码）
-│   ├── admin-edit/          # 内容编辑页（章节/知识点）
-│   ├── admin-exercises/     # 习题管理-章节列表
-│   ├── admin-lessons/       # 习题管理-知识点列表
-│   ├── admin-exercise-edit/ # 习题管理-题目编辑
-│   ├── admin-exam-type/     # 等级考试类型管理
-│   ├── admin-exam-levels/   # 等级考试等级管理
-│   └── admin-exam-edit/     # 等级考试题目编辑
+│   ├── admin/               # 管理后台（仅学生账号管理；课程内容统一在 content-workbench 维护）
+│   └── admin-student-edit/  # 学生账号创建/编辑（续期/重置密码）
 └── cloudfunctions/          # 云函数目录
     ├── userLogin/           # 登录（含有效期校验）
     ├── changePassword/      # 修改密码

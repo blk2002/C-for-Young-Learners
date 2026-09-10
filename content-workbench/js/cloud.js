@@ -31,5 +31,12 @@
   const pullTree = password => call('getCourseTree', { password });
   const pushStructure = payload => call('importContent', payload);
   const pushQuestions = payload => call('importContent', payload);
-  return { init, ensureLogin, call, pullTree, pushStructure, pushQuestions };
+  // 学科 registry（courses 集合）：学科只在小程序端增删改，工作台拉取时合并进来
+  async function listCourses() {
+    init();
+    const db = app.database();
+    const res = await db.collection('courses').limit(50).get();
+    return res.data || [];
+  }
+  return { init, ensureLogin, call, pullTree, pushStructure, pushQuestions, listCourses };
 });

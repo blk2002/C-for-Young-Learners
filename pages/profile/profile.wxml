@@ -71,8 +71,8 @@
     <view class="menu-item admin-item" bindtap="goToAdmin" wx:if="{{isAdmin}}">
       <view class="menu-icon"><text class="icon i-tool"/></view>
       <view class="menu-body">
-        <view class="menu-text">内容管理</view>
-        <view class="menu-sub">管理学生账号、课程内容</view>
+        <view class="menu-text">管理后台</view>
+        <view class="menu-sub">管理学生账号</view>
       </view>
       <view class="menu-arrow"><text class="icon i-chevron"/></view>
     </view>

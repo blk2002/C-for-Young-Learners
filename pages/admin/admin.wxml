@@ -2,38 +2,13 @@
 <view class="container">
   <view class="header">
     <view class="title"><text class="icon i-tool-w"/> 管理后台</view>
-    <view class="subtitle">学生账号与课程内容管理</view>
-  </view>
-
-  <!-- Tab切换 -->
-  <view class="tabs">
-    <view
-      class="tab {{activeTab === 'users' ? 'active' : ''}}"
-      data-tab="users"
-      bindtap="switchTab"
-    >
-      <text class="icon i-users"/> 学生管理
-    </view>
-    <view
-      class="tab {{activeTab === 'chapters' ? 'active' : ''}}"
-      data-tab="chapters"
-      bindtap="switchTab"
-    >
-      <text class="icon i-book"/> 课程管理
-    </view>
-    <view
-      class="tab {{activeTab === 'exercises' ? 'active' : ''}}"
-      data-tab="exercises"
-      bindtap="switchTab"
-    >
-      <text class="icon i-edit"/> 习题管理
-    </view>
+    <view class="subtitle">学生账号管理</view>
   </view>
 
   <view class="loading" wx:if="{{loading}}">加载中...</view>
 
   <!-- 学生管理 -->
-  <view class="content" wx:elif="{{activeTab === 'users'}}">
+  <view class="content">
     <!-- 新建按钮 -->
     <view class="add-btn" bindtap="goToCreateStudent">+ 新建学生账号</view>
 
@@ -90,96 +65,6 @@
       <view class="icon"><text class="icon i-users"/></view>
       <view class="text">{{studentList.length > 0 ? '该分类下没有学生' : '还没有学生账号'}}</view>
       <view class="text" style="font-size: 24rpx; margin-top: 10rpx;">点击上方"新建学生账号"添加</view>
-    </view>
-  </view>
-
-  <!-- 课程管理 -->
-  <view class="content" wx:elif="{{activeTab === 'chapters'}}">
-    <!-- 课程选择 -->
-    <view class="course-selector">
-      <view
-        class="course-tab {{selectedCourse === item.id ? 'active' : ''}}"
-        wx:for="{{courses}}"
-        wx:key="id"
-        data-id="{{item.id}}"
-        data-name="{{item.name}}"
-        bindtap="switchCourse"
-      >
-        <text class="icon {{item.icon}}"/> {{item.name}}
-      </view>
-    </view>
-
-    <view class="chapter-summary">
-      <view class="summary-left">
-        <view class="summary-icon"><text class="icon i-book-w"/></view>
-        <view class="summary-info">
-          <view class="summary-title">{{currentCourseName}} 章节</view>
-          <view class="summary-sub">当前 {{chaptersMap[selectedCourse] ? chaptersMap[selectedCourse].length : 0}} 个章节</view>
-        </view>
-      </view>
-      <view class="summary-btn" bindtap="addChapter">
-        <text class="summary-plus">+</text> 新增章节
-      </view>
-    </view>
-
-    <view class="chapter-list">
-      <view class="chapter-card" wx:for="{{chaptersMap[selectedCourse]}}" wx:key="_id">
-        <view class="chapter-info">
-          <view class="chapter-title">{{item.title}}</view>
-          <view class="chapter-order">序号：{{item.order}}</view>
-        </view>
-        <view class="chapter-actions">
-          <view class="action-btn blue" data-id="{{item._id}}" data-title="{{item.title}}" bindtap="goToLessons">管理知识点</view>
-          <view class="action-btn green" data-id="{{item._id}}" bindtap="editChapter">编辑</view>
-          <view class="action-btn red" data-id="{{item._id}}" bindtap="deleteChapter">删除</view>
-        </view>
-      </view>
-
-      <view class="empty-state" wx:if="{{!chaptersMap[selectedCourse] || chaptersMap[selectedCourse].length === 0}}">
-        <view class="icon"><text class="icon i-book-open"/></view>
-        <view class="text">暂无章节</view>
-        <view class="text" style="font-size: 24rpx; margin-top: 10rpx;">点击上方"新增章节"添加</view>
-      </view>
-    </view>
-  </view>
-
-  <!-- 习题管理 -->
-  <view class="content" wx:elif="{{activeTab === 'exercises'}}">
-    <!-- 课程选择 -->
-    <view class="course-selector">
-      <view
-        class="course-tab {{exerciseCourse === item.id ? 'active' : ''}}"
-        wx:for="{{courses}}"
-        wx:key="id"
-        data-id="{{item.id}}"
-        data-name="{{item.name}}"
-        bindtap="switchExerciseCourse"
-      >
-        <text class="icon {{item.icon}}"/> {{item.name}}
-      </view>
-    </view>
-
-    <view class="section-header">
-      <view class="section-title">{{exerciseCourseName}} - 习题管理</view>
-    </view>
-
-    <!-- 入口卡片 -->
-    <view class="exercise-entry-card" bindtap="goToChapterExercises">
-      <view class="entry-icon"><text class="icon i-book"/></view>
-      <view class="entry-content">
-        <view class="entry-title">章节知识点习题</view>
-        <view class="entry-desc">按章节和知识点组织独立练习题</view>
-      </view>
-      <view class="entry-arrow"><text class="icon i-chevron"/></view>
-    </view>
-
-    <view class="exercise-entry-card" bindtap="goToExamExercises">
-      <view class="entry-icon"><text class="icon i-exam"/></view>
-      <view class="entry-content">
-        <view class="entry-title">等级考试习题</view>
-        <view class="entry-desc">等级考试真题题库管理</view>
-      </view>
-      <view class="entry-arrow"><text class="icon i-chevron"/></view>
     </view>
   </view>
 

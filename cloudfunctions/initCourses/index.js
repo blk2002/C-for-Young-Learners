@@ -189,6 +189,29 @@ int main() {
   }
 };
 
+// ============ 学科 registry seed ============
+// 学科唯一真源是 courses 集合；内置学科也入库并标 builtin（不可删/不可改名由 manageCourses 校验）。
+// 仅当缺失时补入（幂等），不会覆盖已有文档。
+const BUILTIN_COURSE_SEED = [
+  { _id: 'python', name: 'Python', icon: 'i-code', color: '#45B0E0', order: 1, builtin: true },
+  { _id: 'cpp', name: 'C++', icon: 'i-chip', color: '#4E6EF2', order: 2, builtin: true }
+];
+
+async function seedCoursesRegistry() {
+  const seeded = [];
+  for (const c of BUILTIN_COURSE_SEED) {
+    try {
+      await db.collection('courses').doc(c._id).get();
+      // 已存在则跳过，不动它
+    } catch (e) {
+      const { _id, ...data } = c;
+      await db.collection('courses').doc(_id).set({ data: { ...data, createdAt: db.serverDate() } });
+      seeded.push(c.name);
+    }
+  }
+  return seeded;
+}
+
 exports.main = async (event, context) => {
   // 安全开关：必须显式传 confirm: true 才会执行（会清空并重建课程内容）
   if (!event || event.confirm !== true) {
@@ -201,6 +224,14 @@ exports.main = async (event, context) => {
   const stats = { chapters: 0, lessons: 0 };
 
   try {
+    // 0. 先把内置学科补进 courses 集合（缺哪门补哪门）
+    let seededCourses = [];
+    try {
+      seededCourses = await seedCoursesRegistry();
+    } catch (e) {
+      console.warn('seed courses 集合失败（可能集合未创建）', e);
+    }
+
     for (const courseId of Object.keys(COURSES)) {
       const course = COURSES[courseId];
 
@@ -255,7 +286,8 @@ exports.main = async (event, context) => {
 
     return {
       success: true,
-      message: `已初始化 ${stats.chapters} 个章节、${stats.lessons} 个知识点`,
+      message: `已初始化 ${stats.chapters} 个章节、${stats.lessons} 个知识点`
+        + (seededCourses.length ? `；courses 集合补入学科：${seededCourses.join('、')}` : ''),
       chapters: stats.chapters,
       lessons: stats.lessons
     };

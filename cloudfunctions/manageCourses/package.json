@@ -1,0 +1,9 @@
+{
+  "name": "manageCourses",
+  "version": "1.0.0",
+  "description": "学科管理：新增/删除（级联清理）/改名，仅管理员",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  }
+}

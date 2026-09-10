@@ -2,21 +2,15 @@
 <view class="container">
   <!-- 顶部课程切换 -->
   <view class="course-tabs">
-    <view 
-      class="tab-item {{currentCourse === 'cpp' ? 'active' : ''}}" 
+    <view
+      class="tab-item {{currentCourse === item.id ? 'active' : ''}}"
+      wx:for="{{courses}}"
+      wx:key="id"
       bindtap="switchCourse"
-      data-course="cpp"
+      data-course="{{item.id}}"
     >
-      <text class="tab-icon"><text class="icon {{currentCourse === 'cpp' ? 'i-chip-w' : 'i-chip'}}"/></text>
-      <text class="tab-text">C++</text>
-    </view>
-    <view 
-      class="tab-item {{currentCourse === 'python' ? 'active' : ''}}" 
-      bindtap="switchCourse"
-      data-course="python"
-    >
-      <text class="tab-icon"><text class="icon {{currentCourse === 'python' ? 'i-code-w' : 'i-code'}}"/></text>
-      <text class="tab-text">Python</text>
+      <text class="tab-icon"><text class="icon {{currentCourse === item.id ? item.icon + '-w' : item.icon}}"/></text>
+      <text class="tab-text">{{item.name}}</text>
     </view>
   </view>
 

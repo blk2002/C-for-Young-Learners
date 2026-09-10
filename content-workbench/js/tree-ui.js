@@ -11,9 +11,8 @@
   const uid = p => p + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   const draft = () => WB.state.load();
   const $ = id => document.getElementById(id);
-  // 内置学科（python / cpp）：默认存在，不可删除、不可改名
+  // 内置学科（python / cpp）：由 state.js 兜底补齐；增删改在小程序端（管理员）
   const isBuiltin = id => !!(WB.state.isBuiltinCourse && WB.state.isBuiltinCourse(id));
-  const BUILTIN_TIP = 'Python 和 C++ 是内置学科，不能删除，也不能改名。';
 
   function persist(d) { WB.state.save(d); render(); if (window.WBRefreshStat) WBRefreshStat(); }
 
@@ -61,10 +60,13 @@
     if (extra && extra.count != null) {
       const c = document.createElement('span'); c.className = 'cnt'; c.textContent = extra.count; el.appendChild(c);
     }
-    // 内置学科：不挂 ✎ / ✕，改成一个「内置」标记
-    if (level === 'course' && isBuiltin(ids.courseId)) {
-      const lock = document.createElement('span'); lock.className = 'wb-node-lock'; lock.textContent = '内置';
-      el.appendChild(lock);
+    // 学科的增删改在小程序端（管理员）完成，工作台只编辑内容；
+    // 内置学科保留「内置」标记作提示
+    if (level === 'course') {
+      if (isBuiltin(ids.courseId)) {
+        const lock = document.createElement('span'); lock.className = 'wb-node-lock'; lock.textContent = '内置';
+        el.appendChild(lock);
+      }
     } else {
       const edit = document.createElement('span'); edit.className = 'wb-node-act'; edit.textContent = '✎';
       edit.onclick = e => { e.stopPropagation(); rename(ids, level); };
@@ -113,26 +115,18 @@
     return course.chapters.find(x => x.key === ids.chapterKey).lessons.find(x => x.key === ids.lessonKey);
   }
 
+  // 改名只支持章节 / 知识点；学科改名在小程序端（管理员）
   function rename(ids, level) {
-    if (level === 'course' && isBuiltin(ids.courseId)) { alert(BUILTIN_TIP); return; }
     const d = draft();
     const node = findNode(d, ids, level);
-    if (level === 'course') {
-      const name = prompt('学科名称', node.name); if (!name) return;
-      node.name = name;
-    } else {
-      const title = prompt('新标题', node.title); if (!title) return;
-      node.title = title;
-    }
+    const title = prompt('新标题', node.title); if (!title) return;
+    node.title = title;
     persist(d);
   }
 
   function remove(ids, level) {
-    // 内置学科兜底：不管从哪个入口进来都不能删
-    if (level === 'course' && isBuiltin(ids.courseId)) { alert(BUILTIN_TIP); return; }
     if (!confirm('确认删除？已入库的节点将在下次「同步结构与内容」时从云端删除。')) return;
     const d = draft();
-    let orphanExam = null;   // 学科被删时它名下的考试题（独立实体，不跟随删除）
     if (level === 'lesson') {
       const ch = d.tree[ids.courseId].chapters.find(x => x.key === ids.chapterKey);
       const i = ch.lessons.findIndex(x => x.key === ids.lessonKey);
@@ -141,7 +135,7 @@
       if (ls.cloudId) (d._deletedLessons = d._deletedLessons || []).push({ cloudId: ls.cloudId, courseId: ids.courseId });
       ch.lessons.splice(i, 1); reOrder(ch.lessons);
       if (selected && selected.lessonKey === ids.lessonKey) selected = null;
-    } else if (level === 'chapter') {
+    } else {
       const course = d.tree[ids.courseId];
       const i = course.chapters.findIndex(x => x.key === ids.chapterKey);
       const ch = course.chapters[i];
@@ -149,24 +143,8 @@
       ch.lessons.forEach(ls => { if (ls.cloudId) (d._deletedLessons = d._deletedLessons || []).push({ cloudId: ls.cloudId, courseId: ids.courseId }); });
       course.chapters.splice(i, 1); reOrder(course.chapters);
       if (selected && selected.chapterKey === ids.chapterKey) selected = null;
-    } else {
-      const course = d.tree[ids.courseId];
-      course.chapters.forEach(ch => {
-        if (ch.cloudId) (d._deletedChapters = d._deletedChapters || []).push({ cloudId: ch.cloudId, courseId: ids.courseId });
-        ch.lessons.forEach(ls => { if (ls.cloudId) (d._deletedLessons = d._deletedLessons || []).push({ cloudId: ls.cloudId, courseId: ids.courseId }); });
-      });
-      // 考试题是独立实体：不挂在知识点/章节/学科下，删学科不连带删它，
-      // 这些题会变成草稿里的孤儿 → 提示用户它们还在、仍可单独同步。
-      const groups = (d.examQuestions || []).filter(g => g.courseId === ids.courseId);
-      const n = groups.reduce((s, g) => s + (g.questions || []).length, 0);
-      if (n) orphanExam = { groups: groups.length, n };
-      delete d.tree[ids.courseId];
-      selected = null; currentCourse = null;
     }
     persist(d);
-    if (orphanExam) {
-      alert(`学科已删除。\n它名下的 ${orphanExam.groups} 组考试题（共 ${orphanExam.n} 道）是独立的，未被删除，\n仍可通过「同步题目」单独同步。\n如需一并清空：先恢复/新建该学科，到题目页逐题删除，再同步题目。`);
-    }
   }
 
   function addChapter(courseId) {
@@ -201,63 +179,6 @@
     persist(d);
   }
 
-  // ===== 新建学科弹窗 =====
-  function openNewCourseModal() {
-    const mask = document.createElement('div'); mask.className = 'wb-modal-mask';
-    mask.innerHTML =
-      '<div class="wb-modal"><div class="wb-modal-hd"><h3>新建学科</h3><span class="x">关闭</span></div>' +
-      '<div class="wb-modal-bd">' +
-      '<div class="wb-grid2">' +
-      '<div><label class="wb-fld-lb">显示名称</label><input class="wb-inp" id="nc-name" placeholder="如 Scratch"></div>' +
-      '<div><label class="wb-fld-lb">课程 id（英文，入库后不可改）</label><input class="wb-inp" id="nc-id" placeholder="scratch"></div>' +
-      '</div><div class="wb-grid2">' +
-      '<div><label class="wb-fld-lb">图标（小程序 icons）</label><input class="wb-inp" id="nc-icon" value="i-book"></div>' +
-      '<div><label class="wb-fld-lb">主题色</label><input class="wb-inp" id="nc-color" value="#5B67F1"></div>' +
-      '</div>' +
-      '<label class="wb-fld-lb">创建后把这段粘到小程序 app.js 的 globalData.courses，学生端才会显示</label>' +
-      '<div class="wb-snip" id="nc-snip"></div>' +
-      '<div style="display:flex;gap:8px;margin-top:12px;">' +
-      '<button class="wb-btn" id="nc-copy">复制代码</button>' +
-      '<button class="wb-btn primary" id="nc-ok" style="margin-left:auto;">创建学科</button></div>' +
-      '</div></div>';
-    document.body.appendChild(mask);
-    const close = () => mask.remove();
-    mask.querySelector('.x').onclick = close;
-    mask.onclick = e => { if (e.target === mask) close(); };
-    const snip = () => "{ id: '" + document.getElementById('nc-id').value + "',\n  name: '" + document.getElementById('nc-name').value +
-      "',\n  icon: '" + document.getElementById('nc-icon').value + "',\n  color: '" + document.getElementById('nc-color').value + "' }";
-    document.getElementById('nc-snip').textContent = snip();
-    ['nc-name', 'nc-id', 'nc-icon', 'nc-color'].forEach(id => { document.getElementById(id).oninput = () => { document.getElementById('nc-snip').textContent = snip(); }; });
-    document.getElementById('nc-name').oninput = e => {
-      const idEl = document.getElementById('nc-id');
-      if (!idEl.dataset.touched) idEl.value = slug(e.target.value);
-      document.getElementById('nc-snip').textContent = snip();
-    };
-    document.getElementById('nc-id').oninput = e => { e.target.dataset.touched = '1'; document.getElementById('nc-snip').textContent = snip(); };
-    document.getElementById('nc-copy').onclick = () => {
-      const t = document.getElementById('nc-snip').textContent;
-      if (navigator.clipboard) navigator.clipboard.writeText(t).then(() => alert('配置代码已复制'), () => prompt('手动复制：', t));
-      else prompt('手动复制：', t);
-    };
-    document.getElementById('nc-ok').onclick = () => {
-      const name = document.getElementById('nc-name').value.trim();
-      const id = (document.getElementById('nc-id').value.trim() || slug(name) || 'course-' + uid('x'));
-      if (!name) { alert('请填学科名称'); return; }
-      if (isBuiltin(id)) { alert('python / cpp 是内置学科的保留 id，请换一个（如 scratch）'); return; }
-      const d = draft();
-      if (d.tree[id]) { alert('该学科已存在'); return; }
-      d.tree[id] = { name, chapters: [], icon: document.getElementById('nc-icon').value, color: document.getElementById('nc-color').value };
-      WB.state.save(d);
-      close();
-      setCurrentCourse(id);
-      alert('学科「' + name + '」已创建。\n下一步：把教程/大纲粘进右边素材框 → 整树模式 → 开始 AI 整理。');
-    };
-  }
-  function slug(name) {
-    const s = String(name || '').toLowerCase().replace(/[^a-z0-9]+/g, '').trim();
-    return s || '';
-  }
-
   // ===== 渲染 =====
   function render() {
     const host = document.getElementById('wb-tree');
@@ -285,39 +206,18 @@
       o.appendChild(document.createTextNode(d.tree[id].name || id));
       if (id === cid) { const t = document.createElement('span'); t.className = 'tick'; t.textContent = '当前'; o.appendChild(t); }
       if (isBuiltin(id)) {
-        // 内置学科：不显示删除，改成「内置」标记
+        // 内置学科：加「内置」标记（学科的增删改在小程序端，工作台不再提供删除）
         const bi = document.createElement('span'); bi.className = 'wb-course-opt-del ro'; bi.textContent = '内置';
-        bi.title = '内置学科，不可删除';
+        bi.title = '内置学科';
         o.appendChild(bi);
-      } else {
-        // 每个选项右边一个删除按钮（即便只剩一个学科，列表里仍能删）
-        const delOpt = document.createElement('span'); delOpt.className = 'wb-course-opt-del'; delOpt.textContent = '✕';
-        delOpt.title = '删除该学科';
-        delOpt.onclick = e => { e.stopPropagation(); menu.classList.add('hidden'); remove({ courseId: id }, 'course'); };
-        o.appendChild(delOpt);
       }
       o.onclick = () => { menu.classList.add('hidden'); setCurrentCourse(id); };
       menu.appendChild(o);
     });
     sel.onclick = () => menu.classList.toggle('hidden');
-    // 新增：当前学科卡片右侧的删除按钮（不展开菜单就能删，符合"单学科时也能删"的诉求）
-    const delCur = document.createElement('button'); delCur.className = 'wb-side-del'; delCur.textContent = '✕';
-    if (isBuiltin(cid)) {
-      // 不用 disabled 属性：Chrome 对 disabled 元素不显示 title 气泡，用户会以为按钮坏了。
-      // 改成灰化 + 点击弹提示；remove() 里还有兜底拦截，真删不掉。
-      delCur.classList.add('is-disabled');
-      delCur.setAttribute('aria-disabled', 'true');
-      delCur.title = 'Python / C++ 是内置学科，不可删除';
-    } else {
-      delCur.title = '删除当前学科';
-    }
-    delCur.onclick = e => { e.stopPropagation(); if (cid) remove({ courseId: cid }, 'course'); };
     const selRow = document.createElement('div'); selRow.className = 'wb-side-sel-row';
-    selRow.appendChild(sel); selRow.appendChild(delCur);
+    selRow.appendChild(sel);
     hd.appendChild(label); hd.appendChild(selRow); hd.appendChild(menu);
-    const btnNew = document.createElement('button'); btnNew.className = 'wb-btn-dash'; btnNew.textContent = '＋ 新建学科';
-    btnNew.onclick = () => openNewCourseModal();
-    hd.appendChild(btnNew);
     host.appendChild(hd);
 
     // 搜索
@@ -358,7 +258,7 @@
     scroll.innerHTML = '';
     if (!cid) {
       const hint = document.createElement('div'); hint.className = 'wb-tree-empty';
-      hint.textContent = '还没有学科。点上方「＋ 新建学科」开始，或「从云端拉取」读取已有课程。';
+      hint.textContent = '还没有学科。请管理员在小程序首页「新建学科」，然后回来点「从云端拉取」读取。';
       scroll.appendChild(hint);
       return;
     }

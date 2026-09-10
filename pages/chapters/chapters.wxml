@@ -14,8 +14,8 @@
   <!-- 空状态 -->
   <view class="empty-state" wx:elif="{{chapters.length === 0}}">
     <view class="icon"><text class="icon i-book-open"/></view>
-    <view class="text">暂无课程章节</view>
-    <view class="text" style="font-size: 24rpx; margin-top: 10rpx;">请联系老师添加课程内容</view>
+    <view class="text">内容准备中</view>
+    <view class="text" style="font-size: 24rpx; margin-top: 10rpx;">该学科尚未录入章节，老师可在内容工作台添加</view>
   </view>
 
   <!-- 章节列表 -->

@@ -20,6 +20,28 @@
   async function pull() {
     const d = draft();
     if (!ensurePassword(d)) return;
+    // 先合并学科 registry（courses 集合）：学科只在小程序端增删改，
+    // 小程序新建的「空学科」也能在这里出现、可编辑章节/知识点。
+    // 失败不阻塞课程树拉取（老项目可能还没建 courses 集合）。
+    try {
+      const registry = await WB.cloud.listCourses();
+      (registry || []).forEach(c => {
+        if (c._id && !d.tree[c._id]) {
+          d.tree[c._id] = {
+            name: c.name || c._id,
+            icon: c.icon || 'i-book',
+            color: c.color || '#5B67F1',
+            chapters: []
+          };
+        } else if (c._id && d.tree[c._id]) {
+          // 已有学科：名称/主题色以云端 registry 为准（改名在小程序端发生）
+          if (c.name) d.tree[c._id].name = c.name;
+          if (c.color) d.tree[c._id].color = c.color;
+          if (c.icon) d.tree[c._id].icon = c.icon;
+        }
+      });
+    } catch (e) { console.warn('学科 registry 拉取失败，跳过', e); }
+
     let res;
     try { res = await WB.cloud.pullTree(d.password); }
     catch (e) { alert('拉取失败：' + e.message); return; }

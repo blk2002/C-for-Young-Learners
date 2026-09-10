@@ -82,6 +82,42 @@ const users = {
 
 // 课程相关操作
 const courses = {
+  /* ========== 学科 registry（courses 集合，唯一真源） ========== */
+
+  // 拉取全部学科（直读集合，按 order 排序）
+  list() {
+    return wx.cloud.database().collection('courses')
+      .orderBy('order', 'asc')
+      .limit(50)
+      .get();
+  },
+
+  // 新建学科（仅管理员；写操作走 manageCourses 云函数）
+  add(operatorId, name) {
+    return wx.cloud.callFunction({
+      name: 'manageCourses',
+      data: { action: 'add', operatorId, name }
+    });
+  },
+
+  // 删除学科（仅管理员；云端级联清理该学科全部内容与学生数据）
+  remove(operatorId, courseId) {
+    return wx.cloud.callFunction({
+      name: 'manageCourses',
+      data: { action: 'remove', operatorId, courseId }
+    });
+  },
+
+  // 学科改名（仅管理员；内置学科不可改名）
+  rename(operatorId, courseId, name) {
+    return wx.cloud.callFunction({
+      name: 'manageCourses',
+      data: { action: 'update', operatorId, courseId, name }
+    });
+  },
+
+  /* ========== 章节与知识点（内容层） ========== */
+
   // 获取课程章节列表
   getChapters(courseId) {
     return collection('chapters')
